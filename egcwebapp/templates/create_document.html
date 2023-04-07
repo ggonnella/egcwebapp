@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>Create Document</h2>
+  <h2>Create Document Record</h2>
   <form method="POST" enctype="multipart/form-data">
     {{ form.csrf_token }}
     {{ form.document_id.label }} {{ form.document_id(class_="form-control" + (' has-error' if form.document_id.errors else '') ) }}

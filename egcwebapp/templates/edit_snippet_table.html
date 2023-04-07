@@ -1,15 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Edit Snippet/Table</h1>
-    <form method="POST">
+    <h1>Edit Document Extract Record</h1>
+    <form method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
-        {{ form.record_type.label }}: {{ form.record_type }}<br>
-        {{ form.document_id.label }}: {{ form.document_id }}<br>
-        {{ form.id.label }}: {{ form.id }}<br>
-        {{ form.text.label }}: {{ form.text }}<br>
-        {{ form.table_ref.label }}: {{ form.table_ref }}<br>
-        <input type="submit" value="Save Changes">
+        {% include 'form_fields.html' %}
+        <input type="submit" value="Save">
     </form>
 {% endblock %}
 
