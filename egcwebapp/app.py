@@ -90,6 +90,14 @@ def delete_document(document_id):
     egc_data.delete_document(document_id)
     return redirect(url_for('document_list'))
 
+@app.route('/extracts')
+def extract_list():
+  if egc_data is None:
+    return redirect(url_for('load_egc_file'))
+  else:
+    extracts = egc_data.get_extracts()
+    return render_template('extract_list.html', extracts=extracts)
+
 @app.route('/extracts/create', methods=['GET', 'POST'])
 def create_extract():
   if egc_data is None:

@@ -2,25 +2,35 @@
 
 {% block content %}
     <h1>Document Extracts Records</h1>
-    <a href="{{ url_for('create_extract') }}">Create Record</a>
-    <table>
-        <tr>
-            <th>Record Type</th>
-            <th>ID</th>
-            <th>PMID</th>
-            <th>Text / Table Reference</th>
-            <th>Actions</th>
-        </tr>
-        {% for extract in extracts %}
-            <tr>
-                <td>{{ extract.record_type }}</td>
-                <td>{{ extract.id }}</td>
-                <td>{{ extract.document_id.item }}</td>
-                <td>{{ extract.text if extract.record_type == "S" else extract.table_ref }}</td>
-                <td>
-                    <a href="{{ urlfor('edit_extract', record_id=extract.id) }}">Edit</a>
-                </td>
-            </tr>
-        {% endfor %}
+    <a href="{{ url_for('create_extract') }}" class="btn btn-primary create">New Record</a>
+    <table id="extract-table" class="table table-striped table-hover">
+        <thead>
+          <tr>
+              <th>Record Type</th>
+              <th>ID</th>
+              <th>PMID</th>
+              <th>Text / Table Reference</th>
+              <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for extract in extracts %}
+              <tr>
+                  <td>{{ extract.record_type }}</td>
+                  <td>{{ extract.id }}</td>
+                  <td>{{ extract.document_id.item }}</td>
+                  <td style:"white-space: nowrap;"> <span class="document-id" style="display: inline;">{{ extract.document_id.item }}</span><span class="document-info" style="display: inline;">&nbsp;&#9432; </span> </td>
+                  <td>{{ extract.text if extract.record_type == "S" else extract.table_ref }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_extract', record_id=extract.id.item) }}"><i class="fas fa-edit"></i></a>
+                        <form action="{{ url_for('delete_extract', record_id=extract.id.item) }}" method="post" style="display: inline-block;">
+                          <input type="hidden" name="_method" value="DELETE">
+                          <button type="submit" class="btn btn-link"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
+              </tr>
+          {% endfor %}
+        </tbody>
     </table>
+  <script src="{{ url_for('static', filename='js/document_list.js') }}"></script>
 {% endblock %}
