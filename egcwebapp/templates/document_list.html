@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Documents</h1>
-    <a href="{{ url_for('create_document') }}" class="btn btn-primary create">New Document</a>
+    <a href="{{ url_for('create_document') }}" class="btn btn-primary create">New Record</a>
     <table id="document-table" class="table table-striped table-hover">
         <thead>
             <tr>
@@ -34,7 +34,7 @@
         </tbody>
     </table>
 
-  <script src="{{ url_for('static', filename='js/document_list.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/document_list.mjs') }}" type="module"></script>
 
 {% endblock %}
 
