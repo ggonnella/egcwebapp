@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Create Document</h2>
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    {{ form.document_id.label }} {{ form.document_id(class_="form-control" + (' has-error' if form.document_id.errors else '') ) }}
+    {% if form.document_id.errors %}
+      <ul>
+        {% for error in form.document_id.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {{ form.link.label }} {{ form.link(class_="form-control" + (' has-error' if form.link.errors else '') ) }}
+    {% if form.link.errors %}
+      <ul>
+        {% for error in form.link.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <button type="submit">Create Document</button>
+  </form>
+{% endblock %}
+

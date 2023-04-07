@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Load EGC File</h1>
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select EGC file:</label>
+            <input type="file" name="file" id="file" class="form-control-file">
+        </div>
+        <button type="submit" class="btn btn-primary">Load</button>
+    </form>
+{% endblock %}
+

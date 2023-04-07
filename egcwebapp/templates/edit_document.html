@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Edit Document</h1>
+    <form method="POST">
+        {{ form.csrf_token }}
+        {{ form.document_id.label }}: {{ form.document_id }}<br>
+        {% if form.document_id.errors %}
+            <ul>
+                {% for error in form.document_id.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {{ form.link.label }}: {{ form.link }}<br>
+        {% if form.link.errors %}
+            <ul>
+                {% for error in form.link.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <input type="submit" value="Save Changes">
+    </form>
+{% endblock %}

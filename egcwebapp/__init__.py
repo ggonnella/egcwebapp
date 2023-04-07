@@ -1,0 +1,1 @@
+from egcwebapp import app

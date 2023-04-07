@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Create Snippet/Table</h1>
+    <form method="POST">
+        {{ form.csrf_token }}
+        {{ form.record_type.label }}: {{ form.record_type }}<br>
+        {{ form.document_id.label }}: {{ form.document_id }}<br>
+        {{ form.id.label }}: {{ form.id }}<br>
+        {{ form.text.label }}: {{ form.text }}<br>
+        {{ form.table_ref.label }}: {{ form.table_ref }}<br>
+        <input type="submit" value="Create">
+    </form>
+{% endblock %}
+

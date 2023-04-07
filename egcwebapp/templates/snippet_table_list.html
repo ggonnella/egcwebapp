@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Snippet & Table Records</h1>
+    <a href="{{ url_for('create_snippet_table') }}">Create Snippet/Table</a>
+    <table>
+        <tr>
+            <th>Record Type</th>
+            <th>ID</th>
+            <th>PMID</th>
+            <th>Text / Table Reference</th>
+            <th>Actions</th>
+        </tr>
+        {% for snippet_table in snippet_tables %}
+            <tr>
+                <td>{{ snippet_table.record_type }}</td>
+                <td>{{ snippet_table.id }}</td>
+                <td>{{ snippet_table.document_id.item }}</td>
+                <td>{{ snippet_table.text if snippet_table.record_type == "S" else snippet_table.table_ref }}</td>
+                <td>
+                    <a href="{{ urlfor('edit_snippet_table', record_id=snippet_table.id) }}">Edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
