@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Document Extracts Records</h1>
+    <a href="{{ url_for('create_extract') }}">Create Record</a>
+    <table>
+        <tr>
+            <th>Record Type</th>
+            <th>ID</th>
+            <th>PMID</th>
+            <th>Text / Table Reference</th>
+            <th>Actions</th>
+        </tr>
+        {% for extract in extracts %}
+            <tr>
+                <td>{{ extract.record_type }}</td>
+                <td>{{ extract.id }}</td>
+                <td>{{ extract.document_id.item }}</td>
+                <td>{{ extract.text if extract.record_type == "S" else extract.table_ref }}</td>
+                <td>
+                    <a href="{{ urlfor('edit_extract', record_id=extract.id) }}">Edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

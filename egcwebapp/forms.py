@@ -17,7 +17,7 @@ class DocumentForm(Form):
         self.old_id = kwargs.pop('old_id', None)
         self.egc_data = kwargs.pop('egc_data', None)
 
-class SnippetTableForm(Form):
+class ExtractForm(Form):
     record_id = StringField('Record ID',
         [validators.Length(min=1, max=50), validators.DataRequired()])
     record_type = SelectField('Record Type',

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, abort
-from egcwebapp.forms import DocumentForm, SnippetTableForm
+from egcwebapp.forms import DocumentForm, ExtractForm
 from egcwebapp.egc_data import EGCData
 from pathlib import Path
 import os
@@ -90,12 +90,12 @@ def delete_document(document_id):
     egc_data.delete_document(document_id)
     return redirect(url_for('document_list'))
 
-@app.route('/snippet_tables/create', methods=['GET', 'POST'])
-def create_snippet_table():
+@app.route('/extracts/create', methods=['GET', 'POST'])
+def create_extract():
   if egc_data is None:
     return redirect(url_for('load_egc_file'))
   else:
-    form = SnippetTableForm(request.form)
+    form = ExtractForm(request.form)
     if request.method == 'POST' and form.validate():
         new_record = {
             "record_type": form.record_type.data,
@@ -111,27 +111,27 @@ def create_snippet_table():
             new_record["table_ref"] = form.contents.data
         elif form.record_type.data == "S":
             new_record["text"] = form.contents.data
-        egc_data.create_snippet_table(new_record)
-        return redirect(url_for('snippet_table_list'))
-    return render_template('create_snippet_table.html', form=form)
+        egc_data.create_extract(new_record)
+        return redirect(url_for('extract_list'))
+    return render_template('create_extract.html', form=form)
 
-@app.route('/snippet_tables/<record_id>/edit', methods=['GET', 'POST'])
-def edit_snippet_table(record_id):
+@app.route('/extracts/<record_id>/edit', methods=['GET', 'POST'])
+def edit_extract(record_id):
   if egc_data is None:
     return redirect(url_for('load_egc_file'))
   else:
-    snippet_table = egc_data.get_snippet_table(record_id)
-    if snippet_table is None:
+    extract = egc_data.get_extract(record_id)
+    if extract is None:
         abort(404)
 
-    form = SnippetTableForm(request.form, data={
-        "record_type": snippet_table["record_type"],
-        "document_id": snippet_table["document_id"]["item"],
-        "id": snippet_table["id"],
-        "contents": snippet_table.get("contents", ""),
+    form = ExtractForm(request.form, data={
+        "record_type": extract["record_type"],
+        "document_id": extract["document_id"]["item"],
+        "id": extract["id"],
+        "contents": extract.get("contents", ""),
     })
     if request.method == 'POST' and form.validate():
-        updated_snippet_table = {
+        updated_extract = {
             "record_type": form.record_type.data,
             "id": form.id.data,
             "document_id": {
@@ -141,20 +141,20 @@ def edit_snippet_table(record_id):
                 "term": None
             }}
         if form.record_type.data == "T":
-            updated_snippet_table["table_ref"] = form.contents.data
+            updated_extract["table_ref"] = form.contents.data
         elif form.record_type.data == "S":
-            updated_snippet_table["text"] = form.contents.data
-        egc_data.update_snippet_table(record_id, updated_snippet_table)
-        return redirect(url_for('snippet_table_list'))
-    return render_template('edit_snippet_table.html', form=form)
+            updated_extract["text"] = form.contents.data
+        egc_data.update_extract(record_id, updated_extract)
+        return redirect(url_for('extract_list'))
+    return render_template('edit_extract.html', form=form)
 
-@app.route('/snippet_tables/<record_id>/delete', methods=['POST'])
-def delete_snippet_table(record_id):
+@app.route('/extracts/<record_id>/delete', methods=['POST'])
+def delete_extract(record_id):
   if egc_data is None:
     return redirect(url_for('load_egc_file'))
   else:
-    egc_data.delete_snippet_table(record_id)
-    return redirect(url_for('snippet_table_list'))
+    egc_data.delete_extract(record_id)
+    return redirect(url_for('extract_list'))
 
 if __name__ == '__main__':
   app.run()

@@ -139,23 +139,23 @@ class EGCData:
     def is_unique_document(self, document_id):
       return document_id not in self.docid2record
 
-    def get_snippets_and_tables(self):
+    def get_extracts(self):
       return [self.records[i] for i in self.record_type2records['S']] + \
              [self.records[i] for i in self.record_type2records['T']]
 
-    def get_snippet_table(self, record_id):
+    def get_extract(self, record_id):
       record_num = self.id2record[record_id]
       if record_num is None:
         raise ValueError('Record does not exist: {}'.format(record_id))
       return self.records[record_num]
 
-    def create_snippet_table(self, record_data):
+    def create_extract(self, record_data):
       self.create_record_with_id(record_data)
 
-    def update_snippet_table(self, record_id, updated_data):
+    def update_extract(self, record_id, updated_data):
       self.update_record_by_id(record_id, updated_data)
 
-    def delete_snippet_table(self, record_id):
+    def delete_extract(self, record_id):
       self.delete_record_by_id(record_id)
 
     def is_unique_id(self, record_id):
