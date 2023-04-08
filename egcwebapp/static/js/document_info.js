@@ -68,11 +68,11 @@ const tooltipTemplate = (pmid, data) => `
   <table class="tooltip-table table-striped">
     <tr class="odd">
       <th>PMID</th>
-      <td>${pmid}</td>
+      <td><a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}/" target="_blank" class="no-underline pmid-link">${pmid}</a></td>
     </tr>
     <tr class="even">
       <th>DOI</th>
-      <td>${data.DOI}</td>
+      <td><a href="https://dx.doi.org/${data.DOI}" target="_blank" class="no-underline doi-link">${data.DOI}</a></td>
     </tr>
     <tr class="odd">
       <th>Title</th>
@@ -114,16 +114,21 @@ async function getDocumentInfoTable(pmid, url) {
 }
 
 // Initialize Tippy.js tooltip
-export function initDocumentInfoTooltip(target, pmid, url) {
+export async function initTooltip(target, loading, content) {
   tippy(target[0], {
-    content: "Loading article information...",
+    content: "Loading " + loading + "...",
     allowHTML: true,
     trigger: 'mouseenter click',
     interactive: true,
     hideOnClick: true,
     maxWidth: 700,
     onShow: async (instance) => {
-      instance.setContent(await getDocumentInfoTable(pmid, url));
+      instance.setContent(content);
     },
   });
+}
+// Initialize Tippy.js tooltip
+export async function initDocumentInfoTooltip(target, pmid, url) {
+  initTooltip(target, "article information",
+    await getDocumentInfoTable(pmid, url));
 }

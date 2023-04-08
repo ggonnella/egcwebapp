@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, request, redirect, \
+                  url_for, abort, jsonify
 from egcwebapp.forms import DocumentForm, ExtractForm
 from egcwebapp.egc_data import EGCData
 from pathlib import Path
@@ -89,6 +90,14 @@ def delete_document(document_id):
   else:
     egc_data.delete_document(document_id)
     return redirect(url_for('document_list'))
+
+@app.route('/api/documents/<document_id>', methods=['GET'])
+def get_document(document_id):
+  if egc_data is None:
+    return redirect(url_for('load_egc_file'))
+  else:
+    document = egc_data.get_document(document_id)
+    return jsonify(document)
 
 @app.route('/extracts')
 def extract_list():
