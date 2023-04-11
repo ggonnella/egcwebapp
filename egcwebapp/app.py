@@ -10,6 +10,22 @@ app.secret_key = 'secret_key'
 app.config['UPLOAD_FOLDER'] = str(Path(app.instance_path) / 'uploads')
 egc_data = None
 
+# The following web routes are defined for each type of record:
+#
+# /<record_type>s                       table of all records of a given type
+# C /<record_type>s/create              form to create a new record
+# R /<record_type>s/<record_id>         page showing a single record
+# U /<record_type>s/<record_id>/edit    page for editing a single record
+# D /<record_type>s/<record_id>/delete  deletes a single record
+#
+# Furthermore, the following API routes are defined. These are used by the
+# JavaScript code in the application. They return JSON if the request header
+# 'Accept' is set to 'application/json', otherwise they return tabular HTML.
+#
+# /api/<record_type>s/<record_id>                        single record
+# /api/<record_type>s/<record_id>/<ref_by_record_type>
+#                     record from which the given record is referenced
+
 @app.route('/')
 def index():
     return redirect(url_for('document_list'))
@@ -121,8 +137,11 @@ def get_document_extracts(record_id):
   else:
     extracts = egc_data.ref_by('D', record_id, 'S') + \
                egc_data.ref_by('D', record_id, 'T')
-    return render_template('extract_sub_list.html', extracts=extracts,
-        egc_data=egc_data, parent_id=record_id)
+    if request.accept_mimetypes.accept_json:
+      return jsonify(extracts)
+    else:
+      return render_template('extract_sub_list.html', extracts=extracts,
+          egc_data=egc_data, parent_id=record_id)
 
 @app.route('/extracts')
 def extract_list():
