@@ -8,21 +8,36 @@
           <tr>
               <th>Record Type</th>
               <th>ID</th>
-              <th>PMID</th>
+              <th>Document</th>
               <th>Text / Table Reference</th>
               <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for extract in extracts %}
+              {% set document_record_id = egc_data.
+                   compute_docid_from_pfx_and_item(
+                     extract.document_id.resource_prefix,
+                     extract.document_id.item) %}
               <tr>
                   <td>{{ extract.record_type }}</td>
                   <td>{{ extract.id }}</td>
-                  <td style:"white-space: nowrap;"> <span class="document-id" style="display: inline;">{{ extract.document_id.item }}</span><span class="document-info" style="display: inline;">&nbsp;&#9432; </span> </td>
+                  <td style:"white-space: nowrap;">
+                    <span class="document-id"
+                          style="display: inline;"
+                          data-document-id="{{ document_record_id }}">
+                      <a href="{{ url_for('edit_document',
+                                    record_id=document_record_id) }}"
+                         >{{ extract.document_id.resource_prefix }}:{{ extract.document_id.item }}</a></span><span
+                       class="document-info" style="display: inline;">&nbsp;&#9432;</span><span
+                       style="display: inline;">
+                       <a href="{{ url_for('edit_document', record_id=document_record_id) }}">
+                         <i class="fa fa-edit" style="color: black;"></i></a></span>
+                  </td>
                   <td>{{ extract.text if extract.record_type == "S" else extract.table_ref }}</td>
                     <td>
-                        <a href="{{ url_for('edit_extract', record_id=extract.id.item) }}"><i class="fas fa-edit"></i></a>
-                        <form action="{{ url_for('delete_extract', record_id=extract.id.item) }}" method="post" style="display: inline-block;">
+                        <a href="{{ url_for('edit_extract', record_id=extract.id) }}"><i class="fas fa-edit"></i></a>
+                        <form action="{{ url_for('delete_extract', record_id=extract.id) }}" method="post" style="display: inline-block;">
                           <input type="hidden" name="_method" value="DELETE">
                           <button type="submit" class="btn btn-link"><i class="fas fa-trash"></i></button>
                         </form>
