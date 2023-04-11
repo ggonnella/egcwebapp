@@ -1,0 +1,28 @@
+<table class="table table-striped">
+  <tbody>
+    <tr class="odd">
+      <th>ID</th>
+      <td>{{ attribute.id }}</td>
+    </tr>
+    <tr class="even">
+      <th>Unit ID</th>
+      <td>{{ attribute.unit_id }}</td>
+    </tr>
+    <tr class="odd">
+      <th>Measurement Mode</th>
+      <td>{{ attribute.mode }}</td>
+    </tr>
+    {% if attribute.reference %}
+    <tr class="even">
+      <th>Reference</th>
+      <td>{{ attribute.reference }}</td>
+    </tr>
+    {% endif %}
+    {% if attribute.location_label %}
+    <tr class="odd">
+      <th>Location Label</th>
+      <td>{{ attribute.location_label }}</td>
+    </tr>
+    {% endif %}
+ </tbody>
+</table>

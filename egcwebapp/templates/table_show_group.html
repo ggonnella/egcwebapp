@@ -1,0 +1,37 @@
+  <table class="table table-striped">
+    <tbody>
+      <tr class="odd">
+        <th>ID</th>
+        <td>{{ group.id }}</td>
+      </tr>
+      <tr class="even">
+        <th>Name</th>
+        <td>{{ group.name }}</td>
+      </tr>
+      <tr class="odd">
+        <th>Type</th>
+        <td>{{ group.type }}</td>
+      </tr>
+      <tr class="even">
+        <th>Definition</th>
+        <td>{{ group.definition }}</td>
+      </tr>
+      {% if group.parent_id %}
+      <tr class="odd">
+        <th>Parent ID</th>
+        <td>{{ group.parent_id }}</td>
+      </tr>
+      {% endif %}
+      {% if group.children %}
+      <tr class="even">
+        <th>Children</th>
+        <td>
+          {% for childin group.children %}
+            <a href="{{ url_for('show_group', record_id=child.id) }}">{{ child.name }}</a>
+            {% if not loop.last %}, {% endif %}
+          {% endfor %}
+        </td>
+      </tr>
+      {% endif %}
+   </tbody>
+  </table>

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, \
                   url_for, abort, jsonify
-from egcwebapp.forms import DocumentForm, ExtractForm
+from egcwebapp.forms import DocumentForm, ExtractForm, UnitForm, \
+                            AttributeForm
 from egctools.egcdata import EGCData
 from pathlib import Path
 import os
@@ -214,6 +215,7 @@ def edit_extract(record_id):
     if extract is None:
         abort(404)
 
+  previous_page = request.args.get('previous_page')
   if extract["record_type"] == "T":
       contents = extract["table_ref"]
   elif extract["record_type"] == "S":
@@ -241,9 +243,13 @@ def edit_extract(record_id):
     elif form.record_type.data == "S":
         updated_data["text"] = form.contents.data
     egc_data.update_record_by_id(record_id, updated_data)
-    return redirect(url_for('extract_list'))
+    if previous_page:
+      return redirect(url_for(previous_page))
+    else:
+      return redirect(url_for('extract_list'))
   return render_template('edit_extract.html', form=form,
-           egc_data=egc_data)
+           egc_data=egc_data, errors=form.errors,
+           previous_page=previous_page)
 
 @app.route('/extracts/<record_id>/delete', methods=['POST'])
 def delete_extract(record_id):
@@ -256,6 +262,308 @@ def delete_extract(record_id):
       return redirect(url_for(previous_page))
     else:
       return redirect(url_for('extract_list'))
+
+@app.route('/units')
+def unit_list():
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        units = egc_data.get_records('U')
+        return render_template('unit_list.html', units=units, egc_data=egc_data)
+
+@app.route('/units/create', methods=['GET', 'POST'])
+def create_unit():
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        form = UnitForm(request.form, egc_data=egc_data)
+        if request.method == 'POST' and form.validate():
+            new_record = {
+                "record_type": "U",
+                "id": form.id.data,
+                "type": form.type.data,
+                "definition": form.definition.data,
+                "symbol": form.symbol.data,
+                "description": form.description.data
+            }
+            egc_data.create_record(new_record)
+            return redirect(url_for('unit_list'))
+        return render_template('create_unit.html', form=form, errors=form.errors, egc_data=egc_data)
+
+@app.route('/units/<record_id>/edit', methods=['GET', 'POST'])
+def edit_unit(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        unit = egc_data.get_record_by_id(record_id)
+        if unit is None:
+            abort(404)
+
+    previous_page = request.args.get('previous_page')
+    form = UnitForm(request.form, egc_data=egc_data, old_id=record_id, data={
+        "id": unit["id"],
+        "type": unit["type"],
+        "definition": unit["definition"],
+        "symbol": unit["symbol"],
+        "description": unit["description"]
+    })
+
+    if request.method == 'POST' and form.validate():
+        updated_data = {
+            "record_type": "U",
+            "id": form.id.data,
+            "type": form.type.data,
+            "definition": form.definition.data,
+            "symbol": form.symbol.data,
+            "description": form.description.data
+        }
+        egc_data.update_record_by_id(record_id, updated_data)
+        if previous_page:
+          return redirect(url_for(previous_page))
+        else:
+          return redirect(url_for('unit_list'))
+
+    return render_template('edit_unit.html', form=form, egc_data=egc_data,
+        errors=form.errors, previous_page=previous_page)
+
+@app.route('/units/<record_id>/delete', methods=['POST'])
+def delete_unit(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        previous_page = request.args.get('previous_page')
+        egc_data.delete_record_by_id(record_id)
+        if previous_page:
+            return redirect(url_for(previous_page))
+        else:
+            return redirect(url_for('unit_list'))
+
+@app.route('/api/json/units/<record_id>', methods=['GET'])
+def get_unit_json(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        unit = egc_data.get_record_by_id(record_id)
+        if unit is None:
+            return jsonify({ "error": "Unit not found" }), 404
+        else:
+            return jsonify(unit)
+
+@app.route('/api/units/<record_id>', methods=['GET'])
+def get_unit(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        unit = egc_data.get_record_by_id(record_id)
+        if unit is None:
+            return render_template('error.html', message='Unit not found')
+        else:
+            return render_template('table_show_unit.html', unit=unit, egc_data=egc_data)
+
+@app.route('/api/attributes/<record_id>/units', methods=['GET'])
+def get_attribute_units(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        units = egc_data.ref_by('A', record_id, 'U')
+        return render_template('unit_sub_list.html', units=units,
+            egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/json/attributes/<record_id>/units', methods=['GET'])
+def get_attribute_units_json(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        units = egc_data.ref_by('A', record_id, 'U')
+        return jsonify(units)
+
+@app.route('/attributes')
+def attribute_list():
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        attributes = egc_data.get_records('A')
+        return render_template('attribute_list.html', attributes=attributes, egc_data=egc_data)
+
+@app.route('/attributes/create', methods=['GET', 'POST'])
+def create_attribute():
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        form = AttributeForm(request.form, egc_data=egc_data)
+        if request.method == 'POST' and form.validate():
+            new_record = {
+                "record_type": "A",
+                "id": form.id.data,
+                "unit_id": form.unit_id.data,
+                "mode": form.mode.data,
+                "reference": form.reference.data,
+                "location_label": form.location_label.data
+            }
+            egc_data.create_record(new_record)
+            return redirect(url_for('attribute_list'))
+        return render_template('create_attribute.html', form=form, errors=form.errors, egc_data=egc_data)
+
+@app.route('/attributes/<record_id>/edit', methods=['GET', 'POST'])
+def edit_attribute(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        attribute = egc_data.get_record_by_id(record_id)
+        if attribute is None:
+            abort(404)
+
+    attribute_data={
+        "id": attribute["id"],
+        "unit_id": attribute["unit_id"],
+    }
+    if isinstance(attribute["mode"], dict):
+      attribute_data["mode"] = attribute["mode"]["mode"]
+      attribute_data["reference"] = attribute["mode"]["reference"]
+      attribute_data["location_type"] = attribute["mode"]["location_type"]
+      attribute_data["location_label"] = attribute["mode"]["location_label"]
+    form = AttributeForm(request.form, egc_data=egc_data, old_id=record_id,
+        data=attribute_data)
+
+    if request.method == 'POST' and form.validate():
+        updated_data = {
+            "record_type": "A",
+            "id": form.id.data,
+            "unit_id": form.unit_id.data,
+            "mode": {}
+        }
+        updated_data["mode"]["mode"] = form.mode.data
+        updated_data["mode"]["reference"] = form.reference.data
+        updated_data["mode"]["location_type"] = form.location_type.data
+        updated_data["mode"]["location_label"] = form.location_label.data
+        egc_data.update_record_by_id(record_id, updated_data)
+        return redirect(url_for('attribute_list'))
+
+    return render_template('edit_attribute.html', form=form, egc_data=egc_data, errors=form.errors)
+
+@app.route('/attributes/<record_id>/delete', methods=['POST'])
+def delete_attribute(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        egc_data.delete_record_by_id(record_id)
+        return redirect(url_for('attribute_list'))
+
+@app.route('/api/json/attributes/<record_id>', methods=['GET'])
+def get_attribute_json(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        attribute = egc_data.get_record_by_id(record_id)
+        if attribute is None:
+            return jsonify({"error": "Attribute not found"}), 404
+        else:
+            return jsonify(attribute)
+
+@app.route('/api/attributes/<record_id>', methods=['GET'])
+def get_attribute(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        attribute = egc_data.get_record_by_id(record_id)
+        if attribute is None:
+            return render_template('error.html', message='Attribute not found')
+        else:
+            return render_template('table_show_attribute.html',
+                attribute=attribute, egc_data=egc_data)
+
+@app.route('/groups')
+def group_list():
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        groups = egc_data.get_records('G')
+        return render_template('group_list.html', groups=groups, egc_data=egc_data)
+
+@app.route('/groups/create', methods=['GET', 'POST'])
+def create_group():
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        form = GroupForm(request.form, egc_data=egc_data)
+        if request.method == 'POST' and form.validate():
+            new_record = {
+                "record_type": "G",
+                "id": form.id.data,
+                "name": form.name.data,
+                "type": form.type.data,
+                "definition": form.definition.data,
+                "tags": form.tags.data
+            }
+            egc_data.create_record(new_record)
+            return redirect(url_for('group_list'))
+        return render_template('create_group.html', form=form, errors=form.errors, egc_data=egc_data)
+
+@app.route('/groups/<record_id>/edit', methods=['GET', 'POST'])
+def edit_group(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        group = egc_data.get_record_by_id(record_id)
+        if group is None:
+            abort(404)
+
+    group_data = {
+        "id": group["id"],
+        "name": group["name"],
+        "type": group["type"],
+        "definition": group["definition"],
+        "tags": group["tags"]
+    }
+    
+    form = GroupForm(request.form, egc_data=egc_data, old_id=record_id,
+        data=group_data)
+
+    if request.method == 'POST' and form.validate():
+        updated_data = {
+            "record_type": "G",
+            "id": form.id.data,
+            "name": form.name.data,
+            "type": form.type.data,
+            "definition": form.definition.data,
+            "tags": form.tags.data
+        }
+        egc_data.update_record_by_id(record_id, updated_data)
+        return redirect(url_for('group_list'))
+
+    return render_template('edit_group.html', form=form, egc_data=egc_data, errors=form.errors)
+
+@app.route('/groups/<record_id>/delete', methods=['POST'])
+def delete_group(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        egc_data.delete_record_by_id(record_id)
+        return redirect(url_for('group_list'))
+
+@app.route('/api/json/groups/<record_id>', methods=['GET'])
+def get_group_json(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        group = egc_data.get_record_by_id(record_id)
+        if group is None:
+            return jsonify({"error": "Group not found"}), 404
+        else:
+            return jsonify(group)
+
+@app.route('/api/groups/<record_id>', methods=['GET'])
+def get_group(record_id):
+    if egc_data is None:
+        return redirect(url_for('load_egc_file'))
+    else:
+        group = egc_data.get_record_by_id(record_id)
+        if group is None:
+            return render_template('error.html', message='Group not found')
+        else:
+            return render_template('table_show_group.html',
+                group=group, egc_data=egc_data)
+
 
 if __name__ == '__main__':
   app.run()
