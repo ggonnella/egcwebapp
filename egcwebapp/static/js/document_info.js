@@ -1,3 +1,23 @@
+// Initialize Tippy.js tooltip
+export async function initTooltip(target, loading, content) {
+  tippy(target[0], {
+    content: "Loading " + loading + "...",
+    allowHTML: true,
+    trigger: 'mouseenter click',
+    interactive: true,
+    hideOnClick: true,
+    maxWidth: 700,
+    onShow: async (instance) => {
+      instance.setContent(content);
+    },
+  });
+}
+// Initialize Tippy.js tooltip
+export async function initDocumentInfoTooltip(target, pmid, url) {
+  initTooltip(target, "article information",
+    await getDocumentInfoTable(pmid, url));
+}
+
 function parseDocumentInfoJSON(json) {
   const {title, DOI, author, journal} = json;
   const journalTitle = json['container-title'] ? json['container-title'] : '';
@@ -111,24 +131,4 @@ async function getDocumentInfoTable(pmid, url) {
     console.error(error);
     return "Error: Failed to fetch article information";
   }
-}
-
-// Initialize Tippy.js tooltip
-export async function initTooltip(target, loading, content) {
-  tippy(target[0], {
-    content: "Loading " + loading + "...",
-    allowHTML: true,
-    trigger: 'mouseenter click',
-    interactive: true,
-    hideOnClick: true,
-    maxWidth: 700,
-    onShow: async (instance) => {
-      instance.setContent(content);
-    },
-  });
-}
-// Initialize Tippy.js tooltip
-export async function initDocumentInfoTooltip(target, pmid, url) {
-  initTooltip(target, "article information",
-    await getDocumentInfoTable(pmid, url));
 }

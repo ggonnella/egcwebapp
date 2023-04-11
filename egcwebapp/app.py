@@ -76,13 +76,14 @@ def create_document():
         egc_data.create_record(new_document)
         return redirect(url_for('document_list'))
     return render_template('create_document.html', form=form,
-        errors=form.errors)
+        errors=form.errors, egc_data=egc_data)
 
 @app.route('/documents/<record_id>/edit', methods=['GET', 'POST'])
 def edit_document(record_id):
   if egc_data is None:
     return redirect(url_for('load_egc_file'))
   else:
+    previous_page = request.args.get('previous_page')
     document = egc_data.get_record_by_id(record_id)
     if document is None:
         abort(404)
@@ -102,17 +103,25 @@ def edit_document(record_id):
             "link": form.link.data
         }
         egc_data.update_record_by_id(record_id, updated_document)
-        return redirect(url_for('document_list'))
+        if previous_page:
+          return redirect(url_for(previous_page))
+        else:
+          return redirect(url_for('document_list'))
     return render_template('edit_document.html', form=form,
-        errors=form.errors)
+        errors=form.errors, previous_page=previous_page,
+        egc_data=egc_data)
 
 @app.route('/documents/<record_id>/delete', methods=['POST'])
 def delete_document(record_id):
   if egc_data is None:
     return redirect(url_for('load_egc_file'))
   else:
+    previous_page = request.args.get('previous_page')
     egc_data.delete_record_by_id(record_id)
-    return redirect(url_for('document_list'))
+    if previous_page:
+      return redirect(url_for(previous_page))
+    else:
+      return redirect(url_for('document_list'))
 
 @app.route('/documents/<record_id>')
 def show_document(record_id):
@@ -122,7 +131,8 @@ def show_document(record_id):
     document = egc_data.get_record_by_id(record_id)
     if document is None:
         abort(404)
-    return render_template('show_document.html', document=document)
+    return render_template('show_document.html', document=document,
+        egc_data=egc_data)
 
 @app.route('/api/json/documents/<record_id>', methods=['GET'])
 def get_document_json(record_id):
@@ -192,7 +202,8 @@ def create_extract():
             new_record["text"] = form.contents.data
         egc_data.create_record(new_record)
         return redirect(url_for('extract_list'))
-    return render_template('create_extract.html', form=form)
+    return render_template('create_extract.html', form=form,
+        errors=form.errors, egc_data=egc_data)
 
 @app.route('/extracts/<record_id>/edit', methods=['GET', 'POST'])
 def edit_extract(record_id):
@@ -231,15 +242,20 @@ def edit_extract(record_id):
         updated_data["text"] = form.contents.data
     egc_data.update_record_by_id(record_id, updated_data)
     return redirect(url_for('extract_list'))
-  return render_template('edit_extract.html', form=form)
+  return render_template('edit_extract.html', form=form,
+           egc_data=egc_data)
 
 @app.route('/extracts/<record_id>/delete', methods=['POST'])
 def delete_extract(record_id):
   if egc_data is None:
     return redirect(url_for('load_egc_file'))
   else:
+    previous_page = request.args.get('previous_page')
     egc_data.delete_record_by_id(record_id)
-    return redirect(url_for('extract_list'))
+    if previous_page:
+      return redirect(url_for(previous_page))
+    else:
+      return redirect(url_for('extract_list'))
 
 if __name__ == '__main__':
   app.run()

@@ -26,12 +26,15 @@
                     <span class="document-id"
                           style="display: inline;"
                           data-document-id="{{ document_record_id }}">
-                      <a href="{{ url_for('edit_document',
-                                    record_id=document_record_id) }}"
+                      <a href="{{ url_for('show_document',
+                                    record_id=document_record_id,
+                                    previous_page='extract_list') }}"
                          >{{ extract.document_id.resource_prefix }}:{{ extract.document_id.item }}</a></span><span
                        class="document-info" style="display: inline;">&nbsp;&#9432;</span><span
                        style="display: inline;">
-                       <a href="{{ url_for('edit_document', record_id=document_record_id) }}">
+                       <a href="{{ url_for('edit_document',
+                                      record_id=document_record_id,
+                                      previous_page='extract_list') }}">
                          <i class="fa fa-edit" style="color: black;"></i></a></span>
                   </td>
                   <td>{{ extract.text if extract.record_type == "S" else extract.table_ref }}</td>
