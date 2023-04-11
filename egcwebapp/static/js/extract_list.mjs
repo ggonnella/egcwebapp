@@ -11,7 +11,7 @@ $(document).ready(function() {
     $(".document-info").each(async function() {
       const documentId = $(this).prev().data('document-id');
       try {
-        const response = await fetch(`/api/documents/${documentId}/table`);
+        const response = await fetch(`/api/documents/${documentId}`);
         if (!response.ok) {
           console.error(`Failed to fetch D record information for document ${documentId}`);
           return "<p>Error: Failed to fetch D record information</p>";

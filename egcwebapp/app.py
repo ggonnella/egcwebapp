@@ -102,22 +102,17 @@ def show_document(record_id):
         abort(404)
     return render_template('show_document.html', document=document)
 
-@app.route('/api/documents/<record_id>/table', methods=['GET'])
-def get_document_table(record_id):
-  if egc_data is None:
-    return redirect(url_for('load_egc_file'))
-  else:
-    document = egc_data.get_record_by_id(record_id)
-    return render_template('table_show_document.html', document=document,
-            egc_data=egc_data)
-
 @app.route('/api/documents/<record_id>', methods=['GET'])
 def get_document(record_id):
   if egc_data is None:
     return redirect(url_for('load_egc_file'))
   else:
     document = egc_data.get_record_by_id(record_id)
-    return jsonify(document)
+    if request.accept_mimetypes.accept_json:
+      return jsonify(document)
+    else:
+      return render_template('table_show_document.html', document=document,
+              egc_data=egc_data)
 
 @app.route('/api/documents/<record_id>/extracts', methods=['GET'])
 def get_document_extracts(record_id):
