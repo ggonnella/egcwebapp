@@ -349,6 +349,17 @@ def get_unit_json(record_id):
         else:
             return jsonify(unit)
 
+@app.route('/units/<record_id>')
+def show_unit(record_id):
+  if egc_data is None:
+    return redirect(url_for('load_egc_file'))
+  else:
+    unit = egc_data.get_record_by_id(record_id)
+    if unit is None:
+        abort(404)
+    return render_template('show_unit.html', unit=unit,
+        egc_data=egc_data)
+
 @app.route('/api/units/<record_id>', methods=['GET'])
 def get_unit(record_id):
     if egc_data is None:
@@ -383,7 +394,8 @@ def attribute_list():
         return redirect(url_for('load_egc_file'))
     else:
         attributes = egc_data.get_records('A')
-        return render_template('attribute_list.html', attributes=attributes, egc_data=egc_data)
+        return render_template('attribute_list.html',
+            attributes=attributes, egc_data=egc_data)
 
 @app.route('/attributes/create', methods=['GET', 'POST'])
 def create_attribute():
@@ -398,11 +410,13 @@ def create_attribute():
                 "unit_id": form.unit_id.data,
                 "mode": form.mode.data,
                 "reference": form.reference.data,
-                "location_label": form.location_label.data
+                "location_type": form.location_type.data,
+                "location_label": form.location_label.data,
             }
             egc_data.create_record(new_record)
             return redirect(url_for('attribute_list'))
-        return render_template('create_attribute.html', form=form, errors=form.errors, egc_data=egc_data)
+        return render_template('create_attribute.html', form=form,
+            errors=form.errors, egc_data=egc_data)
 
 @app.route('/attributes/<record_id>/edit', methods=['GET', 'POST'])
 def edit_attribute(record_id):
