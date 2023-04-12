@@ -87,12 +87,53 @@ class AttributeForm(Form):
     mode = SelectField('Measurement Mode', choices=[('measurement_mode_simple', 'Simple'), ('measurement_mode_relative', 'Relative'), ('measurement_mode_w_location', 'With Location'), ('measurement_mode_relative_w_location', 'Relative with Location')], validators=[validators.DataRequired()])
 
     reference = StringField('Reference', [validators.Length(min=1, max=50)], render_kw={'style': 'display:none;'})
+    location_type = StringField('Location Type', [validators.Length(min=1, max=50)], render_kw={'style': 'display:none;'})
     location_label = StringField('Location Label', [validators.Length(min=1, max=50)], render_kw={'style': 'display:none;'})
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.egc_data = kwargs.pop('egc_data')
         self.old_id = kwargs.pop('old_id', None)
+        self.script = Markup('''
+          const modeField = document.getElementById("mode");
+          const referenceFieldWrapper =
+            document.getElementById("reference-wrapper");
+          const referenceField = document.getElementById("reference");
+          const locationTypeFieldWrapper =
+            document.getElementById("location_type-wrapper");
+          const locationTypeField =
+            document.getElementById("location_type");
+          const locationLabelFieldWrapper =
+            document.getElementById("location_label-wrapper");
+          const locationLabelField =
+            document.getElementById("location_label");
+
+          function toggleFieldVisibility() {
+            if (modeField.value === 'measurement_mode_relative' ||
+                modeField.value === 'measurement_mode_relative_w_location') {
+              referenceFieldWrapper.style.display = 'block';
+              referenceField.style.display = 'block';
+            } else {
+              referenceFieldWrapper.style.display = 'none';
+              referenceField.style.display = 'none';
+            }
+            if (modeField.value === 'measurement_mode_w_location' ||
+                modeField.value === 'measurement_mode_relative_w_location') {
+              locationLabelFieldWrapper.style.display = 'block';
+              locationLabelField.style.display = 'block';
+              locationTypeFieldWrapper.style.display = 'block';
+              locationTypeField.style.display = 'block';
+            } else {
+              locationLabelFieldWrapper.style.display = 'none';
+              locationLabelField.style.display = 'none';
+              locationTypeFieldWrapper.style.display = 'none';
+              locationTypeField.style.display = 'none';
+            }
+          }
+
+          modeField.addEventListener('change', toggleFieldVisibility);
+          document.addEventListener('DOMContentLoaded', toggleFieldVisibility);
+        ''')
 
     def validate_id(self, field):
       new_id = field.data
@@ -111,30 +152,6 @@ class AttributeForm(Form):
     def validate_reference(self, field):
         if self.mode.data in ['measurement_mode_relative', 'measurement_mode_relative_w_location'] and not field.data:
             raise validators.ValidationError('Reference is required for this measurement mode')
-
-    def render(self):
-        rendered = super().render()
-        rendered += Markup('''
-        <script>
-        var modeField = document.getElementById("mode");
-        var referenceField = document.getElementById("reference");
-        var locationLabelField = document.getElementById("location_label");
-
-        modeField.addEventListener('change', function() {{
-            if (modeField.value == 'measurement_mode_relative' || modeField.value == 'measurement_mode_relative_w_location') {{
-                referenceField.style.display = 'block';
-            }} else {{
-                referenceField.style.display = 'none';
-            }}
-            if (modeField.value == 'measurement_mode_w_location' || modeField.value == 'measurement_mode_relative_w_location') {{
-                locationLabelField.style.display = 'block';
-            }} else {{
-                locationLabelField.style.display = 'none';
-            }}
-        }});
-        </script>
-        ''')
-        return rendered
 
 class ModelForm(Form):
     unit_id = StringField('Unit ID', [validators.Length(min=1, max=50), validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
