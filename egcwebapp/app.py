@@ -371,22 +371,22 @@ def get_unit(record_id):
         else:
             return render_template('table_show_unit.html', unit=unit, egc_data=egc_data)
 
-@app.route('/api/attributes/<record_id>/units', methods=['GET'])
-def get_attribute_units(record_id):
+@app.route('/api/units/<record_id>/attributes', methods=['GET'])
+def get_unit_attributes(record_id):
     if egc_data is None:
         return redirect(url_for('load_egc_file'))
     else:
-        units = egc_data.ref_by('A', record_id, 'U')
-        return render_template('unit_sub_list.html', units=units,
+        attributes = egc_data.ref_by('U', record_id, 'A')
+        return render_template('attribute_sub_list.html', attributes=attributes,
             egc_data=egc_data, parent_id=record_id)
 
-@app.route('/api/json/attributes/<record_id>/units', methods=['GET'])
-def get_attribute_units_json(record_id):
+@app.route('/api/json/units/<record_id>/attributes', methods=['GET'])
+def get_unit_attributes_json(record_id):
     if egc_data is None:
         return redirect(url_for('load_egc_file'))
     else:
-        units = egc_data.ref_by('A', record_id, 'U')
-        return jsonify(units)
+        attributes = egc_data.ref_by('U', record_id, 'A')
+        return jsonify(attributes)
 
 @app.route('/attributes')
 def attribute_list():
