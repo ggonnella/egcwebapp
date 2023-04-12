@@ -13,3 +13,21 @@ export async function initTooltip(target, loading, content) {
   });
 }
 
+export async function initRelatedTooltips(infoclass, collection) {
+  $(infoclass).each(async function() {
+    const recordId = $(this).prev().data('record-id');
+    try {
+      const response = await fetch(`/api/${collection}/${recordId}`);
+      if (!response.ok) {
+        console.error(`Failed to fetch record information for ID ${recordId}`);
+        return "<p>Error: Failed to fetch record information</p>";
+      }
+      const table = await response.text();
+      const html = `<div class="tooltip-table">${table}</div>`
+      initTooltip($(this), "Record", html);
+    } catch (error) {
+      console.error(`Failed to fetch record information for ID ${recordId}:`, error);
+      return "<p>Error: Failed to fetch record information</p>";
+    }
+  });
+}

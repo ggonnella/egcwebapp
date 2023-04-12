@@ -1,4 +1,5 @@
 import { initTooltip } from "./tooltips.js";
+import { initRelatedTooltips } from "./tooltips.js";
 
 $(document).ready(function() {
   // Initialize DataTables
@@ -7,5 +8,8 @@ $(document).ready(function() {
       initTooltips();
     }
   });
+  async function initTooltips() {
+    initRelatedTooltips(".unit-info", "units");
+  }
 });
 

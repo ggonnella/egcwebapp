@@ -19,11 +19,10 @@
       {% for attribute in attributes %}
         <tr>
           <td>{{ attribute.id }}</td>
-          <td>{{ attribute.unit_id }}</td>
           <td style:"white-space: nowrap;">
-            <span class="document-id"
+            <span class="record-id"
                   style="display: inline;"
-                  data-document-id="{{ attribute.unit_id }}">
+                  data-record-id="{{ attribute.unit_id }}">
               <a href="{{ url_for('show_unit',
                             record_id=attribute.unit_id,
                             previous_page='attribute_list') }}">
@@ -35,7 +34,7 @@
                             previous_page='attribute_list') }}">
                  <i class="fa fa-edit" style="color: black;"></i></a></span>
           </td>
-          {% if attribute.mode.mode  %}
+          {% if attribute.mode and attribute.mode.mode  %}
             <td>{{ attribute.mode.mode }}</td>
             <td>{{ attribute.mode.reference }}</td>
             <td>{{ attribute.mode.location_type }}</td>
@@ -56,5 +55,6 @@
     </tbody>
   </table>
 
-  <script src="{{ url_for('static', filename='js/attribute_list.mjs') }}" type="module"></script>
+  <script src="{{ url_for('static', filename='js/attribute_list.mjs') }}"
+    type="module"></script>
 {% endblock %}
