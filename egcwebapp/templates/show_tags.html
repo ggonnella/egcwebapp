@@ -1,0 +1,5 @@
+{% if tags %}
+  {% for tag_name, tag_type_value in tags.items() %}
+    {{ tag_name }}:{{ tag_type_value.type }}:{{ tag_type_value.value }}<br>
+  {% endfor %}
+{% endif %}
