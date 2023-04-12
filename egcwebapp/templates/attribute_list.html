@@ -19,24 +19,18 @@
       {% for attribute in attributes %}
         <tr>
           <td>{{ attribute.id }}</td>
-          <td style:"white-space: nowrap;">
-            <span class="record-id"
-                  style="display: inline;"
-                  data-record-id="{{ attribute.unit_id }}">
-              <a href="{{ url_for('show_unit',
-                            record_id=attribute.unit_id,
-                            previous_page='attribute_list') }}">
-                 {{ attribute.unit_id }}</a></span><span
-               class="unit-info" style="display: inline;">&nbsp;&#9432;</span><span
-               style="display: inline;">
-               <a href="{{ url_for('edit_unit',
-                            record_id=attribute.unit_id,
-                            previous_page='attribute_list') }}">
-                 <i class="fa fa-edit" style="color: black;"></i></a></span>
-          </td>
-          {% if attribute.mode and attribute.mode.mode  %}
+          {% set related_type, related_id, prev =
+             'unit', attribute.unit_id, 'attribute_list' %}
+          {% include 'related_record_cell.html' %}
+          {% if attribute.mode.mode  %}
             <td>{{ attribute.mode.mode }}</td>
-            <td>{{ attribute.mode.reference }}</td>
+            {% if attribute.mode.reference %}
+              {% set related_type, related_id, prev =
+                 'unit', attribute.mode.reference, 'attribute_list' %}
+              {% include 'related_record_cell.html' %}
+            {% else %}
+              <td></td>
+            {% endif %}
             <td>{{ attribute.mode.location_type }}</td>
             <td>{{ attribute.mode.location_label }}</td>
           {% else %}
