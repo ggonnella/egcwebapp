@@ -12,6 +12,7 @@
         <th>Reference</th>
         <th>Location Type</th>
         <th>Location Label</th>
+        <th>Tags</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -37,6 +38,10 @@
             <td>{{ attribute.mode }}</td>
             <td></td> <td></td> <td></td>
           {% endif %}
+          <td>
+            {% set tags = attribute.tags %}
+            {% include 'show_tags.html' %}
+          </td>
           <td>
             <a href="{{ url_for('edit_attribute', record_id=attribute.id) }}"><i class="fas fa-edit"></i></a>
             <form action="{{ url_for('delete_attribute', record_id=attribute.id) }}" method="post" style="display: inline-block;">

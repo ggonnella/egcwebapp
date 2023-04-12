@@ -1,0 +1,56 @@
+{% for field in form if not field.name == "tags" %}
+  <div id="{{field.id}}-wrapper">
+    {{ field.label }} {{ field(class_="form-control" + (' has-error' if field.errors else '') ) }}
+    {% if field.errors %}
+      <ul>
+        {% for error in field.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endfor %}
+<div id="tags-container">
+  <br/>
+    {{ form.tags.label }}
+    {% for f in form.tags %}
+        <div class="tag-entry">
+          {{ f.form.tagname.label }} {{ f.form.tagname(class_="form-control-inline") }}
+          {% if f.form.tagname.errors %}
+            <ul>
+              {% for error in f.form.tagname.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          {{ f.form.tagtype.label }} {{ f.form.tagtype(class_="form-control-inline") }}
+          {{ f.form.tagvalue.label }} {{ f.form.tagvalue(class_="form-control-inline") }}
+          {% if f.form.tagvalue.errors %}
+            <ul>
+              {% for error in f.form.tagvalue.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <button type="button" class="btn btn-danger btn-delete-tag" style="display: inline;">(X)</button>
+        </div>
+    {% endfor %}
+    {% if form.tags.errors %}
+      <ul>
+        {% for error in form.tags.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+</div>
+<button type="button" id="add_tag_button" class="btn btn-primary">more tags...</button>
+<br/>
+<br/>
+
+{% if form.script %}
+{% block scripts %}
+  <script>
+    {{ form.script }}
+  </script>
+{% endblock %}
+{% endif %}

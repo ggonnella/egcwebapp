@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, \
                   url_for, abort, jsonify
 from egcwebapp.forms import DocumentForm, ExtractForm, UnitForm, \
-                            AttributeForm
+                            AttributeForm, GroupForm
 from egctools.egcdata import EGCData
 from pathlib import Path
 import os
@@ -521,6 +521,25 @@ def group_list():
         groups = egc_data.get_records('G')
         return render_template('group_list.html', groups=groups, egc_data=egc_data)
 
+def add_tags_to_form_data(record, form_data):
+  if "tags" in record:
+    form_data["tags"] = []
+    for tag_name, tag_type_value in record["tags"].items():
+      form_data["tags"].append({
+        "tagname": tag_name,
+        "tagtype": tag_type_value["type"],
+        "tagvalue": tag_type_value["value"]
+      })
+
+def add_tags_from_form_data(form_data, record):
+  record["tags"] = {}
+  for tag in form_data.tags.data:
+    if tag != '' and tag["tagname"] != '':
+      record["tags"][tag["tagname"]] = \
+          {"value": tag["tagvalue"], "type": tag["tagtype"]}
+  if len(record["tags"]) == 0:
+    del record["tags"]
+
 @app.route('/groups/create', methods=['GET', 'POST'])
 def create_group():
     if egc_data is None:
@@ -534,11 +553,12 @@ def create_group():
                 "name": form.name.data,
                 "type": form.type.data,
                 "definition": form.definition.data,
-                "tags": form.tags.data
             }
+            add_tags_from_form_data(form, new_record)
             egc_data.create_record(new_record)
             return redirect(url_for('group_list'))
-        return render_template('create_group.html', form=form, errors=form.errors, egc_data=egc_data)
+        return render_template('create_group.html', form=form,
+            errors=form.errors, egc_data=egc_data)
 
 @app.route('/groups/<record_id>/edit', methods=['GET', 'POST'])
 def edit_group(record_id):
@@ -554,9 +574,9 @@ def edit_group(record_id):
         "name": group["name"],
         "type": group["type"],
         "definition": group["definition"],
-        "tags": group["tags"]
     }
-    
+    add_tags_to_form_data(group, group_data)
+
     form = GroupForm(request.form, egc_data=egc_data, old_id=record_id,
         data=group_data)
 
@@ -567,12 +587,15 @@ def edit_group(record_id):
             "name": form.name.data,
             "type": form.type.data,
             "definition": form.definition.data,
-            "tags": form.tags.data
         }
+        add_tags_from_form_data(form, updated_data)
         egc_data.update_record_by_id(record_id, updated_data)
         return redirect(url_for('group_list'))
+    elif not form.validate():
+        print(form.errors)
 
-    return render_template('edit_group.html', form=form, egc_data=egc_data, errors=form.errors)
+    return render_template('edit_group.html', form=form, egc_data=egc_data,
+        errors=form.errors)
 
 @app.route('/groups/<record_id>/delete', methods=['POST'])
 def delete_group(record_id):

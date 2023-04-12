@@ -8,6 +8,7 @@
             <tr>
                 <th>PMID</th>
                 <th>Link</th>
+                <th>Tags</th>
                 <th>Extracts</th>
                 <th>Actions</th>
             </tr>
@@ -30,6 +31,10 @@
                           class="no-underline document-link">
                             {{ document.link }}
                         </a>
+                    </td>
+                    <td>
+                      {% set tags = document.tags %}
+                      {% include 'show_tags.html' %}
                     </td>
                     <td class="extracts-count" data-document-id="{{ record_id }}">
                       <a href="#" class="show-extracts"

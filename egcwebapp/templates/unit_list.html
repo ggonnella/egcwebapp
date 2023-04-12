@@ -12,6 +12,7 @@
         <th>Definition</th>
         <th>Symbol</th>
         <th>Description</th>
+        <th>Tags</th>
         <th>Attributes</th>
         <th>Actions</th>
       </tr>
@@ -24,6 +25,10 @@
           <td>{{ unit.definition }}</td>
           <td>{{ unit.symbol }}</td>
           <td>{{ unit.description }}</td>
+          <td>
+            {% set tags = unit.tags %}
+            {% include 'show_tags.html' %}
+          </td>
           {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
                 'attribute', unit.id, 'U', 'A' %}
           {% include 'ref_by_cell.html' %}
