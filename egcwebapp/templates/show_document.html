@@ -11,7 +11,7 @@
             {{ document.document_id.resource_prefix }}:{{ document.document_id.item }}</a><span class="document-info-container">
           <span class="document-info" style="display: inline;">&nbsp;&#9432;
             <script type="module">
-              import { initDocumentInfoTooltip } from '{{ url_for('static', filename='js/document_info.js') }}';
+              import { initDocumentInfoTooltip } from '{{ url_for('static', filename='js/document_info.mjs') }}';
               const pmid = '{{ document.document_id.item }}';
               const url = '{{ document.link }}';
               const target = $('.document-info-container:last-child .document-info');

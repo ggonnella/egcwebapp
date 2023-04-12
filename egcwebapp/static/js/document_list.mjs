@@ -1,4 +1,4 @@
-import { initDocumentInfoTooltip } from "./document_info.js";
+import { initDocumentInfoTooltip } from "./document_info.mjs";
 
 $(document).ready(function() {
   // Initialize DataTables
