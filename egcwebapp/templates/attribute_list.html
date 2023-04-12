@@ -38,7 +38,7 @@
             <td></td> <td></td> <td></td>
           {% endif %}
           <td>
-            <a ref="{{ url_for('edit_attribute', record_id=attribute.id) }}"><i class="fas fa-edit"></i></a>
+            <a href="{{ url_for('edit_attribute', record_id=attribute.id) }}"><i class="fas fa-edit"></i></a>
             <form action="{{ url_for('delete_attribute', record_id=attribute.id) }}" method="post" style="display: inline-block;">
               <input type="hidden" name="_method" value="DELETE">
               <button type="submit" class="btn btn-link"><i class="fas fa-trash"></i></button>

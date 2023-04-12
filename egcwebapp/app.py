@@ -397,6 +397,57 @@ def attribute_list():
         return render_template('attribute_list.html',
             attributes=attributes, egc_data=egc_data)
 
+def attribute_from_form(form):
+  record_data = {
+      "record_type": "A",
+      "id": form.id.data,
+      "unit_id": form.unit_id.data,
+  }
+  if form.mode_type.data == "measurement_mode_simple":
+      record_data["mode"] = form.mode.data
+  elif form.mode_type.data == "measurement_mode_relative":
+      record_data["mode"] = {
+          "mode": form.mode.data,
+          "reference": form.reference.data,
+      }
+  elif form.mode_type.data == "measurement_mode_w_location":
+      record_data["mode"] = {
+          "mode": form.mode.data,
+          "location_type": form.location_type.data,
+          "location_label": form.location_label.data,
+      }
+  elif form.mode_type.data == "measurement_mode_relative_w_location":
+      record_data["mode"] = {
+          "mode": form.mode.data,
+          "reference": form.reference.data,
+          "location_type": form.location_type.data,
+          "location_label": form.location_label.data,
+      }
+  return record_data
+
+def form_data_from_attribute(attribute):
+  attribute_data={
+    "id": attribute["id"],
+    "unit_id": attribute["unit_id"],
+    "mode_type": "measurement_mode_simple",
+  }
+  if isinstance(attribute["mode"], dict):
+    attribute_data["mode"] = attribute["mode"]["mode"]
+    if "reference" in attribute["mode"]:
+      attribute_data["reference"] = attribute["mode"]["reference"]
+      attribute_data["mode_type"] = "measurement_mode_relative"
+    if "location_type" in attribute["mode"]:
+      attribute_data["location_type"] = attribute["mode"]["location_type"]
+      if attribute_data["mode_type"] == "measurement_mode_relative":
+        attribute_data["mode_type"] = "measurement_mode_relative_w_location"
+      else:
+        attribute_data["mode_type"] = "measurement_mode_w_location"
+    if "location_label" in attribute["mode"]:
+      attribute_data["location_label"] = attribute["mode"]["location_label"]
+  else:
+    attribute_data["mode"] = attribute["mode"]
+  return attribute_data
+
 @app.route('/attributes/create', methods=['GET', 'POST'])
 def create_attribute():
     if egc_data is None:
@@ -404,15 +455,7 @@ def create_attribute():
     else:
         form = AttributeForm(request.form, egc_data=egc_data)
         if request.method == 'POST' and form.validate():
-            new_record = {
-                "record_type": "A",
-                "id": form.id.data,
-                "unit_id": form.unit_id.data,
-                "mode": form.mode.data,
-                "reference": form.reference.data,
-                "location_type": form.location_type.data,
-                "location_label": form.location_label.data,
-            }
+            new_record = attribute_from_form(form)
             egc_data.create_record(new_record)
             return redirect(url_for('attribute_list'))
         return render_template('create_attribute.html', form=form,
@@ -427,33 +470,17 @@ def edit_attribute(record_id):
         if attribute is None:
             abort(404)
 
-    attribute_data={
-        "id": attribute["id"],
-        "unit_id": attribute["unit_id"],
-    }
-    if isinstance(attribute["mode"], dict):
-      attribute_data["mode"] = attribute["mode"]["mode"]
-      attribute_data["reference"] = attribute["mode"]["reference"]
-      attribute_data["location_type"] = attribute["mode"]["location_type"]
-      attribute_data["location_label"] = attribute["mode"]["location_label"]
+    attribute_data = form_data_from_attribute(attribute)
     form = AttributeForm(request.form, egc_data=egc_data, old_id=record_id,
         data=attribute_data)
 
     if request.method == 'POST' and form.validate():
-        updated_data = {
-            "record_type": "A",
-            "id": form.id.data,
-            "unit_id": form.unit_id.data,
-            "mode": {}
-        }
-        updated_data["mode"]["mode"] = form.mode.data
-        updated_data["mode"]["reference"] = form.reference.data
-        updated_data["mode"]["location_type"] = form.location_type.data
-        updated_data["mode"]["location_label"] = form.location_label.data
+        updated_data = attribute_from_form(form)
         egc_data.update_record_by_id(record_id, updated_data)
         return redirect(url_for('attribute_list'))
 
-    return render_template('edit_attribute.html', form=form, egc_data=egc_data, errors=form.errors)
+    return render_template('edit_attribute.html', form=form, egc_data=egc_data,
+                           errors=form.errors)
 
 @app.route('/attributes/<record_id>/delete', methods=['POST'])
 def delete_attribute(record_id):

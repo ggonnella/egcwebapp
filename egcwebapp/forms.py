@@ -80,78 +80,103 @@ class UnitForm(Form):
           raise validators.ValidationError('Record ID already exists')
 
 class AttributeForm(Form):
-    id = StringField('Attribute ID', [validators.Length(min=1, max=50),
-                               validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
-    unit_id = StringField('Unit ID', [validators.Length(min=1, max=50),
-                               validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
-    mode = SelectField('Measurement Mode', choices=[('measurement_mode_simple', 'Simple'), ('measurement_mode_relative', 'Relative'), ('measurement_mode_w_location', 'With Location'), ('measurement_mode_relative_w_location', 'Relative with Location')], validators=[validators.DataRequired()])
+  id = StringField('Attribute ID', [validators.Length(min=1, max=50),
+                             validators.Regexp('[a-zA-Z0-9_]+'),
+                             validators.DataRequired()])
+  unit_id = StringField('Unit ID', [validators.Length(min=1, max=50),
+                             validators.Regexp('[a-zA-Z0-9_]+'),
+                             validators.DataRequired()])
+  mode = StringField('Mode', [validators.Length(min=1, max=50),
+                              validators.Regexp('[a-zA-Z0-9_]+'),
+                              validators.DataRequired()])
+  mode_type = SelectField('Measurement Mode Type',
+                choices=[('measurement_mode_simple', 'Simple'),
+                         ('measurement_mode_relative', 'Relative'),
+                         ('measurement_mode_w_location', 'With Location'),
+                         ('measurement_mode_relative_w_location',
+                            'Relative with Location')],
+                validators=[validators.DataRequired()])
 
-    reference = StringField('Reference', [validators.Length(min=1, max=50)], render_kw={'style': 'display:none;'})
-    location_type = StringField('Location Type', [validators.Length(min=1, max=50)], render_kw={'style': 'display:none;'})
-    location_label = StringField('Location Label', [validators.Length(min=1, max=50)], render_kw={'style': 'display:none;'})
+  hidden = {'style': 'display: none'}
+  reference = StringField('Reference', render_kw=hidden)
+  location_type = StringField('Location Type', render_kw=hidden)
+  location_label = StringField('Location Label', render_kw=hidden)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.egc_data = kwargs.pop('egc_data')
-        self.old_id = kwargs.pop('old_id', None)
-        self.script = Markup('''
-          const modeField = document.getElementById("mode");
-          const referenceFieldWrapper =
-            document.getElementById("reference-wrapper");
-          const referenceField = document.getElementById("reference");
-          const locationTypeFieldWrapper =
-            document.getElementById("location_type-wrapper");
-          const locationTypeField =
-            document.getElementById("location_type");
-          const locationLabelFieldWrapper =
-            document.getElementById("location_label-wrapper");
-          const locationLabelField =
-            document.getElementById("location_label");
+  def __init__(self, *args, **kwargs):
+      super().__init__(*args, **kwargs)
+      self.egc_data = kwargs.pop('egc_data')
+      self.old_id = kwargs.pop('old_id', None)
+      self.script = Markup('''
+        const modeTypeField = document.getElementById("mode_type");
+        const referenceFieldWrapper =
+          document.getElementById("reference-wrapper");
+        const referenceField = document.getElementById("reference");
+        const locationTypeFieldWrapper =
+          document.getElementById("location_type-wrapper");
+        const locationTypeField =
+          document.getElementById("location_type");
+        const locationLabelFieldWrapper =
+          document.getElementById("location_label-wrapper");
+        const locationLabelField =
+          document.getElementById("location_label");
 
-          function toggleFieldVisibility() {
-            if (modeField.value === 'measurement_mode_relative' ||
-                modeField.value === 'measurement_mode_relative_w_location') {
-              referenceFieldWrapper.style.display = 'block';
-              referenceField.style.display = 'block';
-            } else {
-              referenceFieldWrapper.style.display = 'none';
-              referenceField.style.display = 'none';
-            }
-            if (modeField.value === 'measurement_mode_w_location' ||
-                modeField.value === 'measurement_mode_relative_w_location') {
-              locationLabelFieldWrapper.style.display = 'block';
-              locationLabelField.style.display = 'block';
-              locationTypeFieldWrapper.style.display = 'block';
-              locationTypeField.style.display = 'block';
-            } else {
-              locationLabelFieldWrapper.style.display = 'none';
-              locationLabelField.style.display = 'none';
-              locationTypeFieldWrapper.style.display = 'none';
-              locationTypeField.style.display = 'none';
-            }
+        function toggleFieldVisibility() {
+          if (modeTypeField.value === 'measurement_mode_relative' ||
+              modeTypeField.value === 'measurement_mode_relative_w_location') {
+            referenceFieldWrapper.style.display = 'block';
+            referenceField.style.display = 'block';
+          } else {
+            referenceFieldWrapper.style.display = 'none';
+            referenceField.style.display = 'none';
           }
+          if (modeTypeField.value === 'measurement_mode_w_location' ||
+              modeTypeField.value === 'measurement_mode_relative_w_location') {
+            locationLabelFieldWrapper.style.display = 'block';
+            locationLabelField.style.display = 'block';
+            locationTypeFieldWrapper.style.display = 'block';
+            locationTypeField.style.display = 'block';
+          } else {
+            locationLabelFieldWrapper.style.display = 'none';
+            locationLabelField.style.display = 'none';
+            locationTypeFieldWrapper.style.display = 'none';
+            locationTypeField.style.display = 'none';
+          }
+        }
 
-          modeField.addEventListener('change', toggleFieldVisibility);
-          document.addEventListener('DOMContentLoaded', toggleFieldVisibility);
-        ''')
+        modeTypeField.addEventListener('change', toggleFieldVisibility);
+        document.addEventListener('DOMContentLoaded', toggleFieldVisibility);
+      ''')
 
-    def validate_id(self, field):
-      new_id = field.data
-      if self.old_id != new_id:
-        if not self.egc_data.has_unique_id(new_id):
-            raise validators.ValidationError('Record ID already exists')
+  def validate_id(self, field):
+    new_id = field.data
+    if self.old_id != new_id:
+      if not self.egc_data.is_unique_id(new_id):
+          raise validators.ValidationError('Record ID already exists')
 
-    def validate_unit_id(self, field):
+  def validate_unit_id(self, field):
+      if not self.egc_data.id_exists(field.data):
+          raise validators.ValidationError('Unit does not exist')
+
+  def validate_location_type(self, field):
+      if self.mode_type.data in ['measurement_mode_w_location',
+            'measurement_mode_relative_w_location'] and not field.data:
+          raise validators.ValidationError(
+              'Location Type is required for this type of measurement mode')
+
+  def validate_location_label(self, field):
+      if self.mode_type.data in ['measurement_mode_w_location',
+            'measurement_mode_relative_w_location'] and not field.data:
+          raise validators.ValidationError(
+              'Location Label is required for this type of measurement mode')
+
+  def validate_reference(self, field):
+      if self.mode_type.data in ['measurement_mode_relative',
+                                 'measurement_mode_relative_w_location']:
+        if not field.data:
+          raise validators.ValidationError(
+              'Reference is required for this type of measurement mode')
         if not self.egc_data.id_exists(field.data):
-            raise validators.ValidationError('Unit does not exist')
-
-    def validate_location_label(self, field):
-        if self.mode.data in ['measurement_mode_w_location', 'measurement_mode_relative_w_location'] and not field.data:
-            raise validators.ValidationError('Location Label is required for this measurement mode')
-
-    def validate_reference(self, field):
-        if self.mode.data in ['measurement_mode_relative', 'measurement_mode_relative_w_location'] and not field.data:
-            raise validators.ValidationError('Reference is required for this measurement mode')
+          raise validators.ValidationError('Unit does not exist')
 
 class ModelForm(Form):
     unit_id = StringField('Unit ID', [validators.Length(min=1, max=50), validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
