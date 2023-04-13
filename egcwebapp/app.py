@@ -208,7 +208,49 @@ def model_from_form(form):
       "resource_id": form.resource_id.data,
       "model_id": form.model_id.data,
       "model_name": form.model_name.data,
-      }
+  }
+  add_tags_from_form_data(form, record_data)
+  return record_data
+
+def vrule_from_form(form):
+  record_data = {
+      "record_type": "V",
+      "id": form.id.data,
+      "attribute": form.attribute.data,
+      "group": {"id": form.group.data},
+      "operator": form.operator.data,
+      "reference": form.reference.data,
+  }
+  if len(form.sources.data) > 1:
+    record_data["sources"] = form.sources.data
+  else:
+    record_data["sources"] = form.sources.data[0]
+  if form.group_portion.data:
+    record_data["group"]["portion"] = form.group_portion.data
+  add_tags_from_form_data(form, record_data)
+  return record_data
+
+def crule_from_form(form):
+  record_data = {
+      "record_type": "C",
+      "id": form.id.data,
+      "group1": {"id": form.group.data},
+      "operator": form.operator.data,
+      "group2": {"id": form.group.data},
+  }
+  if len(form.sources.data) > 1:
+    record_data["sources"] = form.sources.data
+  else:
+    record_data["sources"] = form.sources.data[0]
+  if form.vs_attribute.data:
+    record_data["attribute"] = {"id1": form.attribute.data,
+                                "id2": form.vs_attribute.data}
+  else:
+    record_data["attribute"] = form.attribute.data
+  if form.group1_portion.data:
+    record_data["group1"]["portion"] = form.group1_portion.data
+  if form.group2_portion.data:
+    record_data["group2"]["portion"] = form.group2_portion.data
   add_tags_from_form_data(form, record_data)
   return record_data
 
@@ -278,6 +320,30 @@ def create_model():
       return redirect(url_for('model_list'))
   return render_template('record_form.html', form=form,
       errors=form.errors, egc_data=egc_data, title_label="Create Model")
+
+@app.route('/vrules/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_vrule():
+  form = VruleForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+      new_record = vrule_from_form(form)
+      egc_data.create_record(new_record)
+      return redirect(url_for('vrule_list'))
+  return render_template('record_form.html', form=form,
+      errors=form.errors, egc_data=egc_data,
+      title_label="Create Value Expectation Rule")
+
+@app.route('/crules/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_crule():
+  form = CruleForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+      new_record = crule_from_form(form)
+      egc_data.create_record(new_record)
+      return redirect(url_for('crule_list'))
+  return render_template('record_form.html', form=form,
+      errors=form.errors, egc_data=egc_data,
+      title_label="Create Comparative Expectation Rule")
 
 def add_tags_to_form_data(record, form_data):
   if "tags" in record:
@@ -448,6 +514,75 @@ def edit_model(record_id):
   return render_template('record_form.html', form=form, egc_data=egc_data,
                          errors=form.errors, previous_page=previous_page,
                          title_label="Edit Model")
+
+def vrule_to_form(record):
+  record_data = {
+    "id": record["id"],
+    "attribute": record["attribute"],
+    "group": record["group"]["id"],
+    "operator": record["operator"],
+    "reference": record["reference"],
+  }
+  if isinstance(record["source"], list):
+    record_data["sources"] = record["source"]
+  else:
+    record_data["sources"] = [record["source"]]
+  if record["group"]["portion"]:
+    record_data["group_portion"] = record["group"]["portion"]
+  add_tags_to_form_data(record, record_data)
+  return record_data
+
+@app.route('/vrules/<record_id>/edit', methods=['GET', 'POST'])
+@require_egc_data
+def edit_vrule(record_id):
+  vrule = egc_data.get_record_by_id(record_id) or abort(404)
+  previous_page = request.args.get('previous_page') or 'vrule_list'
+  form = CruleForm(request.form, egc_data=egc_data, old_id=record_id,
+      data=vrule_to_form(vrule))
+  if request.method == 'POST' and form.validate():
+      egc_data.update_record_by_id(record_id, vrule_from_form(form))
+      return redirect(url_for(previous_page))
+  return render_template('record_form.html', form=form, egc_data=egc_data,
+                         errors=form.errors, previous_page=previous_page,
+                         title_label="Edit Value Expectation Rule")
+
+def crule_to_form(record):
+  record_data = {
+    "id": record["id"],
+    "group1": record["group1"]["id"],
+    "operator": record["operator"],
+    "group2": record["group2"]["id"],
+  }
+  if isinstance(record["source"], list):
+    record_data["sources"] = record["source"]
+  else:
+    record_data["sources"] = [record["source"]]
+  if isinstance(record["attribute"], dict):
+    record_data["attribute"] = record["attribute"]["id1"]
+    record_data["vs_attribute"] = record["attribute"]["id2"]
+  else:
+    record_data["attribute"] = record["attribute"]
+    record_data["vs_attribute"] = None
+  if record["group1"]["portion"]:
+    record_data["group1_portion"] = record["group1"]["portion"]
+  if record["group2"]["portion"]:
+    record_data["group2_portion"] = record["group2"]["portion"]
+  add_tags_to_form_data(record, record_data)
+  return record_data
+
+@app.route('/crules/<record_id>/edit', methods=['GET', 'POST'])
+@require_egc_data
+def edit_crule(record_id):
+  crule = egc_data.get_record_by_id(record_id) or abort(404)
+  previous_page = request.args.get('previous_page') or 'crule_list'
+  form = CruleForm(request.form, egc_data=egc_data, old_id=record_id,
+      data=crule_to_form(crule))
+  if request.method == 'POST' and form.validate():
+      egc_data.update_record_by_id(record_id, crule_from_form(form))
+      return redirect(url_for(previous_page))
+  return render_template('record_form.html', form=form, egc_data=egc_data,
+                         errors=form.errors, previous_page=previous_page,
+                         title_label="Edit Comparative Expectation Rule")
 
 @app.route('/documents/<record_id>/delete', methods=['POST'])
 @require_egc_data
