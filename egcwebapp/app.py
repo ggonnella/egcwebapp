@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, \
                   url_for, abort, jsonify
 from egcwebapp.forms import DocumentForm, ExtractForm, UnitForm, \
-                            AttributeForm, GroupForm
+                            AttributeForm, GroupForm, ModelForm, \
+                            VruleForm, CruleForm
 from egctools.egcdata import EGCData
 from pathlib import Path
 import os
@@ -90,6 +91,24 @@ def attribute_list():
 def group_list():
   groups = egc_data.get_records('G')
   return render_template('list_group.html', groups=groups, egc_data=egc_data)
+
+@app.route('/models')
+@require_egc_data
+def model_list():
+  models = egc_data.get_records('M')
+  return render_template('list_model.html', models=models, egc_data=egc_data)
+
+@app.route('/vrules')
+@require_egc_data
+def vrule_list():
+  vrules = egc_data.get_records('V')
+  return render_template('list_vrule.html', vrules=vrules, egc_data=egc_data)
+
+@app.route('/crules')
+@require_egc_data
+def crule_list():
+  crules = egc_data.get_records('C')
+  return render_template('list_crule.html', crules=crules, egc_data=egc_data)
 
 def add_tags_from_form_data(form_data, record):
   record["tags"] = {}
@@ -182,6 +201,17 @@ def group_from_form(form):
   add_tags_from_form_data(form, record_data)
   return record_data
 
+def model_from_form(form):
+  record_data = {
+      "record_type": "M",
+      "unit_id": form.unit_id.data,
+      "resource_id": form.resource_id.data,
+      "model_id": form.model_id.data,
+      "model_name": form.model_name.data,
+      }
+  add_tags_from_form_data(form, record_data)
+  return record_data
+
 @app.route('/documents/create', methods=['GET', 'POST'])
 @require_egc_data
 def create_document():
@@ -237,6 +267,17 @@ def create_group():
       return redirect(url_for('group_list'))
   return render_template('record_form.html', form=form,
       errors=form.errors, egc_data=egc_data, title_label="Create Group")
+
+@app.route('/models/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_model():
+  form = ModelForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+      new_record = model_from_form(form)
+      egc_data.create_record(new_record)
+      return redirect(url_for('model_list'))
+  return render_template('record_form.html', form=form,
+      errors=form.errors, egc_data=egc_data, title_label="Create Model")
 
 def add_tags_to_form_data(record, form_data):
   if "tags" in record:
@@ -384,6 +425,30 @@ def edit_group(record_id):
                          errors=form.errors, previous_page=previous_page,
                          title_label="Edit Group")
 
+def model_to_form(model):
+  model_data = {
+      "unit_id": model["unit_id"],
+      "resource_id": model["resource_id"],
+      "model_id": model["model_id"],
+      "mode_name": model["model_name"],
+  }
+  add_tags_to_form_data(model, model_data)
+  return model_data
+
+@app.route('/models/<record_id>/edit', methods=['GET', 'POST'])
+@require_egc_data
+def edit_model(record_id):
+  model = egc_data.get_record_by_id(record_id) or abort(404)
+  previous_page = request.args.get('previous_page') or 'model_list'
+  form = ModelForm(request.form, egc_data=egc_data, old_id=record_id,
+      data=model_to_form(model))
+  if request.method == 'POST' and form.validate():
+      egc_data.update_record_by_id(record_id, model_from_form(form))
+      return redirect(url_for(previous_page))
+  return render_template('record_form.html', form=form, egc_data=egc_data,
+                         errors=form.errors, previous_page=previous_page,
+                         title_label="Edit Model")
+
 @app.route('/documents/<record_id>/delete', methods=['POST'])
 @require_egc_data
 def delete_document(record_id):
@@ -419,6 +484,27 @@ def delete_group(record_id):
     previous_page = request.args.get('previous_page') or 'group_list'
     return redirect(url_for(previous_page))
 
+@app.route('/models/<record_id>/delete', methods=['POST'])
+@require_egc_data
+def delete_model(record_id):
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'model_list'
+    return redirect(url_for(previous_page))
+
+@app.route('/vrules/<record_id>/delete', methods=['POST'])
+@require_egc_data
+def delete_vrule(record_id):
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'vrule_list'
+    return redirect(url_for(previous_page))
+
+@app.route('/crules/<record_id>/delete', methods=['POST'])
+@require_egc_data
+def delete_crule(record_id):
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'crule_list'
+    return redirect(url_for(previous_page))
+
 @app.route('/documents/<record_id>')
 @require_egc_data
 def show_document(record_id):
@@ -451,6 +537,24 @@ def show_attribute(record_id):
 def show_group(record_id):
   group = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('show_group.html', group=group, egc_data=egc_data)
+
+@app.route('/models/<record_id>')
+@require_egc_data
+def show_model(record_id):
+  model = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('show_model.html', model=model, egc_data=egc_data)
+
+@app.route('/vrules/<record_id>')
+@require_egc_data
+def show_vrule(record_id):
+  vrule = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('show_vrule.html', vrule=vrule, egc_data=egc_data)
+
+@app.route('/crules/<record_id>')
+@require_egc_data
+def show_crule(record_id):
+  crule = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('show_crule.html', crule=crule, egc_data=egc_data)
 
 @app.route('/api/documents/<record_id>', methods=['GET'])
 @require_egc_data
@@ -485,6 +589,27 @@ def get_group(record_id):
   return render_template('table_group.html',
       group=group, egc_data=egc_data)
 
+@app.route('/api/models/<record_id>', methods=['GET'])
+@require_egc_data
+def get_model(record_id):
+  model = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('table_model.html',
+      model=model, egc_data=egc_data)
+
+@app.route('/api/vrules/<record_id>', methods=['GET'])
+@require_egc_data
+def get_vrule(record_id):
+  vrule = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('table_vrule.html',
+      vrule=vrule, egc_data=egc_data)
+
+@app.route('/api/crules/<record_id>', methods=['GET'])
+@require_egc_data
+def get_crule(record_id):
+  crule = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('table_crule.html',
+      crule=crule, egc_data=egc_data)
+
 @app.route('/api/documents/<record_id>/extracts', methods=['GET'])
 @require_egc_data
 def get_document_extracts(record_id):
@@ -511,6 +636,69 @@ def get_unit_units(record_id):
     abort(404)
   units = egc_data.ref_by('U', record_id, 'U')
   return render_template('datatable_unit.html', units=units,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/units/<record_id>/models', methods=['GET'])
+@require_egc_data
+def get_unit_models(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  models = egc_data.ref_by('U', record_id, 'M')
+  return render_template('datatable_model.html', models=models,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/attributes/<record_id>/vrules', methods=['GET'])
+@require_egc_data
+def get_attribute_vrules(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  vrules = egc_data.ref_by('U', record_id, 'V')
+  return render_template('datatable_vrule.html', vrules=vrules,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/attributes/<record_id>/crules', methods=['GET'])
+@require_egc_data
+def get_attribute_crules(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  crules = egc_data.ref_by('U', record_id, 'C')
+  return render_template('datatable_crule.html', crules=crules,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/groups/<record_id>/vrules', methods=['GET'])
+@require_egc_data
+def get_group_vrules(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  vrules = egc_data.ref_by('U', record_id, 'V')
+  return render_template('datatable_vrule.html', vrules=vrules,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/groups/<record_id>/crules', methods=['GET'])
+@require_egc_data
+def get_group_crules(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  crules = egc_data.ref_by('U', record_id, 'C')
+  return render_template('datatable_crule.html', crules=crules,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/extracts/<record_id>/vrules', methods=['GET'])
+@require_egc_data
+def get_extract_vrules(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  vrules = egc_data.ref_by('U', record_id, 'V')
+  return render_template('datatable_vrule.html', vrules=vrules,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/extracts/<record_id>/crules', methods=['GET'])
+@require_egc_data
+def get_extract_crules(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  crules = egc_data.ref_by('U', record_id, 'C')
+  return render_template('datatable_crule.html', crules=crules,
       egc_data=egc_data, parent_id=record_id)
 
 if __name__ == '__main__':

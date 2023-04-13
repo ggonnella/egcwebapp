@@ -359,7 +359,7 @@ class SourceForm(Form):
     def validate_tags(self, field):
       TagForm.tags_validator(field)
 
-class ValueExpectationForm(Form):
+class VruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
     source = FieldList(FormField(SourceForm))
     attribute = StringField('Attribute', [validators.Length(min=1), validators.DataRequired()])
@@ -392,7 +392,7 @@ class ValueExpectationForm(Form):
     def validate_tags(self, field):
       TagForm.tags_validator(field)
 
-class ComparativeExpectationForm(Form):
+class CruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
     source = FieldList(FormField(SourceForm))
     attribute = StringField('Attribute or Comparison', [validators.Length(min=1), validators.DataRequired()])
