@@ -36,7 +36,7 @@
                       {% set tags = document.tags %}
                       {% include 'show_tags.html' %}
                     </td>
-                    <td class="extracts-count" data-document-id="{{ record_id }}">
+                    <td class="extracts-count" data-record-id="{{ record_id }}">
                       <a href="#" class="show-extracts"
                         >{{ (egc_data.ref_by_ids('D', record_id,'S') +
                             egc_data.ref_by_ids('D', record_id, 'T')) | length }} extracts</a>
@@ -58,8 +58,14 @@
 
   <script src="{{ url_for('static', filename='js/document_list.mjs') }}"
       type="module"></script>
-  <script src="{{ url_for('static', filename='js/extract_sub_list.js') }}"
-      type="module"></script>
+  <script type="module">
+   import { createSubItemsEventListener } from
+      '{{ url_for('static', filename='js/sub_list.mjs') }}';
+    $(function() {
+      $('body').on('click', '.show-extracts',
+            createSubItemsEventListener('documents', 'extracts', 4));
+    });
+  </script>
 
 {% endblock %}
 
