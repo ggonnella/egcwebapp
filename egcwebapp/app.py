@@ -492,7 +492,7 @@ def get_document_extracts(record_id):
     abort(404)
   extracts = egc_data.ref_by('D', record_id, 'S') + \
              egc_data.ref_by('D', record_id, 'T')
-  return render_template('sublist_extract.html', extracts=extracts,
+  return render_template('datatable_extract.html', extracts=extracts,
       egc_data=egc_data, parent_id=record_id)
 
 @app.route('/api/units/<record_id>/attributes', methods=['GET'])
@@ -501,7 +501,7 @@ def get_unit_attributes(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
   attributes = egc_data.ref_by('U', record_id, 'A')
-  return render_template('sublist_attribute.html', attributes=attributes,
+  return render_template('datatable_attribute.html', attributes=attributes,
       egc_data=egc_data, parent_id=record_id)
 
 @app.route('/api/units/<record_id>/units', methods=['GET'])
@@ -510,7 +510,7 @@ def get_unit_units(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
   units = egc_data.ref_by('U', record_id, 'U')
-  return render_template('sublist_unit.html', units=units,
+  return render_template('datatable_unit.html', units=units,
       egc_data=egc_data, parent_id=record_id)
 
 if __name__ == '__main__':
