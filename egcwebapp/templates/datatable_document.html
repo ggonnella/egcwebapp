@@ -1,9 +1,9 @@
 {% block content %}
   {% set table_id="document-table" %}
   {% if main %}
-  {% set show_refby=True %}
+    {% set show_refby=True %}
   {% else %}
-  {% set table_id=table_id+"-"+parent_id%}
+    {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
     <table id="{{table_id}}" class="table table-striped table-hover">
@@ -24,6 +24,7 @@
               <tr>
                   <td style:"white-space: nowrap;">
                     <span class="document-id" style="display: inline;"
+                      data-document-id="{{ record_id }}"
                       ><a href="https://pubmed.ncbi.nlm.nih.gov/{{ document.document_id.item }}"
                         target="_blank" class="no-underline pmid-link"
                       >{{ document.document_id.item }}</a></span><span
@@ -77,9 +78,12 @@
   {% endif %}
   {% if not main %}
     <script type="module">
-      import { initNestedTable } from
-          '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(document).ready(function() { initNestedTable("{{table_id}}"); });
+      import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
+      import { initTooltips } from '{{ url_for('static', filename='js/list_document.mjs') }}';
+      $(document).ready(function() {
+        initNestedTable("{{table_id}}");
+        initTooltips();
+      });
     </script>
   {% endif %}
 {% endblock %}

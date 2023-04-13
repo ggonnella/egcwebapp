@@ -824,9 +824,9 @@ def get_extract_vrules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
   extract = egc_data.get_record_by_id(record_id)
-  if extract.record_type == 'S':
+  if extract["record_type"] == 'S':
     vrules = egc_data.ref_by('S', record_id, 'V')
-  elif extract.record_type == 'T':
+  elif extract["record_type"] == 'T':
     vrules = egc_data.ref_by('T', record_id, 'V')
   return render_template('datatable_vrule.html', vrules=vrules,
       egc_data=egc_data, parent_id=record_id)
@@ -837,9 +837,9 @@ def get_extract_crules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
   extract = egc_data.get_record_by_id(record_id)
-  if extract.record_type == 'S':
+  if extract["record_type"] == 'S':
     crules = egc_data.ref_by('S', record_id, 'C')
-  elif extract.record_type == 'T':
+  elif extract["record_type"] == 'T':
     crules = egc_data.ref_by('T', record_id, 'C')
   return render_template('datatable_crule.html', crules=crules,
       egc_data=egc_data, parent_id=record_id)

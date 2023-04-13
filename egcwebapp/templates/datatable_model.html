@@ -1,8 +1,9 @@
 {% block content %}
   {% set table_id="model-table" %}
-  {% if main %}
-  {% set show_unit=True %}
-  {% else %}
+  {% if not hide_unit %}
+    {% set show_unit=True %}
+  {% endif %}
+  {% if not main %}
   {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
@@ -52,7 +53,11 @@
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(document).ready(function() { initNestedTable("{{table_id}}"); });
+      import { initTooltips } from '{{ url_for('static', filename='js/list_model.mjs') }}';
+      $(document).ready(function() {
+        initNestedTable("{{table_id}}");
+        initTooltips();
+      });
     </script>
   {% endif %}
 {% endblock %}

@@ -1,10 +1,12 @@
 {% block content %}
   {% set table_id="vrule-table" %}
-  {% if main %}
-    {% set show_sources=True %}
+  {% if not hide_attribute %}
     {% set show_attribute=True %}
+  {% endif %}
+  {% if not hide_group %}
     {% set show_group=True %}
-  {% else %}
+  {% endif %}
+  {% if not main %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
@@ -12,9 +14,7 @@
       <thead>
         <tr>
           <th>ID</th>
-          {% if show_sources %}
-            <th>Sources</th>
-          {% endif %}
+          <th>Sources</th>
           {% if show_attribute %}
             <th>Attribute</th>
           {% endif %}
@@ -32,22 +32,20 @@
         {% for vrule in vrules %}
           <tr>
             <td>{{ vrule.id }}</td>
-            {% if show_sources %}
-              <td>
-                {% if vrule.source is string %}
+            <td>
+              {% if vrule.source is string %}
+                {% set related_type, related_id, prev =
+                   'extract', vrule.source, 'vrule_list' %}
+                {% include 'related_record_link.html' %}
+              {% else %}
+                {% for source in vrule.source %}
                   {% set related_type, related_id, prev =
-                     'extract', vrule.source, 'vrule_list' %}
+                     'extract', source, 'vrule_list' %}
                   {% include 'related_record_link.html' %}
-                {% else %}
-                  {% for source in vrule.source %}
-                    {% set related_type, related_id, prev =
-                       'extract', source, 'vrule_list' %}
-                    {% include 'related_record_link.html' %}
-                    <br/>
-                  {% endfor %}
-                {% endif %}
-              </td>
-            {% endif %}
+                  <br/>
+                {% endfor %}
+              {% endif %}
+            </td>
             {% if show_attribute %}
               <td>
                 {% set related_type, related_id, prev =
@@ -88,7 +86,11 @@
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(document).ready(function() { initNestedTable("{{table_id}}"); });
+      import { initTooltips } from '{{ url_for('static', filename='js/list_vrule.mjs') }}';
+      $(document).ready(function() {
+        initNestedTable("{{table_id}}");
+        initTooltips();
+      });
     </script>
   {% endif %}
 {% endblock %}

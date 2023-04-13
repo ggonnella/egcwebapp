@@ -92,7 +92,11 @@
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(document).ready(function() { initNestedTable("{{table_id}}"); });
+      import { initTooltips } from '{{ url_for('static', filename='js/list_crule.mjs') }}';
+      $(document).ready(function() {
+        initNestedTable("{{table_id}}");
+        initTooltips();
+      });
     </script>
   {% endif %}
 {% endblock %}

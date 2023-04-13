@@ -1,9 +1,12 @@
 {% block content %}
   {% set table_id="extract-table" %}
+  {% if not hide_document %}
+    {% set show_document=True %}
+  {% endif %}
   {% if main %}
-  {% set show_document=True %}
+    {% set show_refby=True %}
   {% else %}
-  {% set table_id=table_id+"-"+parent_id%}
+    {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
     <table id="{{table_id}}" class="table table-striped table-hover">
@@ -16,6 +19,9 @@
             {% endif %}
             <th>Text / Table Reference</th>
             <th>Tags</th>
+            {% if show_refby %}
+              <th>Referenced&nbsp;by</th>
+            {% endif %}
             <th>Actions</th>
         </tr>
       </thead>
@@ -49,6 +55,16 @@
               {% set tags = extract.tags %}
               {% include 'tags_lines.html' %}
             </td>
+            {% if show_refby %}
+              <td>
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
+                       'vrule', extract.id, extract.record_type, 'V', 'value rule' %}
+                {% include 'ref_by_link.html' %}
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
+                       'crule', extract.id, extract.record_type, 'C', 'comp. rule' %}
+                {% include 'ref_by_link.html' %}
+              </td>
+            {% endif %}
             <td>
               <a href="{{ url_for('edit_extract', record_id=extract.id) }}"><i class="fas fa-edit"></i></a>
               <form action="{{ url_for('delete_extract', record_id=extract.id) }}" method="post" style="display: inline-block;">
@@ -61,10 +77,28 @@
       </tbody>
     </table>
   </div>
+  {% if show_refby %}
+    <script type="module">
+     import { openNestedTable } from
+          '{{ url_for('static', filename='js/nested_table.js') }}';
+      $(function() {
+        $('body').on('click', '.show-vrules',
+              openNestedTable('extracts', 'vrules', 8));
+      });
+      $(function() {
+        $('body').on('click', '.show-crules',
+              openNestedTable('extracts', 'crules', 8));
+      });
+    </script>
+  {% endif %}
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(document).ready(function() { initNestedTable("{{table_id}}"); });
+      import { initTooltips } from '{{ url_for('static', filename='js/list_extract.mjs') }}';
+      $(document).ready(function() {
+        initNestedTable("{{table_id}}");
+        initTooltips();
+      });
     </script>
   {% endif %}
 {% endblock %}

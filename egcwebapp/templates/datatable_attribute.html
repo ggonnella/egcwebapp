@@ -1,7 +1,9 @@
 {% block content %}
   {% set table_id="attribute-table" %}
+  {% if not hide_unit %}
+    {% set show_unit=True %}
+  {% endif %}
   {% if main %}
-  {% set show_unit=True %}
   {% set show_refby=True %}
   {% else %}
   {% set table_id=table_id+"-"+parent_id%}
@@ -94,7 +96,11 @@
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(document).ready(function() { initNestedTable("{{table_id}}"); });
+      import { initTooltips } from '{{ url_for('static', filename='js/list_attribute.mjs') }}';
+      $(document).ready(function() {
+        initNestedTable("{{table_id}}");
+        initTooltips();
+      });
     </script>
   {% endif %}
 {% endblock %}
