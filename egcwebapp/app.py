@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, \
-                  url_for, abort, jsonify
+                  url_for, abort, jsonify, send_from_directory
 from egcwebapp.forms import DocumentForm, ExtractForm, UnitForm, \
                             AttributeForm, GroupForm, ModelForm, \
                             VruleForm, CruleForm
@@ -12,7 +12,8 @@ from flask_navigation import Navigation
 app = Flask(__name__)
 nav = Navigation(app)
 nav.Bar('top', [
-    nav.Item('Load EGC', 'load_egc_file'),
+    nav.Item('Load', 'load_egc_file'),
+    nav.Item('Save', 'save_egc_file'),
     nav.Item('Documents', 'document_list'),
     nav.Item('Extracts', 'extract_list'),
     nav.Item('Groups', 'group_list'),
@@ -71,6 +72,14 @@ def require_egc_data(func):
         else:
             return func(*args, **kwargs)
     return wrapper
+
+@app.route('/save_egc_file')
+@require_egc_data
+def save_egc_file():
+    return send_from_directory(
+        app.config['UPLOAD_FOLDER'],
+        os.path.basename(egc_data.file_path),
+        mimetype='application/egc')
 
 @app.route('/documents')
 @require_egc_data
