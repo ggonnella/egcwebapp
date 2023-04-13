@@ -24,7 +24,15 @@
       <tbody>
         {% for group in groups %}
           <tr>
-            <td>{{ group.id }}</td>
+            <td>
+              {% if main %}
+                {{ group.id }}
+              {% else %}
+                {% set related_type, related_id, prev =
+                   'group', group.id, 'group_list' %}
+                {% include 'related_record_link.html' %}
+              {% endif %}
+            </td>
             <td>{{ group.type }}</td>
             <td>{{ group.name }}</td>
             <td>{{ group.definition }}</td>

@@ -22,7 +22,15 @@
       <tbody>
         {% for crule in crules %}
           <tr>
-            <td>{{ crule.id }}</td>
+            <td>
+              {% if main %}
+                {{ crule.id }}
+              {% else %}
+                {% set related_type, related_id, prev =
+                   'crule', crule.id, 'crule_list' %}
+                {% include 'related_record_link.html' %}
+              {% endif %}
+            </td>
             <td>
               {% if crule.source is string %}
                 {% set related_type, related_id, prev =

@@ -24,7 +24,15 @@
       <tbody>
         {% for unit in units %}
           <tr>
-            <td>{{ unit.id }}</td>
+            <td>
+              {% if main %}
+                {{ unit.id }}
+              {% else %}
+                {% set related_type, related_id, prev =
+                   'unit', unit.id, 'unit_list' %}
+                {% include 'related_record_link.html' %}
+              {% endif %}
+            </td>
             <td>{{ unit.type }}</td>
             <td>{{ unit.definition }}</td>
             <td>{{ unit.symbol }}</td>

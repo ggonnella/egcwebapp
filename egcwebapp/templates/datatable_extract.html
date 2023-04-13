@@ -29,7 +29,15 @@
         {% for extract in extracts %}
           <tr>
             <td>{{ extract.record_type }}</td>
-            <td>{{ extract.id }}</td>
+            <td>
+              {% if main %}
+                {{ extract.id }}
+              {% else %}
+                {% set related_type, related_id, prev =
+                   'extract', extract.id, 'extract_list' %}
+                {% include 'related_record_link.html' %}
+              {% endif %}
+            </td>
             {% if show_document %}
               <td style:"white-space: nowrap;">
                 {% set document_record_id = egc_data.

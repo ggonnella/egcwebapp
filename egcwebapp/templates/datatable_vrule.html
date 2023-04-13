@@ -31,7 +31,15 @@
       <tbody>
         {% for vrule in vrules %}
           <tr>
-            <td>{{ vrule.id }}</td>
+            <td>
+              {% if main %}
+                {{ vrule.id }}
+              {% else %}
+                {% set related_type, related_id, prev =
+                   'vrule', vrule.id, 'vrule_list' %}
+                {% include 'related_record_link.html' %}
+              {% endif %}
+            </td>
             <td>
               {% if vrule.source is string %}
                 {% set related_type, related_id, prev =
