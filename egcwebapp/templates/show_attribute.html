@@ -1,36 +1,7 @@
 {% extends 'base.html' %}
-
 {% block content %}
-
-  <h2>Attribute Record</h2>
-  <table class="table table-striped">
-    <tbody>
-      <tr class="odd">
-        <th>ID</th>
-        <td>{{ attribute.id }}</td>
-      </tr>
-      <tr class="even">
-        <th>Unit ID</th>
-        <td>{{ attribute.unit_id }}</td>
-      </tr>
-      <tr class="odd">
-        <th>Measurement Mode</th>
-        <td>{{ attribute.mode }}</td>
-      </tr>
-      {% if attribute.reference %}
-      <tr class="even">
-        <th>Reference</th>
-        <td>{{ attribute.reference }}</td>
-      </tr>
-      {% endif %}
-      {% if attribute.location_label %}
-      <tr class="odd">
-        <th>Location Label</th>
-        <td>{{ attribute.location_label }}</td>
-      </tr>
-      {% endif %}
-   </tbody>
-  </table>
+  <h1>Attribute Record</h1>
+  {% include 'table_attribute.html' %}
   <a href="{{ url_for('edit_attribute', record_id=attribute.id) }}"
      class="btn btn-primary">Edit</a>
   <form action="{{ url_for('delete_attribute', record_id=attribute.id) }}"

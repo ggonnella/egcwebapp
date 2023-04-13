@@ -1,37 +1,8 @@
 {% extends "base.html" %}
-
 {% block content %}
-  <h2>Document Record</h2>
-  <table class="table table-striped">
-    <tbody>
-      <tr class="odd">
-        <th>Document ID</th>
-        <td><a href="https://pubmed.ncbi.nlm.nih.gov/{{ document.document_id.item }}"
-                            target="_blank" class="no-underline pmid-link">
-            {{ document.document_id.resource_prefix }}:{{ document.document_id.item }}</a><span class="document-info-container">
-          <span class="document-info" style="display: inline;">&nbsp;&#9432;
-            <script type="module">
-              import { initDocumentInfoTooltip } from '{{ url_for('static', filename='js/document_info.mjs') }}';
-              const pmid = '{{ document.document_id.item }}';
-              const url = '{{ document.link }}';
-              const target = $('.document-info-container:last-child .document-info');
-              initDocumentInfoTooltip(target, pmid, url);
-            </script>
-          </span>
-        </span>
-        </td>
-      </tr>
-      <tr class="even">
-        <th>Link</th>
-        <td>
-          <a href="{{ document.link }}" target="_blank" class="no-underline document-link">
-                {{ document.link }}
-          </a>
-        </td>
-      </tr>
-    </tbody>
-
-  </table>
+  <h1>Document Record</h1>
+  {% set show_document_info = True %}
+  {% include 'table_document.html' %}
   <a href="{{ url_for('edit_document',
      record_id=egc_data.compute_docid(document)) }}"
      class="btn btn-primary">Edit</a>

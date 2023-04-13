@@ -1,31 +1,7 @@
 {% extends "base.html" %}
-
 {% block content %}
-  <h2>Unit Record</h2>
-  <table class="table table-striped">
-    <tbody>
-      <tr class="odd">
-        <th>ID</th>
-        <td>{{ unit.id }}</td>
-      </tr>
-      <tr class="even">
-        <th>Type</th>
-        <td>{{ unit.type }}</td>
-      </tr>
-      <tr class="odd">
-        <th>Definition</th>
-        <td>{{ unit.definition }}</td>
-      </tr>
-      <tr class="even">
-        <th>Symbol</th>
-        <td>{{ unit.symbol }}</td>
-      </tr>
-      <tr class="odd">
-        <th>Description</th>
-        <td>{{ unit.description }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <h1>Unit Record</h1>
+  {% include 'table_unit.html' %}
   <a href="{{ url_for('edit_unit', record_id=unit.id) }}"
      class="btn btn-primary">Edit</a>
   <form action="{{ url_for('delete_unit', record_id=unit.id) }}"

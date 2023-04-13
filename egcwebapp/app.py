@@ -456,33 +456,33 @@ def show_group(record_id):
 @require_egc_data
 def get_document(record_id):
     document = egc_data.get_record_by_id(record_id) or abort(404)
-    return render_template('table_show_document.html', document=document,
+    return render_template('table_document.html', document=document,
             egc_data=egc_data)
 
 @app.route('/api/extracts/<record_id>', methods=['GET'])
 @require_egc_data
 def get_extract(record_id):
     extract = egc_data.get_record_by_id(record_id) or abort(404)
-    return render_template('table_show_extract.html', extract=extract,
+    return render_template('table_extract.html', extract=extract,
             egc_data=egc_data)
 
 @app.route('/api/units/<record_id>', methods=['GET'])
 def get_unit(record_id):
   unit = egc_data.get_record_by_id(record_id) or abort(404)
-  return render_template('table_show_unit.html', unit=unit, egc_data=egc_data)
+  return render_template('table_unit.html', unit=unit, egc_data=egc_data)
 
 @app.route('/api/attributes/<record_id>', methods=['GET'])
 @require_egc_data
 def get_attribute(record_id):
   attribute = egc_data.get_record_by_id(record_id) or abort(404)
-  return render_template('table_show_attribute.html',
+  return render_template('table_attribute.html',
                           attribute=attribute, egc_data=egc_data)
 
 @app.route('/api/groups/<record_id>', methods=['GET'])
 @require_egc_data
 def get_group(record_id):
   group = egc_data.get_record_by_id(record_id) or abort(404)
-  return render_template('table_show_group.html',
+  return render_template('table_group.html',
       group=group, egc_data=egc_data)
 
 @app.route('/api/documents/<record_id>/extracts', methods=['GET'])
