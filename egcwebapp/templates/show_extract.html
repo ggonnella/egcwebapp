@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
   <h1>Document Extract Record</h1>
-  {% include 'table_extract.html' %}
-  <a href="{{ url_for('edit_extract', record_id=extract.id) }}"
-     class="btn btn-primary">Edit</a>
-  <form action="{{ url_for('delete_extract', record_id=extract.id) }}"
-     method="post" style="display: inline-block;">
-    <input type="hidden" name="_method" value="DELETE">
-    <button type="submit" class="btn btn-link">Delete</button>
-  </form>
+  {% set main=True %}
+  {% set extracts = [extract] %}
+  {% include 'datatable_extract.html' %}
+  <script src="{{ url_for('static', filename='js/list_extract.mjs') }}"
+      type="module"></script>
 {% endblock %}

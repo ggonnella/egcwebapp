@@ -1,15 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
   <h1>Document Record</h1>
-  {% set show_document_info = True %}
-  {% include 'table_document.html' %}
-  <a href="{{ url_for('edit_document',
-     record_id=egc_data.compute_docid(document)) }}"
-     class="btn btn-primary">Edit</a>
-  <form action="{{ url_for('delete_document',
-      record_id=egc_data.compute_docid(document)) }}"
-      method="post" style="display: inline-block;">
-    <input type="hidden" name="_method" value="DELETE">
-    <button type="submit" class="btn btn-link">Delete</button>
-  </form>
+  {% set main=True %}
+  {% set documents = [document] %}
+  {% include 'datatable_document.html' %}
+  <script src="{{ url_for('static', filename='js/list_document.mjs') }}"
+      type="module"></script>
 {% endblock %}

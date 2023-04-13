@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
   <h1>Unit Record</h1>
-  {% include 'table_unit.html' %}
-  <a href="{{ url_for('edit_unit', record_id=unit.id) }}"
-     class="btn btn-primary">Edit</a>
-  <form action="{{ url_for('delete_unit', record_id=unit.id) }}"
-     method="post" style="display: inline-block;">
-    <input type="hidden" name="_method" value="DELETE">
-    <button type="submit" class="btn btn-link">Delete</button>
-  </form>
+  {% set main=True %}
+  {% set units = [unit] %}
+  {% include 'datatable_unit.html' %}
+  <script src="{{ url_for('static', filename='js/list_unit.mjs') }}"
+      type="module"></script>
 {% endblock %}

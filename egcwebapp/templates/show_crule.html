@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
   <h1>Comparative Expectation Rule Record</h1>
-  {% include 'table_crule.html' %}
-  <a href="{{ url_for('edit_crule', record_id=crule.id) }}"
-    class="btn btn-primary">Edit</a>
-  <form action="{{ url_for('delete_crule', record_id=crule.id) }}"
-    method="post" style="display: inline-block;">
-    <input type="hidden" name="_method" value="DELETE">
-    <button type="submit" class="btn btn-link">Delete</button>
-  </form>
+  {% set main=True %}
+  {% set crules = [crule] %}
+  {% include 'datatable_crule.html' %}
+  <script src="{{ url_for('static', filename='js/list_crule.mjs') }}"
+      type="module"></script>
 {% endblock %}
