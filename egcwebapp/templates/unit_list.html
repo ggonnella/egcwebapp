@@ -14,6 +14,7 @@
         <th>Description</th>
         <th>Tags</th>
         <th>Attributes</th>
+        <th>Child Units</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -31,6 +32,9 @@
           </td>
           {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
                 'attribute', unit.id, 'U', 'A' %}
+          {% include 'ref_by_cell.html' %}
+          {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
+                'unit', unit.id, 'U', 'U' %}
           {% include 'ref_by_cell.html' %}
           <td>
             <a href="{{ url_for('edit_unit', record_id=unit.id) }}">
@@ -50,6 +54,8 @@
   <script src="{{ url_for('static', filename='js/unit_list.mjs') }}"
     type="module"></script>
   <script src="{{ url_for('static', filename='js/attribute_sub_list.js') }}"
+    type="module"></script>
+  <script src="{{ url_for('static', filename='js/unit_sub_list.js') }}"
     type="module"></script>
 
 {% endblock %}

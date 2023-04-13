@@ -22,7 +22,7 @@
           <td>{{ unit.description }}</td>
             <td>
               <a href="{{ url_for('edit_unit', record_id=unit.id) }}"><i class="fas fa-edit"></i></a>
-              <form action="{{ url_for'delete_unit', record_id=unit.id) }}" method="post" style="display: inline-block;">
+              <form action="{{ url_for('delete_unit', record_id=unit.id) }}" method="post" style="display: inline-block;">
                 <input type="hidden" name="_method" value="DELETE">
                 <button type="submit" class="btn btn-link"><i class="fas fa-trash"></i></button>
               </form>
@@ -34,24 +34,25 @@
 </div>
 <script>
   $(document).ready(function() {
-      var table = $("#unit-sub-table-{{parent_id}}").DataTable();
-  // Create the close button with the FontAwesome icon
-  var closeButton = $('<button id="close-nested-table" class="btn btn-sm btn-light" style="margin-left: 10px;"><i class="fas fa-times"></i></button>');
+    var table = $("#unit-sub-table-{{parent_id}}").DataTable();
+    // Create the close button with the FontAwesome icon
+    var closeButton = $('<button id="close-nested-table" class="btn btn-sm btn-light" style="margin-left: 10px;"><i class="fas fa-times"></i></button>');
 
-  // Attach the click event to the close button
-  closeButton.on('click', closeNestedTable);
+    // Attach the click event to the close button
+    closeButton.on('click', closeNestedTable);
 
-  // Insert the close button as a sibling element of the search input
-  $("#unit-sub-table-wrapper-{{parent_id}} .dataTables_filter").append(closeButton);
-  return table;
-});
+    // Insert the close button as a sibling element of the search input
+    $("#unit-sub-table-wrapper-{{parent_id}} .dataTables_filter").append(closeButton);
+    return table;
+  });
 
-// Function to remove the nested table when the close button is clicked
-function closeNestedTable() {
-var $nestedUnits = $(this).closest('div.dataTables_wrapper').parent().parent().parent();
-if ($nestedUnits.length > 0) {
-$nestedUnits.remove();
-}
-}
+  // Function to remove the nested table when the close button is clicked
+  function closeNestedTable() {
+    var $nestedUnits = $(this).closest('div.dataTables_wrapper').parent().parent().parent();
+    if ($nestedUnits.length > 0) {
+      $nestedUnits.remove();
+    }
+  }
 </script>
-{% endblock %}(
+
+{% endblock %}

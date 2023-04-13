@@ -20,7 +20,7 @@ $(function() {
         var $newRow = $('<tr class="nested-attributes"></tr>');
 
         // Create a new cell that spans all the columns in the table
-        var $newCell = $('<td colspan="4"></td>');
+        var $newCell = $('<td colspan="8"></td>');
 
         // Append the response to the new cell
         $newCell.append(response);
