@@ -1,4 +1,4 @@
-<td class="{{ref_by_type}}s-count" data-record-id="{{ ref_id }}">
+<div class="{{ref_by_type}}s-count" data-record-id="{{ ref_id }}">
   {% set count=egc_data.ref_by_ids(ref_rt, ref_id, ref_by_rt)|length %}
   {% if count == 0 %}
     no {{ref_by_type}}s
@@ -7,4 +7,4 @@
   {% else %}
     <a href="#" class="show-{{ref_by_type}}s"> {{ count }} {{ref_by_type}}s </a>
   {% endif %}
-</td>
+</div>

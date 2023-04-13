@@ -42,10 +42,12 @@
                     {% include 'show_tags.html' %}
                   </td>
                   {% if show_refby %}
-                    <td class="extracts-count" data-record-id="{{ record_id }}">
-                      <a href="#" class="show-extracts"
-                        >{{ (egc_data.ref_by_ids('D', record_id,'S') +
-                            egc_data.ref_by_ids('D', record_id, 'T')) | length }} extracts</a>
+                    <td>
+                      <div class="extracts-count" data-record-id="{{ record_id }}">
+                        <a href="#" class="show-extracts"
+                          >{{ (egc_data.ref_by_ids('D', record_id,'S') +
+                              egc_data.ref_by_ids('D', record_id, 'T')) | length }} extracts</a>
+                      </div>
                     </td>
                   {% endif %}
                   <td>
@@ -65,17 +67,18 @@
   </div>
   {% if show_refby %}
     <script type="module">
-     import { createSubItemsEventListener } from
-        '{{ url_for('static', filename='js/sublist.mjs') }}';
+     import { openNestedTable } from
+        '{{ url_for('static', filename='js/nested_table.js') }}';
       $(function() {
         $('body').on('click', '.show-extracts',
-              createSubItemsEventListener('documents', 'extracts', 4));
+              openNestedTable('documents', 'extracts', 4));
       });
     </script>
   {% endif %}
   {% if not main %}
     <script type="module">
-      import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
+      import { initNestedTable } from
+          '{{ url_for('static', filename='js/nested_table.js') }}';
       $(document).ready(function() { initNestedTable("{{table_id}}"); });
     </script>
   {% endif %}

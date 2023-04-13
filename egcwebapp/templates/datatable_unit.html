@@ -16,8 +16,7 @@
             <th>Description</th>
             <th>Tags</th>
             {% if show_refby %}
-              <th>Attributes</th>
-              <th>Children Units</th>
+              <th>Referenced&nbsp;by</th>
             {% endif %}
             <th>Actions</th>
         </tr>
@@ -35,12 +34,14 @@
               {% include 'show_tags.html' %}
             </td>
             {% if show_refby %}
-              {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
-                     'attribute', unit.id, 'U', 'A' %}
-              {% include 'ref_by_cell.html' %}
-              {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
-                     'unit', unit.id, 'U', 'U' %}
-              {% include 'ref_by_cell.html' %}
+              <td>
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
+                       'attribute', unit.id, 'U', 'A' %}
+                {% include 'ref_by_link.html' %}
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
+                       'unit', unit.id, 'U', 'U' %}
+                {% include 'ref_by_link.html' %}
+              </td>
             {% endif %}
             <td>
               <a href="{{ url_for('edit_unit', record_id=unit.id) }}">
@@ -59,21 +60,22 @@
   </div>
   {% if show_refby %}
     <script type="module">
-     import { createSubItemsEventListener } from
-        '{{ url_for('static', filename='js/sublist.mjs') }}';
+     import { openNestedTable } from
+          '{{ url_for('static', filename='js/nested_table.js') }}';
       $(function() {
         $('body').on('click', '.show-attributes',
-              createSubItemsEventListener('units', 'attributes', 8));
+              openNestedTable('units', 'attributes', 8));
       });
       $(function() {
         $('body').on('click', '.show-units',
-              createSubItemsEventListener('units', 'units', 8));
+              openNestedTable('units', 'units', 8));
       });
     </script>
   {% endif %}
   {% if not main %}
     <script type="module">
-      import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
+      import { initNestedTable } from
+          '{{ url_for('static', filename='js/nested_table.js') }}';
       $(document).ready(function() { initNestedTable("{{table_id}}"); });
     </script>
   {% endif %}
