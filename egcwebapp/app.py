@@ -787,7 +787,7 @@ def get_unit_models(record_id):
 def get_attribute_vrules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
-  vrules = egc_data.ref_by('U', record_id, 'V')
+  vrules = egc_data.ref_by('A', record_id, 'V')
   return render_template('datatable_vrule.html', vrules=vrules,
       egc_data=egc_data, parent_id=record_id)
 
@@ -796,7 +796,7 @@ def get_attribute_vrules(record_id):
 def get_attribute_crules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
-  crules = egc_data.ref_by('U', record_id, 'C')
+  crules = egc_data.ref_by('A', record_id, 'C')
   return render_template('datatable_crule.html', crules=crules,
       egc_data=egc_data, parent_id=record_id)
 
@@ -805,7 +805,7 @@ def get_attribute_crules(record_id):
 def get_group_vrules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
-  vrules = egc_data.ref_by('U', record_id, 'V')
+  vrules = egc_data.ref_by('G', record_id, 'V')
   return render_template('datatable_vrule.html', vrules=vrules,
       egc_data=egc_data, parent_id=record_id)
 
@@ -814,7 +814,7 @@ def get_group_vrules(record_id):
 def get_group_crules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
-  crules = egc_data.ref_by('U', record_id, 'C')
+  crules = egc_data.ref_by('G', record_id, 'C')
   return render_template('datatable_crule.html', crules=crules,
       egc_data=egc_data, parent_id=record_id)
 
@@ -823,7 +823,11 @@ def get_group_crules(record_id):
 def get_extract_vrules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
-  vrules = egc_data.ref_by('U', record_id, 'V')
+  extract = egc_data.get_record_by_id(record_id)
+  if extract.record_type == 'S':
+    vrules = egc_data.ref_by('S', record_id, 'V')
+  elif extract.record_type == 'T':
+    vrules = egc_data.ref_by('T', record_id, 'V')
   return render_template('datatable_vrule.html', vrules=vrules,
       egc_data=egc_data, parent_id=record_id)
 
@@ -832,7 +836,11 @@ def get_extract_vrules(record_id):
 def get_extract_crules(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
-  crules = egc_data.ref_by('U', record_id, 'C')
+  extract = egc_data.get_record_by_id(record_id)
+  if extract.record_type == 'S':
+    crules = egc_data.ref_by('S', record_id, 'C')
+  elif extract.record_type == 'T':
+    crules = egc_data.ref_by('T', record_id, 'C')
   return render_template('datatable_crule.html', crules=crules,
       egc_data=egc_data, parent_id=record_id)
 

@@ -2,6 +2,7 @@
   {% set table_id="attribute-table" %}
   {% if main %}
   {% set show_unit=True %}
+  {% set show_refby=True %}
   {% else %}
   {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
@@ -18,6 +19,9 @@
           <th>Location Type</th>
           <th>Location Label</th>
           <th>Tags</th>
+          {% if show_refby %}
+            <th>Referenced&nbsp;by</th>
+          {% endif %}
           <th>Actions</th>
         </tr>
       </thead>
@@ -51,6 +55,16 @@
               {% set tags = attribute.tags %}
               {% include 'tags_lines.html' %}
             </td>
+            {% if show_refby %}
+              <td>
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
+                       'vrule', attribute.id, 'A', 'V', 'value rule' %}
+                {% include 'ref_by_link.html' %}
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
+                       'crule', attribute.id, 'A', 'C', 'comp. rule' %}
+                {% include 'ref_by_link.html' %}
+              </td>
+            {% endif %}
             <td>
               <a href="{{ url_for('edit_attribute', record_id=attribute.id) }}"><i class="fas fa-edit"></i></a>
               <form action="{{ url_for('delete_attribute', record_id=attribute.id) }}" method="post" style="display: inline-block;">
@@ -63,6 +77,20 @@
       </tbody>
     </table>
   </div>
+  {% if show_refby %}
+    <script type="module">
+     import { openNestedTable } from
+          '{{ url_for('static', filename='js/nested_table.js') }}';
+      $(function() {
+        $('body').on('click', '.show-vrules',
+              openNestedTable('attributes', 'vrules', 8));
+      });
+      $(function() {
+        $('body').on('click', '.show-crules',
+              openNestedTable('attributes', 'crules', 8));
+      });
+    </script>
+  {% endif %}
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
