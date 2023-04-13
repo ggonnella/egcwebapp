@@ -234,9 +234,9 @@ def crule_from_form(form):
   record_data = {
       "record_type": "C",
       "id": form.id.data,
-      "group1": {"id": form.group.data},
+      "group1": {"id": form.group1.data},
       "operator": form.operator.data,
-      "group2": {"id": form.group.data},
+      "group2": {"id": form.group2.data},
   }
   if len(form.sources.data) > 1:
     record_data["sources"] = form.sources.data
@@ -527,7 +527,7 @@ def vrule_to_form(record):
     record_data["sources"] = record["source"]
   else:
     record_data["sources"] = [record["source"]]
-  if record["group"]["portion"]:
+  if "portion" in record["group"]:
     record_data["group_portion"] = record["group"]["portion"]
   add_tags_to_form_data(record, record_data)
   return record_data
@@ -537,7 +537,7 @@ def vrule_to_form(record):
 def edit_vrule(record_id):
   vrule = egc_data.get_record_by_id(record_id) or abort(404)
   previous_page = request.args.get('previous_page') or 'vrule_list'
-  form = CruleForm(request.form, egc_data=egc_data, old_id=record_id,
+  form = VruleForm(request.form, egc_data=egc_data, old_id=record_id,
       data=vrule_to_form(vrule))
   if request.method == 'POST' and form.validate():
       egc_data.update_record_by_id(record_id, vrule_from_form(form))
@@ -563,9 +563,9 @@ def crule_to_form(record):
   else:
     record_data["attribute"] = record["attribute"]
     record_data["vs_attribute"] = None
-  if record["group1"]["portion"]:
+  if "portion" in record["group1"]:
     record_data["group1_portion"] = record["group1"]["portion"]
-  if record["group2"]["portion"]:
+  if "portion" in record["group2"]:
     record_data["group2_portion"] = record["group2"]["portion"]
   add_tags_to_form_data(record, record_data)
   return record_data

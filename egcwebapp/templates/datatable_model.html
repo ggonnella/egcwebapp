@@ -24,9 +24,11 @@
           {% set model_id=egc_data.compute_modelid(model) %}
           <tr>
             {% if show_unit %}
-              {% set related_type, related_id, prev =
-                 'unit', model.unit_id, 'model_list' %}
-              {% include 'related_record_cell.html' %}
+              <td>
+                {% set related_type, related_id, prev =
+                   'unit', model.unit_id, 'model_list' %}
+                {% include 'related_record_link.html' %}
+              </td>
             {% endif %}
             <td>{{ model.resource_id }}</td>
             <td>{{ model.model_id }}</td>
@@ -36,8 +38,8 @@
               {% include 'show_tags.html' %}
             </td>
             <td>
-              <a href="{{ url_for('edit_model', record_id=record_id) }}"><i class="fas fa-edit"></i></a>
-              <form action="{{ url_for('delete_model', record_id=record_id) }}" method="post" style="display: inline-block;">
+              <a href="{{ url_for('edit_model', record_id=model_id) }}"><i class="fas fa-edit"></i></a>
+              <form action="{{ url_for('delete_model', record_id=model_id) }}" method="post" style="display: inline-block;">
                <input type="hidden" name="_method" value="DELETE">
                 <button type="submit" class="btn btn-link"><i class="fas fa-trash"></i></button>
               </form>

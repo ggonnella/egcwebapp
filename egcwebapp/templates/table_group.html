@@ -16,5 +16,12 @@
       <th>Definition</th>
       <td>{{ group.definition }}</td>
     </tr>
+    <tr class="odd">
+      <th>Tags</th>
+      <td>
+        {% set tags = group.tags %}
+        {% include 'show_tags.html' %}
+      </td>
+    </tr>
  </tbody>
 </table>

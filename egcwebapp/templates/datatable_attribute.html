@@ -11,7 +11,7 @@
         <tr>
           <th>ID</th>
           {% if show_unit %}
-            <th>Unit ID</th>
+            <th>Unit</th>
           {% endif %}
           <th>Measurement Mode</th>
           <th>Reference</th>
@@ -26,19 +26,21 @@
           <tr>
             <td>{{ attribute.id }}</td>
             {% if show_unit %}
-              {% set related_type, related_id, prev =
-                 'unit', attribute.unit_id, 'attribute_list' %}
-              {% include 'related_record_cell.html' %}
+              <td>
+                {% set related_type, related_id, prev =
+                   'unit', attribute.unit_id, 'attribute_list' %}
+                {% include 'related_record_link.html' %}
+              </td>
             {% endif %}
             {% if attribute.mode.mode  %}
               <td>{{ attribute.mode.mode }}</td>
-              {% if attribute.mode.reference %}
-                {% set related_type, related_id, prev =
-                   'unit', attribute.mode.reference, 'attribute_list' %}
-                {% include 'related_record_cell.html' %}
-              {% else %}
-                <td></td>
-              {% endif %}
+              <td>
+                {% if attribute.mode.reference %}
+                  {% set related_type, related_id, prev =
+                     'unit', attribute.mode.reference, 'attribute_list' %}
+                  {% include 'related_record_link.html' %}
+                {% endif %}
+              </td>
               <td>{{ attribute.mode.location_type }}</td>
               <td>{{ attribute.mode.location_label }}</td>
             {% else %}

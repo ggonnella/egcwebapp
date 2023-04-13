@@ -351,19 +351,18 @@ class SourceForm(Form):
         rv = super().validate()
         if not rv:
             return False
+          # XXX this cannot work because there is no egc_data in SourceForm
         if not self.egc_data.id_exists(self.source_id.data):
             self.source_id.errors.append('Source ID "{}" does not exist'.format(self.source_id.data))
             return False
         return True
 
-    def validate_tags(self, field):
-      TagForm.tags_validator(field)
-
 class VruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
-    source = FieldList(FormField(SourceForm))
+    sources = FieldList(FormField(SourceForm)) # TODO
     attribute = StringField('Attribute', [validators.Length(min=1), validators.DataRequired()])
     group = StringField('Group', [validators.Length(min=1), validators.DataRequired()])
+    group_portion = StringField('Group Portion')
     operator = StringField('Operator', [validators.Length(min=1), validators.DataRequired()])
     reference = StringField('Reference', [validators.Length(min=1), validators.DataRequired()])
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
@@ -380,6 +379,14 @@ class VruleForm(Form):
         if not self.egc_data.is_unique_id(new_id):
             raise validators.ValidationError('Record ID already exists')
 
+    def validate_attribute(self, field):
+        if not self.egc_data.id_exists(field.data):
+            raise validators.ValidationError('Attribute does not exist')
+
+    def validate_group(self, field):
+        if not self.egc_data.id_exists(field.data):
+            raise validators.ValidationError('Group does not exist')
+
     def validate(self):
         rv = super().validate()
         if not rv:
@@ -394,11 +401,14 @@ class VruleForm(Form):
 
 class CruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
-    source = FieldList(FormField(SourceForm))
-    attribute = StringField('Attribute or Comparison', [validators.Length(min=1), validators.DataRequired()])
+    sources = FieldList(FormField(SourceForm)) # TODO
+    attribute = StringField('Attribute', [validators.Length(min=1), validators.DataRequired()])
+    vs_attribute = StringField('vs. Attribute')
     group1 = StringField('Group 1', [validators.Length(min=1), validators.DataRequired()])
+    group1_portion = StringField('Group 1 Portion')
     operator = StringField('Operator', [validators.Length(min=1), validators.DataRequired()])
     group2 = StringField('Group 2', [validators.Length(min=1), validators.DataRequired()])
+    group2_portion = StringField('Group 2 Portion')
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
 
     def __init__(self, *args, **kwargs):
@@ -421,6 +431,23 @@ class CruleForm(Form):
             if not source_form.validate():
                 return False
         return True
+
+    def validate_attribute(self, field):
+        if not self.egc_data.id_exists(field.data):
+            raise validators.ValidationError('Attribute does not exist')
+
+    def validate_vs_attribute(self, field):
+        if field.data:
+          if not self.egc_data.id_exists(field.data):
+              raise validators.ValidationError('Attribute does not exist')
+
+    def validate_group1(self, field):
+        if not self.egc_data.id_exists(field.data):
+            raise validators.ValidationError('Group does not exist')
+
+    def validate_group2(self, field):
+        if not self.egc_data.id_exists(field.data):
+            raise validators.ValidationError('Group does not exist')
 
     def validate_tags(self, field):
       TagForm.tags_validator(field)
