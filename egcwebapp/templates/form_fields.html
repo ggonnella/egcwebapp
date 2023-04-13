@@ -1,13 +1,7 @@
 {% for field in form %}
   <div id="{{field.id}}-wrapper">
     {{ field.label }} {{ field(class_="form-control" + (' has-error' if field.errors else '') ) }}
-    {% if field.errors %}
-      <ul>
-        {% for error in field.errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+    {% include 'field_error.html' %}
   </div>
 {% endfor %}
 {% if form.script %}
