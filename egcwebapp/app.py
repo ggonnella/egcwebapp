@@ -91,280 +91,56 @@ def group_list():
   groups = egc_data.get_records('G')
   return render_template('group_list.html', groups=groups, egc_data=egc_data)
 
-@app.route('/documents/create', methods=['GET', 'POST'])
-@require_egc_data
-def create_document():
-    form = DocumentForm(request.form, egc_data=egc_data)
-    if request.method == 'POST' and form.validate():
-        new_document = {
-            "record_type": "D",
-            "document_id": {
-                "resource_prefix": "PMID",
-                "item": form.document_id.data,
-                "location": None,
-                "term": None
-            },
-            "link": form.link.data
-        }
-        egc_data.create_record(new_document)
-        return redirect(url_for('document_list'))
-    return render_template('create_document.html', form=form,
-        errors=form.errors, egc_data=egc_data)
+def add_tags_from_form_data(form_data, record):
+  record["tags"] = {}
+  for tag in form_data.tags.data:
+    if tag != '' and tag["tagname"] != '':
+      record["tags"][tag["tagname"]] = \
+          {"value": tag["tagvalue"], "type": tag["tagtype"]}
+  if len(record["tags"]) == 0:
+    del record["tags"]
 
-@app.route('/documents/<record_id>/edit', methods=['GET', 'POST'])
-@require_egc_data
-def edit_document(record_id):
-    previous_page = request.args.get('previous_page')
-    document = egc_data.get_record_by_id(record_id)
-    if document is None:
-        abort(404)
-    form = DocumentForm(request.form,
-        egc_data=egc_data, old_id = record_id,
-        data={"document_id": document["document_id"]["item"],
-              "link": document["link"]})
-    if request.method == 'POST' and form.validate():
-        updated_document = {
-            "record_type": "D",
-            "document_id": {
-                "resource_prefix": "PMID",
-                "item": form.document_id.data,
-                "location": None,
-                "term": None
-            },
-            "link": form.link.data
-        }
-        egc_data.update_record_by_id(record_id, updated_document)
-        if previous_page:
-          return redirect(url_for(previous_page))
-        else:
-          return redirect(url_for('document_list'))
-    return render_template('edit_document.html', form=form,
-        errors=form.errors, previous_page=previous_page,
-        egc_data=egc_data)
+def add_document_id_from_form(form, record_data):
+  record_data["document_id"] = {
+      "resource_prefix": "PMID",
+      "item": form.document_id.data,
+      "location": None,
+      "term": None
+  }
 
-@app.route('/documents/<record_id>/delete', methods=['POST'])
-@require_egc_data
-def delete_document(record_id):
-    previous_page = request.args.get('previous_page')
-    egc_data.delete_record_by_id(record_id)
-    if previous_page:
-      return redirect(url_for(previous_page))
-    else:
-      return redirect(url_for('document_list'))
+def document_from_form(form):
+  record_data = {
+      "record_type": "D",
+      "link": form.link.data
+  }
+  add_document_id_from_form(form, record_data)
+  add_tags_from_form_data(form, record_data)
+  return record_data
 
-@app.route('/documents/<record_id>')
-@require_egc_data
-def show_document(record_id):
-    document = egc_data.get_record_by_id(record_id)
-    if document is None:
-        abort(404)
-    return render_template('show_document.html', document=document,
-        egc_data=egc_data)
+def extract_from_form(form):
+  record_data = {
+      "record_type": form.record_type.data,
+      "id": form.id.data,
+  }
+  add_document_id_from_form(form, record_data)
+  if form.record_type.data == "T":
+      record_data["table_ref"] = form.contents.data
+  elif form.record_type.data == "S":
+      record_data["text"] = form.contents.data
+  add_tags_from_form_data(form, record_data)
+  return record_data
 
-@app.route('/api/json/documents/<record_id>', methods=['GET'])
-@require_egc_data
-def get_document_json(record_id):
-    document = egc_data.get_record_by_id(record_id)
-    return jsonify(document)
-
-@app.route('/api/documents/<record_id>', methods=['GET'])
-@require_egc_data
-def get_document(record_id):
-    document = egc_data.get_record_by_id(record_id)
-    return render_template('table_show_document.html', document=document,
-            egc_data=egc_data)
-
-@app.route('/api/json/documents/<record_id>/extracts', methods=['GET'])
-@require_egc_data
-def get_document_extracts_json(record_id):
-    extracts = egc_data.ref_by('D', record_id, 'S') + \
-               egc_data.ref_by('D', record_id, 'T')
-    return jsonify(extracts)
-
-@app.route('/api/documents/<record_id>/extracts', methods=['GET'])
-@require_egc_data
-def get_document_extracts(record_id):
-    extracts = egc_data.ref_by('D', record_id, 'S') + \
-               egc_data.ref_by('D', record_id, 'T')
-    return render_template('extract_sub_list.html', extracts=extracts,
-        egc_data=egc_data, parent_id=record_id)
-
-@app.route('/extracts/create', methods=['GET', 'POST'])
-@require_egc_data
-def create_extract():
-    form = ExtractForm(request.form, egc_data=egc_data)
-    if request.method == 'POST' and form.validate():
-        new_record = {
-            "record_type": form.record_type.data,
-            "id": form.id.data,
-            "document_id": {
-                "resource_prefix": "PMID",
-                "item": form.document_id.data,
-                "location": None,
-                "term": None
-            }
-        }
-        if form.record_type.data == "T":
-            new_record["table_ref"] = form.contents.data
-        elif form.record_type.data == "S":
-            new_record["text"] = form.contents.data
-        egc_data.create_record(new_record)
-        return redirect(url_for('extract_list'))
-    return render_template('create_extract.html', form=form,
-        errors=form.errors, egc_data=egc_data)
-
-@app.route('/extracts/<record_id>/edit', methods=['GET', 'POST'])
-@require_egc_data
-def edit_extract(record_id):
-  extract = egc_data.get_record_by_id(record_id)
-  if extract is None:
-    abort(404)
-
-  previous_page = request.args.get('previous_page')
-  if extract["record_type"] == "T":
-      contents = extract["table_ref"]
-  elif extract["record_type"] == "S":
-      contents = extract["text"]
-  form = ExtractForm(request.form,
-        egc_data=egc_data, old_id = record_id,
-        data={
-          "id": extract["id"],
-          "record_type": extract["record_type"],
-          "document_id": extract["document_id"]["item"],
-          "contents": contents,
-        })
-  if request.method == 'POST' and form.validate():
-    updated_data = {
-        "record_type": form.record_type.data,
-        "id": form.id.data,
-        "document_id": {
-            "resource_prefix": "PMID",
-            "item": form.document_id.data,
-            "location": None,
-            "term": None
-        }}
-    if form.record_type.data == "T":
-        updated_data["table_ref"] = form.contents.data
-    elif form.record_type.data == "S":
-        updated_data["text"] = form.contents.data
-    egc_data.update_record_by_id(record_id, updated_data)
-    if previous_page:
-      return redirect(url_for(previous_page))
-    else:
-      return redirect(url_for('extract_list'))
-  return render_template('edit_extract.html', form=form,
-           egc_data=egc_data, errors=form.errors,
-           previous_page=previous_page)
-
-@app.route('/extracts/<record_id>/delete', methods=['POST'])
-@require_egc_data
-def delete_extract(record_id):
-    previous_page = request.args.get('previous_page')
-    egc_data.delete_record_by_id(record_id)
-    if previous_page:
-      return redirect(url_for(previous_page))
-    else:
-      return redirect(url_for('extract_list'))
-
-@app.route('/units/create', methods=['GET', 'POST'])
-@require_egc_data
-def create_unit():
-  form = UnitForm(request.form, egc_data=egc_data)
-  if request.method == 'POST' and form.validate():
-      new_record = {
-          "record_type": "U",
-          "id": form.id.data,
-          "type": form.type.data,
-          "definition": form.definition.data,
-          "symbol": form.symbol.data,
-          "description": form.description.data
-      }
-      egc_data.create_record(new_record)
-      return redirect(url_for('unit_list'))
-  return render_template('create_unit.html', form=form, errors=form.errors, egc_data=egc_data)
-
-@app.route('/units/<record_id>/edit', methods=['GET', 'POST'])
-@require_egc_data
-def edit_unit(record_id):
-  unit = egc_data.get_record_by_id(record_id)
-  if unit is None:
-      abort(404)
-
-  previous_page = request.args.get('previous_page')
-  form = UnitForm(request.form, egc_data=egc_data, old_id=record_id, data={
-      "id": unit["id"],
-      "type": unit["type"],
-      "definition": unit["definition"],
-      "symbol": unit["symbol"],
-      "description": unit["description"]
-  })
-
-  if request.method == 'POST' and form.validate():
-      updated_data = {
-          "record_type": "U",
-          "id": form.id.data,
-          "type": form.type.data,
-          "definition": form.definition.data,
-          "symbol": form.symbol.data,
-          "description": form.description.data
-      }
-      egc_data.update_record_by_id(record_id, updated_data)
-      if previous_page:
-        return redirect(url_for(previous_page))
-      else:
-        return redirect(url_for('unit_list'))
-
-  return render_template('edit_unit.html', form=form, egc_data=egc_data,
-      errors=form.errors, previous_page=previous_page)
-
-@app.route('/units/<record_id>/delete', methods=['POST'])
-@require_egc_data
-def delete_unit(record_id):
-  previous_page = request.args.get('previous_page')
-  egc_data.delete_record_by_id(record_id)
-  if previous_page:
-      return redirect(url_for(previous_page))
-  else:
-      return redirect(url_for('unit_list'))
-
-@app.route('/api/json/units/<record_id>', methods=['GET'])
-@require_egc_data
-def get_unit_json(record_id):
-  unit = egc_data.get_record_by_id(record_id)
-  if unit is None:
-      return jsonify({ "error": "Unit not found" }), 404
-  else:
-      return jsonify(unit)
-
-@app.route('/units/<record_id>')
-@require_egc_data
-def show_unit(record_id):
-  unit = egc_data.get_record_by_id(record_id)
-  if unit is None:
-      abort(404)
-  return render_template('show_unit.html', unit=unit,
-      egc_data=egc_data)
-
-@app.route('/api/units/<record_id>', methods=['GET'])
-def get_unit(record_id):
-  unit = egc_data.get_record_by_id(record_id)
-  if unit is None:
-      return render_template('error.html', message='Unit not found')
-  else:
-      return render_template('table_show_unit.html', unit=unit, egc_data=egc_data)
-
-@app.route('/api/units/<record_id>/attributes', methods=['GET'])
-@require_egc_data
-def get_unit_attributes(record_id):
-  attributes = egc_data.ref_by('U', record_id, 'A')
-  return render_template('attribute_sub_list.html', attributes=attributes,
-      egc_data=egc_data, parent_id=record_id)
-
-@app.route('/api/json/units/<record_id>/attributes', methods=['GET'])
-@require_egc_data
-def get_unit_attributes_json(record_id):
-  attributes = egc_data.ref_by('U', record_id, 'A')
-  return jsonify(attributes)
+def unit_from_form(form):
+  record_data = {
+      "record_type": "U",
+      "id": form.id.data,
+      "type": form.type.data,
+      "definition": form.definition.data,
+      "symbol": form.symbol.data,
+      "description": form.description.data
+  }
+  add_tags_from_form_data(form, record_data)
+  return record_data
 
 def attribute_from_form(form):
   record_data = {
@@ -392,9 +168,158 @@ def attribute_from_form(form):
           "location_type": form.location_type.data,
           "location_label": form.location_label.data,
       }
+  add_tags_from_form_data(form, record_data)
   return record_data
 
-def form_data_from_attribute(attribute):
+def group_from_form(form):
+  record_data = {
+      "record_type": "G",
+      "id": form.id.data,
+      "type": form.type.data,
+      "definition": form.definition.data,
+      "description": form.description.data
+  }
+  add_tags_from_form_data(form, record_data)
+  return record_data
+
+@app.route('/documents/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_document():
+  form = DocumentForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+    new_document = document_from_form(form)
+    egc_data.create_record(new_document)
+    return redirect(url_for('document_list'))
+  return render_template('create_document.html', form=form,
+                         errors=form.errors, egc_data=egc_data)
+
+@app.route('/extracts/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_extract():
+  form = ExtractForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+      new_record = extract_from_form(form)
+      egc_data.create_record(new_record)
+      return redirect(url_for('extract_list'))
+  return render_template('create_extract.html', form=form,
+      errors=form.errors, egc_data=egc_data)
+
+@app.route('/units/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_unit():
+  form = UnitForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+      new_record = unit_from_form(form)
+      egc_data.create_record(new_record)
+      return redirect(url_for('unit_list'))
+  return render_template('create_unit.html', form=form, errors=form.errors,
+      egc_data=egc_data)
+
+@app.route('/attributes/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_attribute():
+  form = AttributeForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+      new_record = attribute_from_form(form)
+      egc_data.create_record(new_record)
+      return redirect(url_for('attribute_list'))
+  return render_template('create_attribute.html', form=form,
+      errors=form.errors, egc_data=egc_data)
+
+@app.route('/groups/create', methods=['GET', 'POST'])
+@require_egc_data
+def create_group():
+  form = GroupForm(request.form, egc_data=egc_data)
+  if request.method == 'POST' and form.validate():
+      new_record = group_from_form(form)
+      egc_data.create_record(new_record)
+      return redirect(url_for('group_list'))
+  return render_template('create_group.html', form=form,
+      errors=form.errors, egc_data=egc_data)
+
+def add_tags_to_form_data(record, form_data):
+  if "tags" in record:
+    form_data["tags"] = []
+    for tag_name, tag_type_value in record["tags"].items():
+      form_data["tags"].append({
+        "tagname": tag_name,
+        "tagtype": tag_type_value["type"],
+        "tagvalue": tag_type_value["value"]
+      })
+
+def document_to_form(document):
+  data={"document_id": document["document_id"]["item"],
+        "link": document["link"]}
+  add_tags_to_form_data(document, data)
+  return data
+
+@app.route('/documents/<record_id>/edit', methods=['GET', 'POST'])
+@require_egc_data
+def edit_document(record_id):
+    previous_page = request.args.get('previous_page') or 'document_list'
+    document = egc_data.get_record_by_id(record_id) or abort(404)
+    form = DocumentForm(request.form,
+        egc_data=egc_data, old_id = record_id, data=document_to_form(document))
+    if request.method == 'POST' and form.validate():
+        egc_data.update_record_by_id(record_id, document_from_form(form))
+        return redirect(url_for(previous_page))
+    return render_template('edit_document.html', form=form,
+        errors=form.errors, previous_page=previous_page,
+        egc_data=egc_data)
+
+def extract_to_form(extract):
+  if extract["record_type"] == "T":
+      contents = extract["table_ref"]
+  elif extract["record_type"] == "S":
+      contents = extract["text"]
+  form_data = {
+          "id": extract["id"],
+          "record_type": extract["record_type"],
+          "document_id": extract["document_id"]["item"],
+          "contents": contents,
+        }
+  add_tags_to_form_data(extract, form_data)
+  return form_data
+
+@app.route('/extracts/<record_id>/edit', methods=['GET', 'POST'])
+@require_egc_data
+def edit_extract(record_id):
+  extract = egc_data.get_record_by_id(record_id) or abort(404)
+  form = ExtractForm(request.form, egc_data=egc_data, old_id = record_id,
+                     data=extract_to_form(extract))
+  previous_page = request.args.get('previous_page') or 'extract_list'
+  if request.method == 'POST' and form.validate():
+    egc_data.update_record_by_id(record_id, extract_from_form(form))
+    return redirect(url_for(previous_page))
+  return render_template('edit_extract.html', form=form, egc_data=egc_data,
+      errors=form.errors, previous_page=previous_page)
+
+def unit_to_form(unit):
+  form_data = {
+      "id": unit["id"],
+      "type": unit["type"],
+      "definition": unit["definition"],
+      "symbol": unit["symbol"],
+      "description": unit["description"]
+  }
+  add_tags_to_form_data(unit, form_data)
+  return form_data
+
+@app.route('/units/<record_id>/edit', methods=['GET', 'POST'])
+@require_egc_data
+def edit_unit(record_id):
+  unit = egc_data.get_record_by_id(record_id) or abort(404)
+  form = UnitForm(request.form, egc_data=egc_data, old_id=record_id,
+                  data=unit_to_form(unit))
+  previous_page = request.args.get('previous_page') or 'unit_list'
+  if request.method == 'POST' and form.validate():
+      updated_data = unit_from_form(form)
+      egc_data.update_record_by_id(record_id, updated_data)
+      return redirect(url_for(previous_page))
+  return render_template('edit_unit.html', form=form, egc_data=egc_data,
+      errors=form.errors, previous_page=previous_page)
+
+def attribute_to_form(attribute):
   attribute_data={
     "id": attribute["id"],
     "unit_id": attribute["unit_id"],
@@ -415,107 +340,23 @@ def form_data_from_attribute(attribute):
       attribute_data["location_label"] = attribute["mode"]["location_label"]
   else:
     attribute_data["mode"] = attribute["mode"]
+  add_tags_to_form_data(attribute, attribute_data)
   return attribute_data
-
-@app.route('/attributes/create', methods=['GET', 'POST'])
-@require_egc_data
-def create_attribute():
-  form = AttributeForm(request.form, egc_data=egc_data)
-  if request.method == 'POST' and form.validate():
-      new_record = attribute_from_form(form)
-      egc_data.create_record(new_record)
-      return redirect(url_for('attribute_list'))
-  return render_template('create_attribute.html', form=form,
-      errors=form.errors, egc_data=egc_data)
 
 @app.route('/attributes/<record_id>/edit', methods=['GET', 'POST'])
 @require_egc_data
 def edit_attribute(record_id):
-  attribute = egc_data.get_record_by_id(record_id)
-  if attribute is None:
-      abort(404)
-
-  attribute_data = form_data_from_attribute(attribute)
+  attribute = egc_data.get_record_by_id(record_id) or abort(404)
+  previous_page = request.args.get('previous_page') or 'attribute_list'
   form = AttributeForm(request.form, egc_data=egc_data, old_id=record_id,
-      data=attribute_data)
-
+      data=attribute_to_form(attribute))
   if request.method == 'POST' and form.validate():
-      updated_data = attribute_from_form(form)
-      egc_data.update_record_by_id(record_id, updated_data)
-      return redirect(url_for('attribute_list'))
-
+      egc_data.update_record_by_id(record_id, attribute_from_form(form))
+      return redirect(url_for(previous_page))
   return render_template('edit_attribute.html', form=form, egc_data=egc_data,
-                         errors=form.errors)
+                         errors=form.errors, previous_page=previous_page)
 
-@app.route('/attributes/<record_id>/delete', methods=['POST'])
-@require_egc_data
-def delete_attribute(record_id):
-  egc_data.delete_record_by_id(record_id)
-  return redirect(url_for('attribute_list'))
-
-@app.route('/api/json/attributes/<record_id>', methods=['GET'])
-@require_egc_data
-def get_attribute_json(record_id):
-  attribute = egc_data.get_record_by_id(record_id)
-  if attribute is None:
-      return jsonify({"error": "Attribute not found"}), 404
-  else:
-      return jsonify(attribute)
-
-@app.route('/api/attributes/<record_id>', methods=['GET'])
-@require_egc_data
-def get_attribute(record_id):
-  attribute = egc_data.get_record_by_id(record_id)
-  if attribute is None:
-      return render_template('error.html', message='Attribute not found')
-  else:
-      return render_template('table_show_attribute.html',
-                             attribute=attribute, egc_data=egc_data)
-
-def add_tags_to_form_data(record, form_data):
-  if "tags" in record:
-    form_data["tags"] = []
-    for tag_name, tag_type_value in record["tags"].items():
-      form_data["tags"].append({
-        "tagname": tag_name,
-        "tagtype": tag_type_value["type"],
-        "tagvalue": tag_type_value["value"]
-      })
-
-def add_tags_from_form_data(form_data, record):
-  record["tags"] = {}
-  for tag in form_data.tags.data:
-    if tag != '' and tag["tagname"] != '':
-      record["tags"][tag["tagname"]] = \
-          {"value": tag["tagvalue"], "type": tag["tagtype"]}
-  if len(record["tags"]) == 0:
-    del record["tags"]
-
-@app.route('/groups/create', methods=['GET', 'POST'])
-@require_egc_data
-def create_group():
-  form = GroupForm(request.form, egc_data=egc_data)
-  if request.method == 'POST' and form.validate():
-      new_record = {
-          "record_type": "G",
-          "id": form.id.data,
-          "name": form.name.data,
-          "type": form.type.data,
-          "definition": form.definition.data,
-      }
-      add_tags_from_form_data(form, new_record)
-      egc_data.create_record(new_record)
-      return redirect(url_for('group_list'))
-  return render_template('create_group.html', form=form,
-      errors=form.errors, egc_data=egc_data)
-
-@app.route('/groups/<record_id>/edit', methods=['GET', 'POST'])
-@require_egc_data
-def edit_group(record_id):
-  group = egc_data.get_record_by_id(record_id)
-  if group is None:
-      abort(404)
-
+def group_to_form(group):
   group_data = {
       "id": group["id"],
       "name": group["name"],
@@ -523,52 +364,149 @@ def edit_group(record_id):
       "definition": group["definition"],
   }
   add_tags_to_form_data(group, group_data)
+  return group_data
 
+@app.route('/groups/<record_id>/edit', methods=['GET', 'POST'])
+@require_egc_data
+def edit_group(record_id):
+  group = egc_data.get_record_by_id(record_id) or abort(404)
+  previous_page = request.args.get('previous_page') or 'group_list'
   form = GroupForm(request.form, egc_data=egc_data, old_id=record_id,
-      data=group_data)
-
+      data=group_to_form(group))
   if request.method == 'POST' and form.validate():
-      updated_data = {
-          "record_type": "G",
-          "id": form.id.data,
-          "name": form.name.data,
-          "type": form.type.data,
-          "definition": form.definition.data,
-      }
-      add_tags_from_form_data(form, updated_data)
-      egc_data.update_record_by_id(record_id, updated_data)
-      return redirect(url_for('group_list'))
-  elif not form.validate():
-      print(form.errors)
-
+      egc_data.update_record_by_id(record_id, group_from_form(form))
+      return redirect(url_for(previous_page))
   return render_template('edit_group.html', form=form, egc_data=egc_data,
-      errors=form.errors)
+                         errors=form.errors, previous_page=previous_page)
+
+@app.route('/documents/<record_id>/delete', methods=['POST'])
+@require_egc_data
+def delete_document(record_id):
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'document_list'
+    return redirect(url_for(previous_page))
+
+@app.route('/extracts/<record_id>/delete', methods=['POST'])
+@require_egc_data
+def delete_extract(record_id):
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'extract_list'
+    return redirect(url_for(previous_page))
+
+@app.route('/units/<record_id>/delete', methods=['POST'])
+@require_egc_data
+def delete_unit(record_id):
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'unit_list'
+    return redirect(url_for(previous_page))
+
+@app.route('/attributes/<record_id>/delete', methods=['POST'])
+@require_egc_data
+def delete_attribute(record_id):
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'attribute_list'
+    return redirect(url_for(previous_page))
 
 @app.route('/groups/<record_id>/delete', methods=['POST'])
 @require_egc_data
 def delete_group(record_id):
-  egc_data.delete_record_by_id(record_id)
-  return redirect(url_for('group_list'))
+    egc_data.delete_record_by_id(record_id)
+    previous_page = request.args.get('previous_page') or 'group_list'
+    return redirect(url_for(previous_page))
 
-@app.route('/api/json/groups/<record_id>', methods=['GET'])
+@app.route('/documents/<record_id>')
 @require_egc_data
-def get_group_json(record_id):
-  group = egc_data.get_record_by_id(record_id)
-  if group is None:
-      return jsonify({"error": "Group not found"}), 404
-  else:
-      return jsonify(group)
+def show_document(record_id):
+    document = egc_data.get_record_by_id(record_id) or abort(404)
+    return render_template('show_document.html', document=document,
+        egc_data=egc_data)
+
+@app.route('/extracts/<record_id>')
+@require_egc_data
+def show_extract(record_id):
+    extract = egc_data.get_record_by_id(record_id) or abort(404)
+    return render_template('show_extract.html', extract=extract,
+        egc_data=egc_data)
+
+@app.route('/units/<record_id>')
+@require_egc_data
+def show_unit(record_id):
+  unit = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('show_unit.html', unit=unit, egc_data=egc_data)
+
+@app.route('/attributes/<record_id>')
+@require_egc_data
+def show_attribute(record_id):
+  attribute = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('show_attribute.html', attribute=attribute,
+      egc_data=egc_data)
+
+@app.route('/groups/<record_id>')
+@require_egc_data
+def show_group(record_id):
+  group = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('show_group.html', group=group, egc_data=egc_data)
+
+@app.route('/api/documents/<record_id>', methods=['GET'])
+@require_egc_data
+def get_document(record_id):
+    document = egc_data.get_record_by_id(record_id) or abort(404)
+    return render_template('table_show_document.html', document=document,
+            egc_data=egc_data)
+
+@app.route('/api/extracts/<record_id>', methods=['GET'])
+@require_egc_data
+def get_extract(record_id):
+    extract = egc_data.get_record_by_id(record_id) or abort(404)
+    return render_template('table_show_extract.html', extract=extract,
+            egc_data=egc_data)
+
+@app.route('/api/units/<record_id>', methods=['GET'])
+def get_unit(record_id):
+  unit = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('table_show_unit.html', unit=unit, egc_data=egc_data)
+
+@app.route('/api/attributes/<record_id>', methods=['GET'])
+@require_egc_data
+def get_attribute(record_id):
+  attribute = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('table_show_attribute.html',
+                          attribute=attribute, egc_data=egc_data)
 
 @app.route('/api/groups/<record_id>', methods=['GET'])
 @require_egc_data
 def get_group(record_id):
-  group = egc_data.get_record_by_id(record_id)
-  if group is None:
-      return render_template('error.html', message='Group not found')
-  else:
-      return render_template('table_show_group.html',
-          group=group, egc_data=egc_data)
+  group = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('table_show_group.html',
+      group=group, egc_data=egc_data)
 
+@app.route('/api/documents/<record_id>/extracts', methods=['GET'])
+@require_egc_data
+def get_document_extracts(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  extracts = egc_data.ref_by('D', record_id, 'S') + \
+             egc_data.ref_by('D', record_id, 'T')
+  return render_template('extract_sub_list.html', extracts=extracts,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/units/<record_id>/attributes', methods=['GET'])
+@require_egc_data
+def get_unit_attributes(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  attributes = egc_data.ref_by('U', record_id, 'A')
+  return render_template('attribute_sub_list.html', attributes=attributes,
+      egc_data=egc_data, parent_id=record_id)
+
+@app.route('/api/units/<record_id>/units', methods=['GET'])
+@require_egc_data
+def get_unit_units(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  units = egc_data.ref_by('U', record_id, 'U')
+  return render_template('unit_sub_list.html', units=units,
+      egc_data=egc_data, parent_id=record_id)
 
 if __name__ == '__main__':
   app.run()
