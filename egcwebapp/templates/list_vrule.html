@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Value Expectation Rule Records</h1>
+  <a href="{{ url_for('create_vrule') }}"
+    class="btn btn-primary create">New Record</a>
+  {% set main=True %}
+  {% include 'datatable_vrule.html' %}
+
+  <script src="{{ url_for('static', filename='js/list_vrule.mjs') }}"
+    type="module"></script>
+
+{% endblock %}
+

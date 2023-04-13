@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Model Records</h1>
+  <a href="{{ url_for('create_model') }}"
+    class="btn btn-primary create">New Record</a>
+  {% set main=True %}
+  {% include 'datatable_model.html' %}
+
+  <script src="{{ url_for('static', filename='js/list_model.mjs') }}"
+    type="module"></script>
+
+{% endblock %}
+
