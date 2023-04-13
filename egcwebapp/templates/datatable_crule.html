@@ -75,7 +75,7 @@
             </td>
             <td>
               {% set tags = crule.tags %}
-              {% include 'show_tags.html' %}
+              {% include 'tags_lines.html' %}
             </td>
             <td>
               <a href="{{ url_for('edit_crule', record_id=crule.id) }}"><i class="fas fa-edit"></i></a>

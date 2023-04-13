@@ -47,7 +47,7 @@
             <td>{{ extract.text if extract.record_type == "S" else extract.table_ref }}</td>
             <td>
               {% set tags = extract.tags %}
-              {% include 'show_tags.html' %}
+              {% include 'tags_lines.html' %}
             </td>
             <td>
               <a href="{{ url_for('edit_extract', record_id=extract.id) }}"><i class="fas fa-edit"></i></a>

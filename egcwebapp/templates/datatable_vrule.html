@@ -71,7 +71,7 @@
             <td>{{ vrule.reference }}</td>
             <td>
               {% set tags = vrule.tags %}
-              {% include 'show_tags.html' %}
+              {% include 'tags_lines.html' %}
             </td>
             <td>
               <a href="{{ url_for('edit_vrule', record_id=vrule.id) }}"><i class="fas fa-edit"></i></a>
