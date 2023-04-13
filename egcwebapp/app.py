@@ -190,8 +190,8 @@ def create_document():
     new_document = document_from_form(form)
     egc_data.create_record(new_document)
     return redirect(url_for('document_list'))
-  return render_template('create_document.html', form=form,
-                         errors=form.errors, egc_data=egc_data)
+  return render_template('record_form.html', form=form,
+      errors=form.errors, egc_data=egc_data, title_label="Create Document")
 
 @app.route('/extracts/create', methods=['GET', 'POST'])
 @require_egc_data
@@ -201,8 +201,9 @@ def create_extract():
       new_record = extract_from_form(form)
       egc_data.create_record(new_record)
       return redirect(url_for('extract_list'))
-  return render_template('create_extract.html', form=form,
-      errors=form.errors, egc_data=egc_data)
+  return render_template('record_form.html', form=form,
+      errors=form.errors, egc_data=egc_data,
+      title_label="Create Document Extract")
 
 @app.route('/units/create', methods=['GET', 'POST'])
 @require_egc_data
@@ -212,8 +213,8 @@ def create_unit():
       new_record = unit_from_form(form)
       egc_data.create_record(new_record)
       return redirect(url_for('unit_list'))
-  return render_template('create_unit.html', form=form, errors=form.errors,
-      egc_data=egc_data)
+  return render_template('record_form.html', form=form, errors=form.errors,
+      egc_data=egc_data, title_label="Create Unit")
 
 @app.route('/attributes/create', methods=['GET', 'POST'])
 @require_egc_data
@@ -223,8 +224,8 @@ def create_attribute():
       new_record = attribute_from_form(form)
       egc_data.create_record(new_record)
       return redirect(url_for('attribute_list'))
-  return render_template('create_attribute.html', form=form,
-      errors=form.errors, egc_data=egc_data)
+  return render_template('record_form.html', form=form,
+      errors=form.errors, egc_data=egc_data, title_label="Create Attribute")
 
 @app.route('/groups/create', methods=['GET', 'POST'])
 @require_egc_data
@@ -234,8 +235,8 @@ def create_group():
       new_record = group_from_form(form)
       egc_data.create_record(new_record)
       return redirect(url_for('group_list'))
-  return render_template('create_group.html', form=form,
-      errors=form.errors, egc_data=egc_data)
+  return render_template('record_form.html', form=form,
+      errors=form.errors, egc_data=egc_data, title_label="Create Group")
 
 def add_tags_to_form_data(record, form_data):
   if "tags" in record:
@@ -263,9 +264,9 @@ def edit_document(record_id):
     if request.method == 'POST' and form.validate():
         egc_data.update_record_by_id(record_id, document_from_form(form))
         return redirect(url_for(previous_page))
-    return render_template('edit_document.html', form=form,
+    return render_template('record_form.html', form=form,
         errors=form.errors, previous_page=previous_page,
-        egc_data=egc_data)
+        egc_data=egc_data, title_label="Edit Document")
 
 def extract_to_form(extract):
   if extract["record_type"] == "T":
@@ -291,8 +292,9 @@ def edit_extract(record_id):
   if request.method == 'POST' and form.validate():
     egc_data.update_record_by_id(record_id, extract_from_form(form))
     return redirect(url_for(previous_page))
-  return render_template('edit_extract.html', form=form, egc_data=egc_data,
-      errors=form.errors, previous_page=previous_page)
+  return render_template('record_form.html', form=form, egc_data=egc_data,
+      errors=form.errors, previous_page=previous_page,
+      title_label="Edit Extract")
 
 def unit_to_form(unit):
   form_data = {
@@ -316,8 +318,9 @@ def edit_unit(record_id):
       updated_data = unit_from_form(form)
       egc_data.update_record_by_id(record_id, updated_data)
       return redirect(url_for(previous_page))
-  return render_template('edit_unit.html', form=form, egc_data=egc_data,
-      errors=form.errors, previous_page=previous_page)
+  return render_template('record_form.html', form=form, egc_data=egc_data,
+      errors=form.errors, previous_page=previous_page,
+      title_label="Edit Unit")
 
 def attribute_to_form(attribute):
   attribute_data={
@@ -353,8 +356,9 @@ def edit_attribute(record_id):
   if request.method == 'POST' and form.validate():
       egc_data.update_record_by_id(record_id, attribute_from_form(form))
       return redirect(url_for(previous_page))
-  return render_template('edit_attribute.html', form=form, egc_data=egc_data,
-                         errors=form.errors, previous_page=previous_page)
+  return render_template('record_form.html', form=form, egc_data=egc_data,
+                         errors=form.errors, previous_page=previous_page,
+                         title_label="Edit Attribute")
 
 def group_to_form(group):
   group_data = {
@@ -376,8 +380,9 @@ def edit_group(record_id):
   if request.method == 'POST' and form.validate():
       egc_data.update_record_by_id(record_id, group_from_form(form))
       return redirect(url_for(previous_page))
-  return render_template('edit_group.html', form=form, egc_data=egc_data,
-                         errors=form.errors, previous_page=previous_page)
+  return render_template('record_form.html', form=form, egc_data=egc_data,
+                         errors=form.errors, previous_page=previous_page,
+                         title_label="Edit Group")
 
 @app.route('/documents/<record_id>/delete', methods=['POST'])
 @require_egc_data
