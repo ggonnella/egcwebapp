@@ -29,6 +29,13 @@
   </head>
 
   <body>
+
+      <div class="topnav">
+        {% for item in nav.top %}
+          <a href="{{ item.url }}" class="{{ 'active' if item.is_active else '' }}">{{ item.label }}</a>
+        {% endfor %}
+      </div>
+
       <div class="container">
           {% block content %}{% endblock %}
       </div>

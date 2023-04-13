@@ -7,8 +7,21 @@ from egctools.egcdata import EGCData
 from pathlib import Path
 import os
 import functools
+from flask_navigation import Navigation
 
 app = Flask(__name__)
+nav = Navigation(app)
+nav.Bar('top', [
+    nav.Item('Load EGC', 'load_egc_file'),
+    nav.Item('Documents', 'document_list'),
+    nav.Item('Extracts', 'extract_list'),
+    nav.Item('Groups', 'group_list'),
+    nav.Item('Units', 'unit_list'),
+    nav.Item('Models', 'model_list'),
+    nav.Item('Attributes', 'attribute_list'),
+    nav.Item('Value Exp.', 'vrule_list'),
+    nav.Item('Comp. Exp.', 'crule_list'),
+])
 egc_data = None
 app.secret_key = 'secret_key'
 app.config['UPLOAD_FOLDER'] = str(Path(app.instance_path) / 'uploads')
