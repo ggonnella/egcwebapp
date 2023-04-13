@@ -222,9 +222,9 @@ def vrule_from_form(form):
       "reference": form.reference.data,
   }
   if len(form.sources.data) > 1:
-    record_data["sources"] = form.sources.data
+    record_data["source"] = [s["source_id"] for s in form.sources.data]
   else:
-    record_data["sources"] = form.sources.data[0]
+    record_data["source"] = form.sources.data[0]["source_id"]
   if form.group_portion.data:
     record_data["group"]["portion"] = form.group_portion.data
   add_tags_from_form_data(form, record_data)
@@ -239,9 +239,9 @@ def crule_from_form(form):
       "group2": {"id": form.group2.data},
   }
   if len(form.sources.data) > 1:
-    record_data["sources"] = form.sources.data
+    record_data["source"] = [s["source_id"] for s in form.sources.data]
   else:
-    record_data["sources"] = form.sources.data[0]
+    record_data["source"] = form.sources.data[0]["source_id"]
   if form.vs_attribute.data:
     record_data["attribute"] = {"id1": form.attribute.data,
                                 "id2": form.vs_attribute.data}
@@ -524,9 +524,9 @@ def vrule_to_form(record):
     "reference": record["reference"],
   }
   if isinstance(record["source"], list):
-    record_data["sources"] = record["source"]
+    record_data["sources"] = [{"source_id": s} for s in record["source"]]
   else:
-    record_data["sources"] = [record["source"]]
+    record_data["sources"] = [{"source_id": record["source"]}]
   if "portion" in record["group"]:
     record_data["group_portion"] = record["group"]["portion"]
   add_tags_to_form_data(record, record_data)
@@ -554,9 +554,9 @@ def crule_to_form(record):
     "group2": record["group2"]["id"],
   }
   if isinstance(record["source"], list):
-    record_data["sources"] = record["source"]
+    record_data["sources"] = [{"source_id": s} for s in record["source"]]
   else:
-    record_data["sources"] = [record["source"]]
+    record_data["sources"] = [{"source_id": record["source"]}]
   if isinstance(record["attribute"], dict):
     record_data["attribute"] = record["attribute"]["id1"]
     record_data["vs_attribute"] = record["attribute"]["id2"]

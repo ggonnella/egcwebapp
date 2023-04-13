@@ -345,21 +345,67 @@ class ModelForm(Form):
         self.script = TagForm.Script
 
 class SourceForm(Form):
-    source_id = StringField('Source ID', [validators.Length(min=1), validators.DataRequired()])
+    source_id = StringField('Source ID')
 
-    def validate(self):
-        rv = super().validate()
-        if not rv:
-            return False
-          # XXX this cannot work because there is no egc_data in SourceForm
-        if not self.egc_data.id_exists(self.source_id.data):
-            self.source_id.errors.append('Source ID "{}" does not exist'.format(self.source_id.data))
-            return False
-        return True
+    Script = Markup('''
+      function updateSourceNamesAndIds(container) {
+        var sourceInputs = container.querySelectorAll('.source-entry');
+        for (var i = 0; i < sourceInputs.length; i++) {
+          var input = sourceInputs[i];
+          input.id = 'sources-' + i + '-source_id';
+          input.name = 'sources-' + i + '-source_id';
+        }
+      }
+
+      document.getElementById('add_source_button').addEventListener('click', function() {
+        const sourceTemplate = document.querySelector('#sources-container .source-entry').cloneNode(true);
+        var sourceIndex = document.querySelectorAll('#sources-container .source-entry').length;
+        sourceTemplate.querySelectorAll('input').forEach(function(input) {
+          input.value = '';
+          input.id = 'sources-' + sourceIndex + '-source_id';
+          input.name = 'sources-' + sourceIndex + '-source_id';
+        });
+        document.getElementById('sources-container').appendChild(sourceTemplate);
+      });
+
+      document.getElementById('sources-container').addEventListener('click', function(event) {
+        if (event.target.classList.contains('btn-delete-source')) {
+          console.log('delete source');
+          const sourceEntry = event.target.closest('.source-entry');
+          const sourceTemplate = document.querySelector('#sources-container .source-entry').cloneNode(true);
+          sourceTemplate.querySelectorAll('input').forEach(function(input) {
+            input.value = '';
+            input.id = 'sources-0-source_id';
+            input.name = 'sources-0-source_id';
+          });
+          sourceEntry.querySelectorAll('input').forEach(function(input) {
+            input.value = '';
+          });
+          sourceEntry.remove();
+          if (document.querySelectorAll('#sources-container .source-entry').length === 0) {
+            document.getElementById('sources-container').appendChild(sourceTemplate);
+          }
+          updateSourceNamesAndIds(document.getElementById('sources-container'));
+        }
+      });
+
+      updateSourceNamesAndIds(document.getElementById('sources-container'));
+      ''')
+
+    @staticmethod
+    def sources_validator(egc_data, sources_field):
+      from icecream import ic
+      for source in sources_field:
+        if source.data["source_id"] != '':
+          if not egc_data.id_exists(source.data["source_id"]):
+            raise validators.ValidationError(\
+                'Document Extract ID "{}" does not exist'.\
+                  format(source.data["source_id"]))
+      return True
 
 class VruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
-    sources = FieldList(FormField(SourceForm)) # TODO
+    sources = FieldList(FormField(SourceForm), min_entries=1, label="Sources")
     attribute = StringField('Attribute', [validators.Length(min=1), validators.DataRequired()])
     group = StringField('Group', [validators.Length(min=1), validators.DataRequired()])
     group_portion = StringField('Group Portion')
@@ -371,7 +417,7 @@ class VruleForm(Form):
         super().__init__(*args, **kwargs)
         self.egc_data = kwargs.pop('egc_data')
         self.old_id = kwargs.pop('old_id', None)
-        self.script = TagForm.Script
+        self.script = TagForm.Script + SourceForm.Script
 
     def validate_id(self, field):
       new_id = field.data
@@ -387,21 +433,15 @@ class VruleForm(Form):
         if not self.egc_data.id_exists(field.data):
             raise validators.ValidationError('Group does not exist')
 
-    def validate(self):
-        rv = super().validate()
-        if not rv:
-            return False
-        for source_form in self.source:
-            if not source_form.validate():
-                return False
-        return True
+    def validate_sources(self, field):
+      SourceForm.sources_validator(self.egc_data, field)
 
     def validate_tags(self, field):
       TagForm.tags_validator(field)
 
 class CruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
-    sources = FieldList(FormField(SourceForm)) # TODO
+    sources = FieldList(FormField(SourceForm), min_entries=1, label="Sources")
     attribute = StringField('Attribute', [validators.Length(min=1), validators.DataRequired()])
     vs_attribute = StringField('vs. Attribute')
     group1 = StringField('Group 1', [validators.Length(min=1), validators.DataRequired()])
@@ -415,22 +455,13 @@ class CruleForm(Form):
         super().__init__(*args, **kwargs)
         self.egc_data = kwargs.pop('egc_data')
         self.old_id = kwargs.pop('old_id', None)
-        self.script = TagForm.Script
+        self.script = TagForm.Script + SourceForm.Script
 
     def validate_id(self, field):
       new_id = field.data
       if self.old_id != new_id:
         if not self.egc_data.is_unique_id(new_id):
             raise validators.ValidationError('Record ID already exists')
-
-    def validate(self):
-        rv = super().validate()
-        if not rv:
-            return False
-        for source_form in self.source:
-            if not source_form.validate():
-                return False
-        return True
 
     def validate_attribute(self, field):
         if not self.egc_data.id_exists(field.data):
@@ -448,6 +479,9 @@ class CruleForm(Form):
     def validate_group2(self, field):
         if not self.egc_data.id_exists(field.data):
             raise validators.ValidationError('Group does not exist')
+
+    def validate_sources(self, field):
+      SourceForm.sources_validator(self.egc_data, field)
 
     def validate_tags(self, field):
       TagForm.tags_validator(field)
