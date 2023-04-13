@@ -62,34 +62,34 @@ def require_egc_data(func):
 @require_egc_data
 def document_list():
   documents = egc_data.get_records('D')
-  return render_template('document_list.html', documents=documents,
+  return render_template('list_document.html', documents=documents,
       egc_data=egc_data)
 
 @app.route('/extracts')
 @require_egc_data
 def extract_list():
   extracts = egc_data.get_records('S') + egc_data.get_records('T')
-  return render_template('extract_list.html', extracts=extracts,
+  return render_template('list_extract.html', extracts=extracts,
       egc_data=egc_data)
 
 @app.route('/units')
 @require_egc_data
 def unit_list():
   units = egc_data.get_records('U')
-  return render_template('unit_list.html', units=units, egc_data=egc_data)
+  return render_template('list_unit.html', units=units, egc_data=egc_data)
 
 @app.route('/attributes')
 @require_egc_data
 def attribute_list():
   attributes = egc_data.get_records('A')
-  return render_template('attribute_list.html',
+  return render_template('list_attribute.html',
       attributes=attributes, egc_data=egc_data)
 
 @app.route('/groups')
 @require_egc_data
 def group_list():
   groups = egc_data.get_records('G')
-  return render_template('group_list.html', groups=groups, egc_data=egc_data)
+  return render_template('list_group.html', groups=groups, egc_data=egc_data)
 
 def add_tags_from_form_data(form_data, record):
   record["tags"] = {}
@@ -487,7 +487,7 @@ def get_document_extracts(record_id):
     abort(404)
   extracts = egc_data.ref_by('D', record_id, 'S') + \
              egc_data.ref_by('D', record_id, 'T')
-  return render_template('extract_sub_list.html', extracts=extracts,
+  return render_template('sublist_extract.html', extracts=extracts,
       egc_data=egc_data, parent_id=record_id)
 
 @app.route('/api/units/<record_id>/attributes', methods=['GET'])
@@ -496,7 +496,7 @@ def get_unit_attributes(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
   attributes = egc_data.ref_by('U', record_id, 'A')
-  return render_template('attribute_sub_list.html', attributes=attributes,
+  return render_template('sublist_attribute.html', attributes=attributes,
       egc_data=egc_data, parent_id=record_id)
 
 @app.route('/api/units/<record_id>/units', methods=['GET'])
@@ -505,7 +505,7 @@ def get_unit_units(record_id):
   if not egc_data.id_exists(record_id):
     abort(404)
   units = egc_data.ref_by('U', record_id, 'U')
-  return render_template('unit_sub_list.html', units=units,
+  return render_template('sublist_unit.html', units=units,
       egc_data=egc_data, parent_id=record_id)
 
 if __name__ == '__main__':

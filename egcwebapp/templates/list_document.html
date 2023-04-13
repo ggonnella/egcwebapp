@@ -56,11 +56,11 @@
         </tbody>
     </table>
 
-  <script src="{{ url_for('static', filename='js/document_list.mjs') }}"
+  <script src="{{ url_for('static', filename='js/list_document.mjs') }}"
       type="module"></script>
   <script type="module">
    import { createSubItemsEventListener } from
-      '{{ url_for('static', filename='js/sub_list.mjs') }}';
+      '{{ url_for('static', filename='js/sublist.mjs') }}';
     $(function() {
       $('body').on('click', '.show-extracts',
             createSubItemsEventListener('documents', 'extracts', 4));
