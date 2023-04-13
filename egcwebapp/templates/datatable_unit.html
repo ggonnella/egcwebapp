@@ -38,7 +38,7 @@
             <td>{{ unit.symbol }}</td>
             <td>{{ unit.description }}</td>
             <td>
-              {% set tags = unit.tags %}
+              {% set record = unit %}
               {% include 'tags_lines.html' %}
             </td>
             {% if show_refby %}

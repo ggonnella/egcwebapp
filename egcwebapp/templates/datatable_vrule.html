@@ -76,7 +76,7 @@
             <td>{{ vrule.operator }}</td>
             <td>{{ vrule.reference }}</td>
             <td>
-              {% set tags = vrule.tags %}
+              {% set record = vrule %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

@@ -33,9 +33,13 @@
     <tr class="odd">
       <th>Tags</th>
       <td>
-        {% set tags = document.tags %}
+        {% set record = document %}
         {% include 'tags_lines.html' %}
       </td>
+    </tr>
+    <tr class="even">
+      <th>Comment</th>
+      <td>{{ document.comment }}</td>
     </tr>
   </tbody>
 

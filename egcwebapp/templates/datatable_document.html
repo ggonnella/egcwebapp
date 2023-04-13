@@ -39,7 +39,7 @@
                       </a>
                   </td>
                   <td>
-                    {% set tags = document.tags %}
+                    {% set record = document %}
                     {% include 'tags_lines.html' %}
                   </td>
                   {% if show_refby %}

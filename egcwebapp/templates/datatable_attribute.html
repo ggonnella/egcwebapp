@@ -62,7 +62,7 @@
               <td></td> <td></td> <td></td>
             {% endif %}
             <td>
-              {% set tags = attribute.tags %}
+              {% set record = attribute %}
               {% include 'tags_lines.html' %}
             </td>
             {% if show_refby %}

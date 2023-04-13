@@ -60,7 +60,7 @@
             {% endif %}
             <td>{{ extract.text if extract.record_type == "S" else extract.table_ref }}</td>
             <td>
-              {% set tags = extract.tags %}
+              {% set record = extract %}
               {% include 'tags_lines.html' %}
             </td>
             {% if show_refby %}

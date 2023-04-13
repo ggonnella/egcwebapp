@@ -129,6 +129,7 @@ class DocumentForm(Form):
     link = StringField('Link',
         [validators.URL(), validators.DataRequired()])
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+    comment = StringField('Comment')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -157,6 +158,7 @@ class ExtractForm(Form):
          validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
     contents = TextAreaField('Text / Table Ref', render_kw={"rows": 10})
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+    comment = StringField('Comment')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -186,6 +188,7 @@ class UnitForm(Form):
   symbol = StringField('Symbol')
   description = StringField('Description')
   tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+  comment = StringField('Comment')
 
   def validate(self):
     if not super().validate():
@@ -236,6 +239,7 @@ class AttributeForm(Form):
   location_type = StringField('Location Type', render_kw=hidden)
   location_label = StringField('Location Label', render_kw=hidden)
   tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+  comment = StringField('Comment')
 
   def __init__(self, *args, **kwargs):
       super().__init__(*args, **kwargs)
@@ -324,6 +328,7 @@ class ModelForm(Form):
     model_id = StringField('Model ID', [validators.Length(min=1, max=50), validators.DataRequired()])
     model_name = StringField('Model Name', [validators.Length(min=1, max=100), validators.DataRequired()])
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+    comment = StringField('Comment')
 
     def validate(self):
       if not super().validate():
@@ -412,6 +417,7 @@ class VruleForm(Form):
     operator = StringField('Operator', [validators.Length(min=1), validators.DataRequired()])
     reference = StringField('Reference', [validators.Length(min=1), validators.DataRequired()])
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+    comment = StringField('Comment')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -450,6 +456,7 @@ class CruleForm(Form):
     group2 = StringField('Group 2', [validators.Length(min=1), validators.DataRequired()])
     group2_portion = StringField('Group 2 Portion')
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+    comment = StringField('Comment')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -496,6 +503,7 @@ class GroupForm(Form):
   definition = StringField('Group Definition', [validators.Length(min=1),
     validators.DataRequired()])
   tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
+  comment = StringField('Comment')
 
   def __init__(self, *args, **kwargs):
       super().__init__(*args, **kwargs)

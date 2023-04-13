@@ -35,7 +35,7 @@
             <td>{{ model.model_id }}</td>
             <td>{{ model.model_name }}</td>
             <td>
-              {% set tags = model.tags %}
+              {% set record = model %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

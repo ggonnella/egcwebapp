@@ -118,6 +118,8 @@ def add_tags_from_form_data(form_data, record):
           {"value": tag["tagvalue"], "type": tag["tagtype"]}
   if len(record["tags"]) == 0:
     del record["tags"]
+  if len(form_data.comment.data) > 0:
+    record["comment"] = form_data.comment.data
 
 def add_document_id_from_form(form, record_data):
   record_data["document_id"] = {
@@ -354,6 +356,8 @@ def add_tags_to_form_data(record, form_data):
         "tagtype": tag_type_value["type"],
         "tagvalue": tag_type_value["value"]
       })
+  if "comment" in record and record["comment"]:
+    form_data["comment"] = record["comment"]
 
 def document_to_form(document):
   data={"document_id": document["document_id"]["item"],

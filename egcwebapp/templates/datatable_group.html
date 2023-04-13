@@ -37,7 +37,7 @@
             <td>{{ group.name }}</td>
             <td>{{ group.definition }}</td>
             <td>
-              {% set tags = group.tags %}
+              {% set record = group %}
               {% include 'tags_lines.html' %}
             </td>
             {% if show_refby %}
