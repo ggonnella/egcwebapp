@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Document Extracts Records</h1>
+    <h1>Document Extracts</h1>
     <a href="{{ url_for('create_extract') }}" class="btn btn-primary create">New Record</a>
     {% set main=True %}
     {% include 'datatable_extract.html' %}
