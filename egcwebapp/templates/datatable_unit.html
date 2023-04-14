@@ -34,7 +34,7 @@
               {% endif %}
             </td>
             <td>{{ unit.type }}</td>
-            <td>{{ unit.definition }}</td>
+            <td>{{ linked_unit_definition(unit.type, unit.definition) | safe }}</td>
             <td>{{ unit.symbol }}</td>
             <td>{{ unit.description }}</td>
             <td>

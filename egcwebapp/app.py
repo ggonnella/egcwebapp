@@ -51,7 +51,32 @@ def my_context_processor():
 
         return group_definition
 
-    return {'linked_group_definition': linked_group_definition}
+    def linked_unit_definition(unit_type, unit_definition):
+        rel_units = []
+        if unit_type.startswith('homolog_'):
+            m = re.match(r'^homolog:([a-zA-Z0-9_]+)', unit_definition)
+            if m:
+                rel_units = [m.group(1)]
+        elif unit_type == 'set!:arrangement':
+            parts = unit_definition.split(',')
+            rel_units = []
+            for part in parts:
+                m = re.match(r'^([a-zA-Z0-9_]+)$', part)
+                if m:
+                    rel_units.append(m.group(1))
+        elif unit_type.startswith('*') or unit_type.startswith('set!:'):
+            rel_units = re.findall(r"[a-zA-Z0-9_]+", unit_definition)
+
+        for rel_unit in rel_units:
+            rendered_template = render_template('related_record_link.html',
+                related_type='unit', related_id=rel_unit, prev='list_unit')
+            unit_definition = re.sub(r'\b' + re.escape(rel_unit) + r'\b',
+                rendered_template, unit_definition)
+
+        return unit_definition
+
+    return {'linked_group_definition': linked_group_definition,
+            'linked_unit_definition': linked_unit_definition}
 
 # The following web routes are defined for each type of record:
 #
