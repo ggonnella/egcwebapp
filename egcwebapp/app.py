@@ -6,6 +6,7 @@ from egcwebapp.forms import DocumentForm, ExtractForm, UnitForm, \
 from egctools.egcdata import EGCData
 from pathlib import Path
 import os
+import re
 import functools
 from flask_navigation import Navigation
 
@@ -30,6 +31,27 @@ if os.environ.get('EGCWEBAPP') == 'development':
   app.debug = True
   this_dir = Path(__file__).parent
   egc_data = EGCData.from_file(str(this_dir.parent / "archaea.egc"))
+
+@app.context_processor
+def my_context_processor():
+    def linked_group_definition(group_type, group_definition):
+        rel_groups = []
+        if group_type == 'combined' or group_type == 'inverted':
+            rel_groups = re.findall(r"[a-zA-Z0-9_]+", group_definition)
+        else:
+            m = re.match(r'^derived:([a-zA-Z0-9_]+):.*', group_definition)
+            if m:
+                rel_groups = [m.group(1)]
+
+        for rel_group in rel_groups:
+            rendered_template = render_template('related_record_link.html',
+                related_type='group', related_id=rel_group, prev='list_group')
+            group_definition = re.sub(r'\b' + re.escape(rel_group) + r'\b',
+                rendered_template, group_definition)
+
+        return group_definition
+
+    return {'linked_group_definition': linked_group_definition}
 
 # The following web routes are defined for each type of record:
 #
