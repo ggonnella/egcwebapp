@@ -48,6 +48,9 @@
                 {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
                        'crule', group.id, 'G', 'C', 'comp. rule' %}
                 {% include 'ref_by_link.html' %}
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
+                       'group', group.id, 'G', 'G', 'group' %}
+                {% include 'ref_by_link.html' %}
               </td>
             {% endif %}
             <td>
@@ -73,6 +76,10 @@
       $(function() {
         $('body').on('click', '.show-crules',
               openNestedTable('groups', 'crules', 6));
+      });
+      $(function() {
+        $('body').on('click', '.show-groups',
+              openNestedTable('groups', 'groups', 6));
       });
     </script>
   {% endif %}

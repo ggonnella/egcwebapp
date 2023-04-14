@@ -844,6 +844,15 @@ def get_group_crules(record_id):
   return render_template('datatable_crule.html', crules=crules,
       egc_data=egc_data, parent_id=record_id)
 
+@app.route('/api/groups/<record_id>/groups', methods=['GET'])
+@require_egc_data
+def get_group_groups(record_id):
+  if not egc_data.id_exists(record_id):
+    abort(404)
+  groups = egc_data.ref_by('G', record_id, 'G')
+  return render_template('datatable_group.html', groups=groups,
+      egc_data=egc_data, parent_id=record_id)
+
 @app.route('/api/extracts/<record_id>/vrules', methods=['GET'])
 @require_egc_data
 def get_extract_vrules(record_id):
