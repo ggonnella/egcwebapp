@@ -1,15 +1,14 @@
 from wtforms import Form, StringField, SelectField, TextAreaField, validators, \
-                    FieldList, FormField, Field
-from wtforms.validators import ValidationError, Regexp
+                    FieldList, FormField
 import json
 import re
 from jinja2 import Markup
 
 class TagForm(Form):
-    tagname = StringField('Name')
+    tagname = StringField('Name', render_kw={'size': 2})
     tagtype = SelectField('Type', choices=[('Z', 'String'), ('i', 'Integer'),
                                            ('f', 'Float'), ('J', 'JSON')], default='Z')
-    tagvalue = StringField('Value')
+    tagvalue = StringField('Value', render_kw={'size': "80%"})
 
     def validate_value(self, field):
         if self.type.data == 'i':
