@@ -7,7 +7,7 @@ body {
 h1 {
   font-size: 40px;
   background-image: url('../img/logo.jpg');
-  background-size: 40px auto;
+  background-size: 50px auto;
   background-repeat: no-repeat;
   padding-left: 50px;
 }
