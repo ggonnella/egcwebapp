@@ -5,8 +5,6 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>EGC Data Editor</title>
 
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-
       <!-- Font-awesome -->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
@@ -24,6 +22,9 @@
       <!-- Tippy.js -->
       <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
       <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+
+      <!-- EGCwebapp stylesheet -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/egcwebapp.css') }}">
 
       {% block head %}{% endblock %}
   </head>

@@ -5,8 +5,10 @@ body {
 }
 
 .container {
-    width: 80%;
-    margin: 0 auto;
+    width: 97%;
+    max-width: unset;
+    margin-left: 20px;
+    margin-right: 40px;
     padding: 20px;
     padding-top: 80px;
 }
