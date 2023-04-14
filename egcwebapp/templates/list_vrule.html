@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Value Expectation Rules</h1>
-  <a href="{{ url_for('create_vrule') }}"
-    class="btn btn-primary create">New Record</a>
+  <h1>Value Expectation Rules
+    <span style="float: right">
+      <a href="{{ url_for('create_vrule') }}"
+         class="btn btn-primary create">New Record</a>
+    </span>
+  </h1>
   {% set main=True %}
   {% include 'datatable_vrule.html' %}
 

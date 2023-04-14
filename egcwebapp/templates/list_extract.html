@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Document Extracts</h1>
-    <a href="{{ url_for('create_extract') }}" class="btn btn-primary create">New Record</a>
+  <h1>Document Extracts
+    <span style="float: right">
+      <a href="{{ url_for('create_document') }}"
+         class="btn btn-primary create">New Record</a>
+    </span>
+  </h1>
     {% set main=True %}
     {% include 'datatable_extract.html' %}
   <script src="{{ url_for('static', filename='js/list_extract.mjs') }}" type="module"></script>

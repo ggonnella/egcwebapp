@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Unit Models</h1>
-  <a href="{{ url_for('create_model') }}"
-    class="btn btn-primary create">New Record</a>
+  <h1>Unit Models
+    <span style="float: right">
+      <a href="{{ url_for('create_model') }}"
+         class="btn btn-primary create">New Record</a>
+    </span>
+  </h1>
   {% set main=True %}
   {% include 'datatable_model.html' %}
 

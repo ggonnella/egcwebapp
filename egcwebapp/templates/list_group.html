@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Organism Groups</h1>
-  <a href="{{ url_for('create_group') }}"
-    class="btn btn-primary create">New Record</a>
+  <h1>Organism Groups
+    <span style="float: right">
+      <a href="{{ url_for('create_group') }}"
+         class="btn btn-primary create">New Record</a>
+    </span>
+  </h1>
   {% set main=True %}
   {% include 'datatable_group.html' %}
   <script src="{{ url_for('static', filename='js/list_group.mjs') }}"
