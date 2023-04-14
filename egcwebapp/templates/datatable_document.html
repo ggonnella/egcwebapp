@@ -22,7 +22,7 @@
           {% for document in documents %}
              {% set record_id = egc_data.compute_id(document) %}
               <tr>
-                  <td style:"white-space: nowrap;">
+                  <td style="white-space: nowrap;">
                     <span class="document-id" style="display: inline;"
                       data-document-id="{{ record_id }}"
                       ><a href="https://pubmed.ncbi.nlm.nih.gov/{{ document.document_id.item }}"

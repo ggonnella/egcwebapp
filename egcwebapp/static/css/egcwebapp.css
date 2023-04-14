@@ -100,3 +100,7 @@ a.create {
 .hidden {
   display: none;
 }
+
+.related_link {
+  white-space: nowrap;
+}

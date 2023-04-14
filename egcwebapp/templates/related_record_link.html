@@ -1,4 +1,8 @@
-<span style:"white-space: nowrap;">
+<span
+  {% if not noclass %}
+    class="related_link"
+  {% endif %}
+  >
   <span class="record-id"
         style="display: inline;"
         data-record-id="{{ related_id }}">

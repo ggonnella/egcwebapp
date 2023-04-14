@@ -32,48 +32,132 @@ if os.environ.get('EGCWEBAPP') == 'development':
   this_dir = Path(__file__).parent
   egc_data = EGCData.from_file(str(this_dir.parent / "archaea.egc"))
 
+def break_string(string, goal_length, min_length=None, breaking_chars=" ,"):
+    """Breaks a string into pieces of a desired length.
+
+    The function tries to break the string into pieces of length
+    `goal_length`, where the break can only happen at one of the
+    characters contained in the string `breaking_chars`.
+
+    If there is no such character at the desired breaking position,
+    it can take one between the position `min_length` and the
+    and `goal_length` of the remaining string.
+
+    If also in that region there is none, then take the first available
+    breaking point after position `goal_length` (or leave the remaining string
+    unbroken if there are no further breaking characters).
+
+    Args:
+        string (str):                   The string to be broken into pieces.
+        goal_length (int):              The desired length of the pieces.
+        min_length (int):               The minimum length of the pieces.
+                                        (default: 90% of `goal_length`)
+        breaking_chars (str, optional): The characters at which the string
+                                        can be broken (default: " ,").
+
+    Returns:
+        list: A list of the broken pieces of the original string.
+              The breaking character is included in the piece before the break.
+
+    Examples:
+        >>> break_string("This is a very long string that needs a break.", 20)
+        ['This is a very long ', 'string that needs a ', 'break.']
+
+        >>> break_string("This is a test string", 10, breaking_chars="-")
+        ['This is a test string']
+    """
+    # Check if string is already shorter than goal length
+    if len(string) <= goal_length:
+        return [string]
+
+    if min_length is None:
+      min_length = int(goal_length * 0.9)
+
+    # Find the first breaking character at the goal length
+    if string[goal_length] in breaking_chars:
+        return [string[:goal_length+1]] + break_string(string[goal_length+1:],
+                goal_length, min_length, breaking_chars)
+
+    # Find the last breaking character before the deviation range
+    last_break = -1
+    for i in range(min_length, goal_length):
+        if i >= 0 and string[i] in breaking_chars:
+            last_break = i
+
+    # Find the first breaking character after the goal length
+    first_break = -1
+    for i in range(goal_length+1, len(string)):
+        if string[i] in breaking_chars:
+            first_break = i
+            break
+
+    # Choose the preferred breaking position based on priority
+    if last_break >= 0:
+        return [string[:last_break+1]] + break_string(string[last_break+1:],
+                goal_length, min_length, breaking_chars)
+    elif first_break > 0:
+        return [string[:first_break+1]] + break_string(string[first_break+1:],
+                goal_length, min_length, breaking_chars)
+    else:
+        return [string]
+
 @app.context_processor
 def my_context_processor():
     def linked_group_definition(group_type, group_definition):
         rel_groups = []
-        if group_type == 'combined' or group_type == 'inverted':
-            rel_groups = re.findall(r"[a-zA-Z0-9_]+", group_definition)
-        else:
-            m = re.match(r'^derived:([a-zA-Z0-9_]+):.*', group_definition)
-            if m:
-                rel_groups = [m.group(1)]
+        definition_pieces = break_string(group_definition, 12, 8)
+        output = []
+        for group_definition in definition_pieces:
+          if group_type == 'combined' or group_type == 'inverted':
+              rel_groups = re.findall(r"[a-zA-Z0-9_]+", group_definition)
+          else:
+              m = re.match(r'^derived:([a-zA-Z0-9_]+):.*', group_definition)
+              if m:
+                  rel_groups = [m.group(1)]
 
-        for rel_group in rel_groups:
-            rendered_template = render_template('related_record_link.html',
-                related_type='group', related_id=rel_group, prev='list_group')
-            group_definition = re.sub(r'\b' + re.escape(rel_group) + r'\b',
-                rendered_template, group_definition)
+          for rel_group in rel_groups:
+              rendered_template = render_template('related_record_link.html',
+                  related_type='group', related_id=rel_group, prev='list_group')
+              group_definition = re.sub(r'\b' + re.escape(rel_group) + r'\b',
+                  rendered_template, group_definition)
+          group_definition = '<span class="related_link">' +\
+                            group_definition + '</span>'
+          output.append(group_definition)
 
-        return group_definition
+        return "<br/>".join(output)
 
     def linked_unit_definition(unit_type, unit_definition):
-        rel_units = []
-        if unit_type.startswith('homolog_'):
-            m = re.match(r'^homolog:([a-zA-Z0-9_]+)', unit_definition)
-            if m:
-                rel_units = [m.group(1)]
-        elif unit_type == 'set!:arrangement':
-            parts = unit_definition.split(',')
-            rel_units = []
-            for part in parts:
-                m = re.match(r'^([a-zA-Z0-9_]+)$', part)
-                if m:
-                    rel_units.append(m.group(1))
-        elif unit_type.startswith('*') or unit_type.startswith('set!:'):
-            rel_units = re.findall(r"[a-zA-Z0-9_]+", unit_definition)
+        if unit_definition == ".":
+          return unit_definition
+        unit_definition_pieces = break_string(unit_definition, 15)
+        output = []
+        for unit_definition in unit_definition_pieces:
+          rel_units = []
+          if unit_type.startswith('homolog_'):
+              m = re.match(r'^homolog:([a-zA-Z0-9_]+)', unit_definition)
+              if m:
+                  rel_units = [m.group(1)]
+          elif unit_type == 'set!:arrangement':
+              parts = unit_definition.split(',')
+              rel_units = []
+              for part in parts:
+                  m = re.match(r'^([a-zA-Z0-9_]+)$', part)
+                  if m:
+                      rel_units.append(m.group(1))
+          elif unit_type.startswith('*') or unit_type.startswith('set!:'):
+              rel_units = re.findall(r"[a-zA-Z0-9_]+", unit_definition)
 
-        for rel_unit in rel_units:
-            rendered_template = render_template('related_record_link.html',
-                related_type='unit', related_id=rel_unit, prev='list_unit')
-            unit_definition = re.sub(r'\b' + re.escape(rel_unit) + r'\b',
-                rendered_template, unit_definition)
+          for rel_unit in rel_units:
+              rendered_template = render_template('related_record_link.html',
+                  related_type='unit', related_id=rel_unit, prev='list_unit',
+                  noclass=True)
+              unit_definition = re.sub(r'\b' + re.escape(rel_unit) + r'\b',
+                  rendered_template, unit_definition)
+          unit_definition = '<span class="related_link">' +\
+                            unit_definition + '</span>'
+          output.append(unit_definition)
 
-        return unit_definition
+        return "<br/>".join(output)
 
     return {'linked_group_definition': linked_group_definition,
             'linked_unit_definition': linked_unit_definition}
