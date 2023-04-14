@@ -9,7 +9,8 @@ h1 {
   background-image: url('../img/logo.jpg');
   background-size: 50px auto;
   background-repeat: no-repeat;
-  padding-left: 50px;
+  padding-left: 60px;
+  padding-bottom: 10px;
 }
 
 .container {
