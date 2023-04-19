@@ -103,7 +103,7 @@ def break_string(string, goal_length, min_length=None, breaking_chars=" ,"):
 
 @app.context_processor
 def my_context_processor():
-    def linked_group_definition(group_type, group_definition):
+    def linked_group_definition(group_type, group_definition, parent_id):
         rel_groups = []
         definition_pieces = break_string(group_definition, 12, 8)
         output = []
@@ -117,7 +117,8 @@ def my_context_processor():
 
           for rel_group in rel_groups:
               rendered_template = render_template('related_record_link.html',
-                  related_type='group', related_id=rel_group, prev='list_group')
+                  related_type='group', related_id=rel_group,
+                  parent_id=parent_id, prev='list_group')
               group_definition = re.sub(r'\b' + re.escape(rel_group) + r'\b',
                   rendered_template, group_definition)
           group_definition = '<span class="related_link">' +\
@@ -126,7 +127,7 @@ def my_context_processor():
 
         return "<br/>".join(output)
 
-    def linked_unit_definition(unit_type, unit_definition):
+    def linked_unit_definition(unit_type, unit_definition, parent_id):
         if unit_definition == ".":
           return unit_definition
         unit_definition_pieces = break_string(unit_definition, 15)
@@ -150,7 +151,7 @@ def my_context_processor():
           for rel_unit in rel_units:
               rendered_template = render_template('related_record_link.html',
                   related_type='unit', related_id=rel_unit, prev='list_unit',
-                  noclass=True)
+                  noclass=True, parent_id=parent_id)
               unit_definition = re.sub(r'\b' + re.escape(rel_unit) + r'\b',
                   rendered_template, unit_definition)
           unit_definition = '<span class="related_link">' +\
