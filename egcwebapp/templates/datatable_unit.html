@@ -49,6 +49,9 @@
                 {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
                        'unit', unit.id, 'U', 'U' %}
                 {% include 'ref_by_link.html' %}
+                {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
+                       'model', unit.id, 'U', 'M' %}
+                {% include 'ref_by_link.html' %}
               </td>
             {% endif %}
             <td>
@@ -77,6 +80,10 @@
       $(function() {
         $('body').on('click', '.show-units',
               openNestedTable('units', 'units', 8));
+      });
+      $(function() {
+        $('body').on('click', '.show-models',
+              openNestedTable('units', 'models', 8));
       });
     </script>
   {% endif %}
