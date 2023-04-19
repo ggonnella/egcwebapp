@@ -1,5 +1,8 @@
+{% if not link_text %}
+  {% set link_text = related_id %}
+{% endif %}
 {% if ancestor_ids and (related_id in ancestor_ids) %}
-  <i>{{ related_id }}</i>
+  <i>{{ link_text }}</i>
 {% else %}
   {% if ancestor_ids %}
     {% set ancestor_ids_all = ancestor_ids + [record_id] %}
@@ -15,7 +18,7 @@
     ><a href="#"
        data-related-id="{{related_id}}"
        data-ancestor-ids="{{ancestor_ids_str}}"
-       class="related-{{record_table}}s-{{related_table}}s">{{related_id}}</a><span
+       class="related-{{record_table}}s-{{related_table}}s">{{link_text}}</a><span
        class="{{related_table}}-info">&nbsp;&#9432;
        <a href="{{ url_for('edit_'+related_table,
                     record_id=related_id,
