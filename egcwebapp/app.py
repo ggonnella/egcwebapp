@@ -103,7 +103,78 @@ def break_string(string, goal_length, min_length=None, breaking_chars=" ,"):
 
 @app.context_processor
 def my_context_processor():
+
+    DOI_URL = "https://doi.org/"
+    GEONAMES_URL = "https://www.geonames.org/"
+    OBO_URL = "http://purl.obolibrary.org/obo/"
+    MICRO_URL = "https://www.ebi.ac.uk/ols4/ontologies/micro/classes/"+\
+        "http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FMICRO_"
+    WIKIPEDIA_URL = "https://en.wikipedia.org/wiki/"
+    WIKTIONARY_URL = "https://en.wiktionary.org/wiki/"
+    INTERPRO_URL="https://www.ebi.ac.uk/interpro/entry/InterPro/"
+    PFAM_URL="https://www.ebi.ac.uk/interpro/entry/pfam/"
+    PFAM_CLAN_URL="https://www.ebi.ac.uk/interpro/set/pfam/"
+    TC_URL="https://www.tcdb.org/search/result.php?tc="
+    EC_URL="https://enzyme.expasy.org/EC/"
+    GO_URL="https://www.ebi.ac.uk/QuickGO/term/GO:"
+    SO_URL="http://www.sequenceontology.org/browser/current_release/term/"
+    KEGG_URL="https://www.genome.jp/entry/"
+    BRENDA_EC_URL="https://www.brenda-enzymes.org/enzyme.php?ecno="
+    COG_URL="https://www.ncbi.nlm.nih.gov/research/cog/cog/"
+    COG_CAT_URL="https://www.ncbi.nlm.nih.gov/research/cog/cogcategory/"
+    ARCOG_URL="http://eggnog6.embl.de/search/ogs/"
+    PMID_URL="https://www.ncbi.nlm.nih.gov/pubmed/"
+    CDD_URL="https://www.ncbi.nlm.nih.gov/Structure/cdd/"
+    TAXID_URL="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
+    SNOMED_URL="https://snomedbrowser.com/Codes/Details/"
+    BACDIVE_URL="https://bacdive.dsmz.de/strain/"
+    HTTP_URL="http:"
+    HTTPS_URL="https:"
+    INTERRIDGE_URL="https://vents-data.interridge.org/ventfield/"
+
+    def link_external_resource(resource, item, text):
+      url = None
+      if resource == "geonames":
+          url = GEONAMES_URL + item
+      elif resource in ["ENVO", "UBERON", "RO", "CHEBI", "OMP"]:
+          url = OBO_URL + resource + "_" + item
+      elif resource == "MICRO":
+          url = MICRO_URL + item
+      elif resource == "GO":
+          url = GO_URL + item
+      elif resource == "Wikipedia":
+          url = WIKIPEDIA_URL + item
+      elif resource == "Wiktionary":
+          url = WIKTIONARY_URL + item
+      elif resource == "taxid":
+          url = TAXID_URL + item
+      elif resource == "sctid":
+          url = SNOMED_URL + item
+      elif resource == "bacdive":
+          url = BACDIVE_URL + item
+      elif resource == "interridge":
+          url = INTERRIDGE_URL + item
+      elif resource == "doi" or resource == "DOI":
+          url = DOI_URL + item
+      elif resource == "http":
+          url = HTTP_URL + item
+      elif resource == "https":
+          url = HTTPS_URL + item
+      if url:
+        return f"<a href='{url}' target='_blank'>{text}</a>"
+      else:
+        return None
+
     def linked_group_definition(group_type, group_definition, parent_id):
+        m = re.match(r"^(.+):([^!#]+)([!#].*)?$", group_definition)
+        if m:
+          group_definition_prefix = m.group(1)
+          group_definition_id = m.group(2)
+          link = link_external_resource(group_definition_prefix,
+                                        group_definition_id,
+                                        group_definition)
+          if link:
+            return link
         rel_groups = []
         definition_pieces = break_string(group_definition, 12, 8)
         output = []
@@ -126,21 +197,6 @@ def my_context_processor():
           output.append(group_definition)
 
         return "<br/>".join(output)
-
-    INTERPRO_URL="https://www.ebi.ac.uk/interpro/entry/InterPro/"
-    PFAM_URL="https://www.ebi.ac.uk/interpro/entry/pfam/"
-    PFAM_CLAN_URL="https://www.ebi.ac.uk/interpro/set/pfam/"
-    TC_URL="https://www.tcdb.org/search/result.php?tc="
-    EC_URL="https://enzyme.expasy.org/EC/"
-    GO_URL="https://www.ebi.ac.uk/QuickGO/term/GO:"
-    SO_URL="http://www.sequenceontology.org/browser/current_release/term/"
-    KEGG_URL="https://www.genome.jp/entry/"
-    BRENDA_EC_URL="https://www.brenda-enzymes.org/enzyme.php?ecno="
-    COG_URL="https://www.ncbi.nlm.nih.gov/research/cog/cog/"
-    COG_CAT_URL="https://www.ncbi.nlm.nih.gov/research/cog/cogcategory/"
-    ARCOG_URL="http://eggnog6.embl.de/search/ogs/"
-    PMID_URL="https://www.ncbi.nlm.nih.gov/pubmed/"
-    CDD_URL="https://www.ncbi.nlm.nih.gov/Structure/cdd/"
 
     def linked_unit_definition(unit_type, unit_definition, parent_id):
         if unit_definition == ".":
@@ -413,9 +469,9 @@ def group_from_form(form):
   record_data = {
       "record_type": "G",
       "id": form.id.data,
+      "name": form.name.data,
       "type": form.type.data,
       "definition": form.definition.data,
-      "description": form.description.data
   }
   add_tags_from_form_data(form, record_data)
   return record_data
