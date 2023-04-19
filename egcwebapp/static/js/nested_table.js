@@ -84,9 +84,13 @@ export function openRelatedNested(thisRecordsName, nestedRecordsName, colspan) {
 
 
 function addCloseButton(table_id) {
-  var closeButton = $('<button id="close-nested-table" class="btn btn-sm btn-light" style="margin-left: 10px;"><i class="fas fa-times"></i></button>');
-  closeButton.on('click', closeNestedTable);
-  $(`#${table_id}-wrapper .dataTables_filter`).append(closeButton);
+  const buttonId = `close-nested-table-${table_id}`;
+  const $button = $(`#${buttonId}`);
+  if ($button.length == 0) {
+    var closeButton = $(`<button id="${buttonId}" class="btn btn-sm btn-light" style="margin-left: 10px;"><i class="fas fa-times"></i></button>`);
+    closeButton.on('click', closeNestedTable);
+    $(`#${table_id}-wrapper .dataTables_filter`).append(closeButton);
+  }
 }
 
 function closeNestedTable() {
