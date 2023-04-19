@@ -39,18 +39,9 @@
                    compute_docid_from_pfx_and_item(
                      extract.document_id.resource_prefix,
                      extract.document_id.item) %}
-              <span class="document-id" style="display: inline;"
-                    data-document-id="{{ document_record_id }}">
-                <a href="{{ url_for('show_document',
-                              record_id=document_record_id,
-                              previous_page='extract_list') }}"
-                   >{{ extract.document_id.resource_prefix }}:{{ extract.document_id.item }}</a></span><span
-                 class="document-info" style="display: inline;">&nbsp;&#9432;</span><span
-                 style="display: inline;">
-                 <a href="{{ url_for('edit_document',
-                                record_id=document_record_id,
-                                previous_page='extract_list') }}">
-                   <i class="fa fa-edit" style="color: black;"></i></a></span>
+              {% set related_table, related_id =
+                     'document', document_record_id %}
+              {% include 'refs_link.html' %}
             </td>
             <td>{{ extract.text if record_type == "S" else extract.table_ref }}</td>
             <td>
@@ -78,13 +69,15 @@
     </table>
   </div>
   <script type="module">
-   import { openNestedTable } from
+   import { openNestedTable, openRelatedNested } from
         '{{ url_for('static', filename='js/nested_table.js') }}';
     $(function() {
       $('body').on('click', '.show-extracts-vrules',
             openNestedTable('extracts', 'vrules', 6));
       $('body').on('click', '.show-extracts-crules',
             openNestedTable('extracts', 'crules', 6));
+      $('body').on('click', '.related-extracts-documents',
+            openRelatedNested('extracts', 'documents', 6));
     });
   </script>
   {% if not main %}
