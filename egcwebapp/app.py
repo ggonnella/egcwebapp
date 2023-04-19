@@ -8,6 +8,7 @@ from pathlib import Path
 import os
 import re
 import functools
+import urllib.parse
 from flask_navigation import Navigation
 
 app = Flask(__name__)
@@ -131,6 +132,13 @@ def my_context_processor():
     HTTP_URL="http:"
     HTTPS_URL="https:"
     INTERRIDGE_URL="https://vents-data.interridge.org/ventfield/"
+    PROSITE_URL="https://prosite.expasy.org/"
+    PIRSF_URL="https://www.ebi.ac.uk/interpro/entry/pirsf/"
+    TIGRFAMS_URL="https://www.ncbi.nlm.nih.gov/genome/annotation_prok/evidence/"
+    SFLD_URL="https://www.ebi.ac.uk/interpro/entry/sfld/"
+    SMART_URL="https://www.ebi.ac.uk/interpro/entry/smart/"
+    HAMAP_URL="https://hamap.expasy.org/rule/"
+    UNIPROTKB_QUERY_URL="https://www.uniprot.org/uniprotkb?query="
 
     def link_external_resource(resource, item, text=None):
       if text is None:
@@ -188,6 +196,18 @@ def my_context_processor():
         url = COG_URL + item
       elif resource == 'arCOG':
         url = ARCOG_URL + item
+      elif resource == 'PROSITE':
+        url = PROSITE_URL + item
+      elif resource == 'PIRSF':
+        url = PIRSF_URL + item
+      elif resource == 'TIGRFAMs':
+        url = TIGRFAMS_URL + item
+      elif resource == 'SFLD':
+        url = SFLD_URL + item
+      elif resource == 'SMART':
+        url = SMART_URL + item
+      elif resource == 'HAMAP':
+        url = HAMAP_URL + item
       if url:
         return f"<a href='{url}' target='_blank'>{text}</a>"
       else:
@@ -210,6 +230,41 @@ def my_context_processor():
         return ";".join(linked)
       else:
         return tag_value
+
+    def linked_model_id(resource_id, model_id):
+      link = link_external_resource(resource_id, model_id)
+      if link:
+        return link
+      else:
+        return model_id
+
+    def uniprotkb_link(query):
+      url = UNIPROTKB_QUERY_URL + query
+      return f"<small>[&rightarrow;&nbsp;<a href='{url}' "+\
+             "style='text-decoration: none' "+\
+             "target='_blank'>UniProtKB</a>]</small>"
+
+    def linked_unit_symbol(unit_type, symbol):
+      if unit_type in ["specific_gene", "specific_protein", "function",
+      "set:protein_complex"]:
+        if symbol == ".":
+          return symbol
+        symq = urllib.parse.quote(symbol, safe='')
+        query= f"query=(gene:{symq})%20OR%20(protein_name:{symq})"
+        return symbol + " " + uniprotkb_link(query)
+      else:
+        return symbol
+
+    def linked_unit_description(unit_type, description):
+      if unit_type in ["specific_gene", "specific_protein", "function",
+      "set:protein_complex"]:
+        if description == ".":
+          return description
+        desq = description.replace("[", "(").replace("]", ")")
+        desq = urllib.parse.quote(desq, safe='')
+        return description + " " + uniprotkb_link(desq)
+      else:
+        return description
 
     def linked_group_definition(group_type, group_definition, parent_id):
         m = re.match(r"^(.+):([^!#]+)([!#].*)?$", group_definition)
@@ -247,7 +302,6 @@ def my_context_processor():
     def linked_unit_definition(unit_type, unit_definition, parent_id):
         if unit_definition == ".":
           return unit_definition
-        url=None
         if unit_type == 'family_or_domain:InterPro':
           return link_external_resource('InterPro', unit_definition)
         elif unit_type == 'family_or_domain:TC':
@@ -323,7 +377,11 @@ def my_context_processor():
 
     return {'linked_group_definition': linked_group_definition,
             'linked_unit_definition': linked_unit_definition,
-            'linked_tag_value': linked_tag_value}
+            'linked_tag_value': linked_tag_value,
+            'linked_model_id': linked_model_id,
+            'linked_unit_symbol': linked_unit_symbol,
+            'linked_unit_description': linked_unit_description,
+           }
 
 # The following web routes are defined for each type of record:
 #

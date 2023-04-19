@@ -35,8 +35,8 @@
             </td>
             <td>{{ unit.type }}</td>
             <td>{{ linked_unit_definition(unit.type, unit.definition, parent_id) | safe }}</td>
-            <td>{{ unit.symbol }}</td>
-            <td>{{ unit.description }}</td>
+            <td>{{ linked_unit_symbol(unit.type, unit.symbol) | safe }}</td>
+            <td>{{ linked_unit_description(unit.type, unit.description) | safe }}</td>
             <td>
               {% set record = unit %}
               {% include 'tags_lines.html' %}
