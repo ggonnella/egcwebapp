@@ -1,3 +1,5 @@
-<a href="{{ url_for(
-             'show_'+linked_type, record_id=linked_id, previous_page=prev)
-         }}"> {{ linked_id }} </a>
+<span class='related_link'> {{ record_id }}
+       <a href="{{ url_for('show_'+record_table,
+                    record_id=record_id,
+                    previous_page=prev) }}">
+         <i class="fa fa-arrow-up" style="color: black;"></i></a></span>

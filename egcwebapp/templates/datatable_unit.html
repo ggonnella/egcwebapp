@@ -31,7 +31,6 @@
               {% if main %}
                 {{ unit.id }}
               {% else %}
-                {% set linked_type, linked_id = 'unit', unit.id %}
                 {% include 'linked_record_id.html' %}
               {% endif %}
             </td>

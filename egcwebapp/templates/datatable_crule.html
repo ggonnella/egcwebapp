@@ -33,8 +33,6 @@
               {% if main %}
                 {{ crule.id }}
               {% else %}
-                {% set linked_type, linked_id, prev =
-                   'crule', crule.id, 'crule_list' %}
                 {% include 'linked_record_id.html' %}
               {% endif %}
             </td>
