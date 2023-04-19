@@ -67,7 +67,7 @@
     </table>
   </div>
   <script type="module">
-   import { openNestedTable } from
+   import { openNestedTable, openRelatedNested } from
         '{{ url_for('static', filename='js/nested_table.js') }}';
     $(function() {
       $('body').on('click', '.show-groups-vrules',
@@ -76,6 +76,8 @@
             openNestedTable('groups', 'crules', 6));
       $('body').on('click', '.show-groups-groups',
             openNestedTable('groups', 'groups', 6));
+      $('body').on('click', '.related-groups-groups',
+            openRelatedNested('groups', 'groups', 6));
     });
   </script>
   {% if not main %}
