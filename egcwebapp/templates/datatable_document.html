@@ -1,8 +1,7 @@
 {% block content %}
   {% set table_id="document-table" %}
-  {% if main %}
-    {% set show_refby=True %}
-  {% else %}
+  {% set show_refby=True %}
+  {% if not main %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">

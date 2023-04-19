@@ -1,11 +1,10 @@
 {% block content %}
   {% set table_id="attribute-table" %}
+  {% set show_refby=True %}
   {% if not hide_unit %}
     {% set show_unit=True %}
   {% endif %}
-  {% if main %}
-    {% set show_refby=True %}
-  {% else %}
+  {% if not main %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
