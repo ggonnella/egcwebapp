@@ -1,3 +1,6 @@
+{% if parent_id and parent_id == related_id %}
+  {{ related_id }}
+{% else %}
 <span
   {% if not noclass %}
     class="related_link"
@@ -18,3 +21,4 @@
                   previous_page=prev) }}">
        <i class="fa fa-edit" style="color: black;"></i></a></span>
 </span>
+{% endif %}
