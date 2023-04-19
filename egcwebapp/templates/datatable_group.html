@@ -4,8 +4,10 @@
   {% set table_id="group-table" %}
   {% if main %}
     {% set prev = 'group_list' %}
+    {% set ancestor_ids = [] %}
   {% else %}
-    {% set table_id=table_id+"-"+parent_id%}
+    {% set ancestor_ids_str = ancestor_ids | join("-") %}
+    {% set table_id=table_id+"-"+ancestor_ids_str %}
   {% endif %}
 
   <div id="{{table_id}}-wrapper">
@@ -37,7 +39,7 @@
             <td>{{ group.type }}</td>
             <td>{{ group.name }}</td>
             <td>{{ linked_group_definition(record_id, group.type,
-                                           group.definition, parent_id) | safe
+                                           group.definition, ancestor_ids) | safe
                 }}</td>
             <td>
               {% set record = group %}

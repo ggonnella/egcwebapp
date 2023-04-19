@@ -4,8 +4,10 @@
   {% set table_id="unit-table" %}
   {% if main %}
     {% set prev = 'unit_list' %}
+    {% set ancestor_ids = [] %}
   {% else %}
-    {% set table_id=table_id+"-"+parent_id%}
+    {% set ancestor_ids_str = ancestor_ids | join("-") %}
+    {% set table_id=table_id+"-"+ancestor_ids_str %}
   {% endif %}
   <div id="{{table_id}}-wrapper">
     <table id="{{table_id}}" class="table table-striped table-hover">
@@ -34,7 +36,8 @@
               {% endif %}
             </td>
             <td>{{ unit.type }}</td>
-            <td>{{ linked_unit_definition(record_id, unit.type, unit.definition, parent_id) | safe }}</td>
+            <td>{{ linked_unit_definition(record_id, unit.type,
+                     unit.definition, ancestor_ids) | safe }}</td>
             <td>{{ linked_unit_symbol(unit.type, unit.symbol) | safe }}</td>
             <td>{{ linked_unit_description(unit.type, unit.description) | safe }}</td>
             <td>

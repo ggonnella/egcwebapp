@@ -4,8 +4,10 @@
   {% set table_id="model-table" %}
   {% if main %}
     {% set prev = 'model_list' %}
+    {% set ancestor_ids = [] %}
   {% else %}
-    {% set table_id=table_id+"-"+parent_id%}
+    {% set ancestor_ids_str = ancestor_ids | join("-") %}
+    {% set table_id=table_id+"-"+ancestor_ids_str %}
   {% endif %}
   <div id="{{table_id}}-wrapper">
     <table id="{{table_id}}" class="table table-striped table-hover">

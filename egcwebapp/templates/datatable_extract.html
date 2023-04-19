@@ -1,8 +1,12 @@
 {% block content %}
   {% set record_table="extract" %}
   {% set table_id="extract-table" %}
-  {% if not main %}
-    {% set table_id=table_id+"-"+parent_id%}
+  {% if main %}
+    {% set prev = 'extract_list' %}
+    {% set ancestor_ids = [] %}
+  {% else %}
+    {% set ancestor_ids_str = ancestor_ids | join("-") %}
+    {% set table_id=table_id+"-"+ancestor_ids_str %}
   {% endif %}
   <div id="{{table_id}}-wrapper">
     <table id="{{table_id}}" class="table table-striped table-hover">

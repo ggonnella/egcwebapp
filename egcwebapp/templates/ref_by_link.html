@@ -1,5 +1,11 @@
+{% if ancestor_ids %}
+  {% set ancestor_ids_all = ancestor_ids + [record_id] %}
+  {% set ancestor_ids_str = ancestor_ids_all | join('-') %}
+{% else %}
+  {% set ancestor_ids_str = record_id %}
+{% endif %}
 <div class="count-{{record_table}}s-{{ref_by_table}}s"
-     data-record-id="{{ record_id }}">
+     data-ancestor-ids="{{ ancestor_ids_str }}">
   {% if not count %}
     {% set count=egc_data.ref_by_ids(record_type, record_id, ref_by_rt)|length %}
   {% endif %}

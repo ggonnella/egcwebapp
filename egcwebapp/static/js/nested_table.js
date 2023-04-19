@@ -2,11 +2,11 @@ export function openNestedTable(thisRecordsName, nestedRecordsName, colspan) {
   return function(event) {
     event.preventDefault();
     var $count = $(this).closest(`.count-${thisRecordsName}-${nestedRecordsName}`);
-    var recordId = $count.data('record-id');
+    var ancestorIds = $count.data('ancestor-ids');
     var $currentRow = $count.closest('tr');
 
     $.ajax({
-      url: `/api/${thisRecordsName}/${recordId}/${nestedRecordsName}`,
+      url: `/api/${thisRecordsName}/${ancestorIds}/${nestedRecordsName}`,
       type: 'GET',
       success: function(response) {
         console.log(`Success fetching ${nestedRecordsName}`);
@@ -47,11 +47,11 @@ export function openRelatedNested(thisRecordsName, nestedRecordsName, colspan) {
     event.preventDefault();
     var $link = $(this).closest(`.related-${thisRecordsName}-${nestedRecordsName}`);
     var relatedId = $link.data('related-id');
-    var recordId = $link.data('record-id');
+    var ancestorIds = $link.data('ancestor-ids');
     var $currentRow = $link.closest('tr');
 
     $.ajax({
-      url: `/api/ref/${recordId}/${nestedRecordsName}/${relatedId}`,
+      url: `/api/ref/${ancestorIds}/${nestedRecordsName}/${relatedId}`,
       type: 'GET',
       success: function(response) {
         console.log(`Success fetching ${nestedRecordsName} ${relatedId}`);
