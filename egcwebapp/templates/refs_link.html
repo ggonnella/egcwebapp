@@ -3,7 +3,7 @@
 {% else %}
   {% if ancestor_ids %}
     {% set ancestor_ids_all = ancestor_ids + [record_id] %}
-    {% set ancestor_ids_str = ancestor_ids_all | join('-') %}
+    {% set ancestor_ids_str = ancestor_ids_all | join('.') %}
   {% else %}
     {% set ancestor_ids_str = record_id %}
   {% endif %}

@@ -1132,20 +1132,20 @@ def get_crule(record_id):
 def get_ref_document(ancestor_ids, record_id):
   document = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_document.html', documents=[document],
-            egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+            egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/ref/<ancestor_ids>/extracts/<record_id>', methods=['GET'])
 @require_egc_data
 def get_ref_extract(ancestor_ids, record_id):
   extract = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_extract.html', extracts=[extract],
-            egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+            egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/ref/<ancestor_ids>/units/<record_id>', methods=['GET'])
 def get_ref_unit(ancestor_ids, record_id):
   unit = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_unit.html',
-      units=[unit], egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      units=[unit], egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/ref/<ancestor_ids>/attributes/<record_id>', methods=['GET'])
 @require_egc_data
@@ -1153,131 +1153,131 @@ def get_ref_attribute(ancestor_ids, record_id):
   attribute = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_attribute.html',
       attributes=[attribute], egc_data=egc_data,
-      ancestor_ids=ancestor_ids.split('-'))
+      ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/ref/<ancestor_ids>/groups/<record_id>', methods=['GET'])
 @require_egc_data
 def get_ref_group(ancestor_ids, record_id):
   group = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_group.html',
-      groups=[group], egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      groups=[group], egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/ref/<ancestor_ids>/models/<record_id>', methods=['GET'])
 @require_egc_data
 def get_ref_model(ancestor_ids, record_id):
   model = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_model.html',
-      models=[model], egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      models=[model], egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/ref/<ancestor_ids>/vrules/<record_id>', methods=['GET'])
 @require_egc_data
 def get_ref_vrule(ancestor_ids, record_id):
   vrule = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_vrule.html',
-      vrules=[vrule], egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      vrules=[vrule], egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/ref/<ancestor_ids>/crules/<record_id>', methods=['GET'])
 @require_egc_data
 def get_ref_crule(ancestor_ids, record_id):
   crule = egc_data.get_record_by_id(record_id) or abort(404)
   return render_template('datatable_crule.html',
-      crules=[crule], egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      crules=[crule], egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/documents/<ancestor_ids>/extracts', methods=['GET'])
 @require_egc_data
 def get_document_extracts(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   extracts = egc_data.ref_by('D', record_id, 'S') + \
              egc_data.ref_by('D', record_id, 'T')
   return render_template('datatable_extract.html', extracts=extracts,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/units/<ancestor_ids>/attributes', methods=['GET'])
 @require_egc_data
 def get_unit_attributes(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   attributes = egc_data.ref_by('U', record_id, 'A')
   return render_template('datatable_attribute.html', attributes=attributes,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/units/<ancestor_ids>/units', methods=['GET'])
 @require_egc_data
 def get_unit_units(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   units = egc_data.ref_by('U', record_id, 'U')
   return render_template('datatable_unit.html', units=units,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/units/<ancestor_ids>/models', methods=['GET'])
 @require_egc_data
 def get_unit_models(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   models = egc_data.ref_by('U', record_id, 'M')
   return render_template('datatable_model.html', models=models,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/attributes/<ancestor_ids>/vrules', methods=['GET'])
 @require_egc_data
 def get_attribute_vrules(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   vrules = egc_data.ref_by('A', record_id, 'V')
   return render_template('datatable_vrule.html', vrules=vrules,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/attributes/<ancestor_ids>/crules', methods=['GET'])
 @require_egc_data
 def get_attribute_crules(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   crules = egc_data.ref_by('A', record_id, 'C')
   return render_template('datatable_crule.html', crules=crules,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/groups/<ancestor_ids>/vrules', methods=['GET'])
 @require_egc_data
 def get_group_vrules(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   vrules = egc_data.ref_by('G', record_id, 'V')
   return render_template('datatable_vrule.html', vrules=vrules,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/groups/<ancestor_ids>/crules', methods=['GET'])
 @require_egc_data
 def get_group_crules(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   crules = egc_data.ref_by('G', record_id, 'C')
   return render_template('datatable_crule.html', crules=crules,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/groups/<ancestor_ids>/groups', methods=['GET'])
 @require_egc_data
 def get_group_groups(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   groups = egc_data.ref_by('G', record_id, 'G')
   return render_template('datatable_group.html', groups=groups,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/extracts/<ancestor_ids>/vrules', methods=['GET'])
 @require_egc_data
 def get_extract_vrules(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   extract = egc_data.get_record_by_id(record_id)
@@ -1286,12 +1286,12 @@ def get_extract_vrules(ancestor_ids):
   elif extract["record_type"] == 'T':
     vrules = egc_data.ref_by('T', record_id, 'V')
   return render_template('datatable_vrule.html', vrules=vrules,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 @app.route('/api/extracts/<ancestor_ids>/crules', methods=['GET'])
 @require_egc_data
 def get_extract_crules(ancestor_ids):
-  record_id=ancestor_ids.split('-')[-1]
+  record_id=ancestor_ids.split('.')[-1]
   if not egc_data.id_exists(record_id):
     abort(404)
   extract = egc_data.get_record_by_id(record_id)
@@ -1300,7 +1300,7 @@ def get_extract_crules(ancestor_ids):
   elif extract["record_type"] == 'T':
     crules = egc_data.ref_by('T', record_id, 'C')
   return render_template('datatable_crule.html', crules=crules,
-      egc_data=egc_data, ancestor_ids=ancestor_ids.split('-'))
+      egc_data=egc_data, ancestor_ids=ancestor_ids.split('.'))
 
 if __name__ == '__main__':
   app.run()
