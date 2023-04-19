@@ -6,7 +6,7 @@
     {% set prev = 'crule_list' %}
     {% set ancestor_ids = [] %}
   {% else %}
-    {% set ancestor_ids_str = ancestor_ids | join(",") %}
+    {% set ancestor_ids_str = ancestor_ids | join("-") %}
     {% set table_id=table_id+"-"+ancestor_ids_str %}
   {% endif %}
   <div id="{{table_id}}-wrapper">
