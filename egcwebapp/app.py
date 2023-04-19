@@ -127,9 +127,68 @@ def my_context_processor():
 
         return "<br/>".join(output)
 
+    INTERPRO_URL="https://www.ebi.ac.uk/interpro/entry/InterPro/"
+    PFAM_URL="https://www.ebi.ac.uk/interpro/entry/pfam/"
+    PFAM_CLAN_URL="https://www.ebi.ac.uk/interpro/set/pfam/"
+    TC_URL="https://www.tcdb.org/search/result.php?tc="
+    EC_URL="https://enzyme.expasy.org/EC/"
+    GO_URL="https://www.ebi.ac.uk/QuickGO/term/GO:"
+    SO_URL="http://www.sequenceontology.org/browser/current_release/term/"
+    KEGG_URL="https://www.genome.jp/entry/"
+    BRENDA_EC_URL="https://www.brenda-enzymes.org/enzyme.php?ecno="
+    COG_URL="https://www.ncbi.nlm.nih.gov/research/cog/cog/"
+    COG_CAT_URL="https://www.ncbi.nlm.nih.gov/research/cog/cogcategory/"
+    ARCOG_URL="http://eggnog6.embl.de/search/ogs/"
+    PMID_URL="https://www.ncbi.nlm.nih.gov/pubmed/"
+    CDD_URL="https://www.ncbi.nlm.nih.gov/Structure/cdd/"
+
     def linked_unit_definition(unit_type, unit_definition, parent_id):
         if unit_definition == ".":
           return unit_definition
+        url=None
+        if unit_type == 'family_or_domain:InterPro':
+          url = INTERPRO_URL + unit_definition
+        elif unit_type == 'family_or_domain:TC':
+          url = TC_URL + unit_definition
+        elif unit_type == 'family_or_domain:Pfam':
+          url = PFAM_URL + unit_definition
+        elif unit_type == 'family_or_domain:Pfam_clan':
+          url = PFAM_CLAN_URL + unit_definition
+        elif unit_type == 'family_or_domain:CDD':
+          url = CDD_URL + unit_definition
+        elif unit_type == 'function:EC':
+          url = EC_URL + unit_definition
+        elif unit_type == 'function:BRENDA_EC':
+          url = BRENDA_EC_URL + unit_definition
+        elif unit_type == 'function:GO':
+          url = GO_URL + unit_definition
+        elif (unit_type == 'feature_type' or unit_type == 'amino_acid') and \
+            unit_definition.startswith('SO:'):
+          url = SO_URL + unit_definition
+        elif unit_type == 'set:metabolic_pathway' \
+            and unit_definition.startswith('KEGG:'):
+          url = KEGG_URL + unit_definition[5:]
+        elif unit_type == 'ortholog_groups_category:COG_category':
+          url = COG_CAT_URL + unit_definition
+        elif unit_type == 'ortholog_group:COG':
+          url = COG_URL + unit_definition
+        elif unit_type == 'ortholog_group:arCOG':
+          url = ARCOG_URL + unit_definition
+        if url:
+          return f"<a href='{url}' target='_blank'>{unit_definition}</a>"
+        if unit_definition.startswith('ref:doi:') or \
+            unit_definition.startswith('ref:DOI:'):
+          return f"ref:doi:<a href='https://doi.org/{unit_definition[8:]}'"+\
+              f"target='_blank'>{unit_definition[8:]}</a>"
+        if unit_definition.startswith('ref:pmid:') or \
+            unit_definition.startswith('ref:PMID:'):
+          return f"ref:pmid:<a href='{PMID_URL}{unit_definition[9:]}'"+\
+              f"target='_blank'>{unit_definition[9:]}</a>"
+        if unit_type.startswith("set:+"):
+          definition_parts = unit_definition.split(",")
+          output_parts = [linked_unit_definition("set:" +\
+              unit_type[5:], part, parent_id) for part in definition_parts]
+          return ",".join(output_parts)
         unit_definition_pieces = break_string(unit_definition, 15)
         output = []
         for unit_definition in unit_definition_pieces:
@@ -147,6 +206,10 @@ def my_context_processor():
                       rel_units.append(m.group(1))
           elif unit_type.startswith('*') or unit_type.startswith('set!:'):
               rel_units = re.findall(r"[a-zA-Z0-9_]+", unit_definition)
+          elif unit_definition.startswith('derived:'):
+              m = re.match(r'^derived:([a-zA-Z0-9_]+):.*', unit_definition)
+              if m:
+                rel_units = [m.group(1)]
 
           for rel_unit in rel_units:
               rendered_template = render_template('related_record_link.html',
