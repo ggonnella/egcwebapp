@@ -29,13 +29,12 @@
               {% if main %}
                 {{ unit.id }}
               {% else %}
-                {% set linked_type, linked_id, prev =
-                   'unit', unit.id, 'unit_list' %}
+                {% set linked_type, linked_id = 'unit', unit.id %}
                 {% include 'linked_record_id.html' %}
               {% endif %}
             </td>
             <td>{{ unit.type }}</td>
-            <td>{{ linked_unit_definition(unit.type, unit.definition, parent_id) | safe }}</td>
+            <td>{{ linked_unit_definition(record_id, unit.type, unit.definition, parent_id) | safe }}</td>
             <td>{{ linked_unit_symbol(unit.type, unit.symbol) | safe }}</td>
             <td>{{ linked_unit_description(unit.type, unit.description) | safe }}</td>
             <td>
@@ -66,7 +65,7 @@
     </table>
   </div>
   <script type="module">
-   import { openNestedTable } from
+   import { openNestedTable, openRelatedNested } from
         '{{ url_for('static', filename='js/nested_table.js') }}';
     $(function() {
       $('body').on('click', '.show-units-attributes',
@@ -75,6 +74,8 @@
             openNestedTable('units', 'units', 7));
       $('body').on('click', '.show-units-models',
             openNestedTable('units', 'models', 7));
+      $('body').on('click', '.related-units-units',
+            openRelatedNested('units', 'units', 7));
     });
   </script>
   {% if not main %}

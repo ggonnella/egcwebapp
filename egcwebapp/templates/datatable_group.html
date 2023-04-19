@@ -36,7 +36,9 @@
             </td>
             <td>{{ group.type }}</td>
             <td>{{ group.name }}</td>
-            <td>{{ linked_group_definition(group.type, group.definition, parent_id) | safe }}</td>
+            <td>{{ linked_group_definition(record_id, group.type,
+                                           group.definition, parent_id) | safe
+                }}</td>
             <td>
               {% set record = group %}
               {% include 'tags_lines.html' %}

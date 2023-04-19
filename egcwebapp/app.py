@@ -266,7 +266,8 @@ def my_context_processor():
       else:
         return description
 
-    def linked_group_definition(group_type, group_definition, parent_id):
+    def linked_group_definition(group_id, group_type,
+                                group_definition, parent_id):
         m = re.match(r"^(.+):([^!#]+)([!#].*)?$", group_definition)
         if m:
           group_definition_prefix = m.group(1)
@@ -288,8 +289,9 @@ def my_context_processor():
                   rel_groups = [m.group(1)]
 
           for rel_group in rel_groups:
-              rendered_template = render_template('related_record_link.html',
-                  related_type='group', related_id=rel_group,
+              rendered_template = render_template('refs_link.html',
+                  record_table='group', record_id=group_id,
+                  related_table='group', related_id=rel_group,
                   parent_id=parent_id, prev='list_group')
               group_definition = re.sub(r'\b' + re.escape(rel_group) + r'\b',
                   rendered_template, group_definition)
@@ -299,7 +301,7 @@ def my_context_processor():
 
         return "<br/>".join(output)
 
-    def linked_unit_definition(unit_type, unit_definition, parent_id):
+    def linked_unit_definition(unit_id, unit_type, unit_definition, parent_id):
         if unit_definition == ".":
           return unit_definition
         if unit_type == 'family_or_domain:InterPro':
@@ -364,8 +366,9 @@ def my_context_processor():
                 rel_units = [m.group(1)]
 
           for rel_unit in rel_units:
-              rendered_template = render_template('related_record_link.html',
-                  related_type='unit', related_id=rel_unit, prev='list_unit',
+              rendered_template = render_template('refs_link.html',
+                  record_table='unit', record_id=unit_id,
+                  related_table='unit', related_id=rel_unit, prev='list_unit',
                   noclass=True, parent_id=parent_id)
               unit_definition = re.sub(r'\b' + re.escape(rel_unit) + r'\b',
                   rendered_template, unit_definition)

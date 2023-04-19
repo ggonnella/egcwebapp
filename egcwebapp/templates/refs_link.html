@@ -1,7 +1,11 @@
 {% if parent_id and parent_id == related_id %}
   <i>{{ related_id }}</i>
 {% else %}
-  <a href="#"
+<span
+  {% if not noclass %}
+    class="related_link"
+  {% endif %}
+  ><a href="#"
      data-related-id="{{related_id}}"
      data-record-id="{{record_id}}"
      class="related-{{record_table}}s-{{related_table}}s">{{related_id}}</a></span><span
@@ -16,5 +20,6 @@
                   record_id=related_id,
                   previous_page=prev) }}">
        <i class="fa fa-arrow-up" style="color: black;"></i></a></span>
+  </span>
 </span>
 {% endif %}
