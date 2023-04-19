@@ -132,11 +132,13 @@ def my_context_processor():
     HTTPS_URL="https:"
     INTERRIDGE_URL="https://vents-data.interridge.org/ventfield/"
 
-    def link_external_resource(resource, item, text):
+    def link_external_resource(resource, item, text=None):
+      if text is None:
+        text = item
       url = None
       if resource == "geonames":
           url = GEONAMES_URL + item
-      elif resource in ["ENVO", "UBERON", "RO", "CHEBI", "OMP"]:
+      elif resource in ["ENVO", "UBERON", "RO", "CHEBI", "OMP", "NCIT", "OHMI"]:
           url = OBO_URL + resource + "_" + item
       elif resource == "MICRO":
           url = MICRO_URL + item
@@ -148,6 +150,8 @@ def my_context_processor():
           url = WIKTIONARY_URL + item
       elif resource == "taxid":
           url = TAXID_URL + item
+      elif resource == "pmid" or resource == "PMID":
+          url = PMID_URL + item
       elif resource == "sctid":
           url = SNOMED_URL + item
       elif resource == "bacdive":
@@ -160,10 +164,52 @@ def my_context_processor():
           url = HTTP_URL + item
       elif resource == "https":
           url = HTTPS_URL + item
+      elif resource == 'InterPro':
+        url = INTERPRO_URL + item
+      elif resource == 'TC':
+        url = TC_URL + item
+      elif resource == 'Pfam':
+        url = PFAM_URL + item
+      elif resource == 'Pfam_clan':
+        url = PFAM_CLAN_URL + item
+      elif resource == 'CDD':
+        url = CDD_URL + item
+      elif resource == 'EC':
+        url = EC_URL + item
+      elif resource == 'BRENDA_EC':
+        url = BRENDA_EC_URL + item
+      elif resource == 'SO':
+        url = SO_URL + item
+      elif resource == 'KEGG':
+        url = KEGG_URL + item
+      elif resource == 'COG_category':
+        url = COG_CAT_URL + item
+      elif resource == 'COG':
+        url = COG_URL + item
+      elif resource == 'arCOG':
+        url = ARCOG_URL + item
       if url:
         return f"<a href='{url}' target='_blank'>{text}</a>"
       else:
         return None
+
+    def linked_tag_value(tag_type, tag_value):
+      if tag_type in ["XD", "XR"]:
+        linked = []
+        for value_part in tag_value.split(";"):
+          m = re.match(r"^(.+):([^!#]+)([!#].*)?$", value_part)
+          link = None
+          if m:
+            resource = m.group(1)
+            item = m.group(2)
+            link = link_external_resource(resource, item, value_part)
+          if link:
+            linked.append(link)
+          else:
+            linked.append(value_part)
+        return ";".join(linked)
+      else:
+        return tag_value
 
     def linked_group_definition(group_type, group_definition, parent_id):
         m = re.match(r"^(.+):([^!#]+)([!#].*)?$", group_definition)
@@ -203,43 +249,39 @@ def my_context_processor():
           return unit_definition
         url=None
         if unit_type == 'family_or_domain:InterPro':
-          url = INTERPRO_URL + unit_definition
+          return link_external_resource('InterPro', unit_definition)
         elif unit_type == 'family_or_domain:TC':
-          url = TC_URL + unit_definition
+          return link_external_resource('TC', unit_definition)
         elif unit_type == 'family_or_domain:Pfam':
-          url = PFAM_URL + unit_definition
+          return link_external_resource('Pfam', unit_definition)
         elif unit_type == 'family_or_domain:Pfam_clan':
-          url = PFAM_CLAN_URL + unit_definition
+          return link_external_resource('Pfam_clan', unit_definition)
         elif unit_type == 'family_or_domain:CDD':
-          url = CDD_URL + unit_definition
+          return link_external_resource('CDD', unit_definition)
         elif unit_type == 'function:EC':
-          url = EC_URL + unit_definition
+          return link_external_resource('EC', unit_definition)
         elif unit_type == 'function:BRENDA_EC':
-          url = BRENDA_EC_URL + unit_definition
+          return link_external_resource('BRENDA_EC', unit_definition)
         elif unit_type == 'function:GO':
-          url = GO_URL + unit_definition
+          return link_external_resource('GO', unit_definition)
+        elif unit_type == 'ortholog_groups_category:COG_category':
+          return link_external_resource('COG_category', unit_definition)
+        elif unit_type == 'ortholog_group:COG':
+          return link_external_resource('COG', unit_definition)
+        elif unit_type == 'ortholog_group:arCOG':
+          return link_external_resource('arCOG', unit_definition)
         elif (unit_type == 'feature_type' or unit_type == 'amino_acid') and \
             unit_definition.startswith('SO:'):
-          url = SO_URL + unit_definition
+          return link_external_resource('SO',
+                unit_definition[3:], unit_definition)
         elif unit_type == 'set:metabolic_pathway' \
             and unit_definition.startswith('KEGG:'):
-          url = KEGG_URL + unit_definition[5:]
-        elif unit_type == 'ortholog_groups_category:COG_category':
-          url = COG_CAT_URL + unit_definition
-        elif unit_type == 'ortholog_group:COG':
-          url = COG_URL + unit_definition
-        elif unit_type == 'ortholog_group:arCOG':
-          url = ARCOG_URL + unit_definition
-        if url:
-          return f"<a href='{url}' target='_blank'>{unit_definition}</a>"
-        if unit_definition.startswith('ref:doi:') or \
-            unit_definition.startswith('ref:DOI:'):
-          return f"ref:doi:<a href='https://doi.org/{unit_definition[8:]}'"+\
-              f"target='_blank'>{unit_definition[8:]}</a>"
-        if unit_definition.startswith('ref:pmid:') or \
-            unit_definition.startswith('ref:PMID:'):
-          return f"ref:pmid:<a href='{PMID_URL}{unit_definition[9:]}'"+\
-              f"target='_blank'>{unit_definition[9:]}</a>"
+          return link_external_resource('KEGG',
+                unit_definition[5:], unit_definition)
+        m = re.match(r"^ref:(.+):(.*)$", unit_definition)
+        if m:
+          return "ref:" + link_external_resource(m.group(1), m.group(2),
+              unit_definition[4:])
         if unit_type.startswith("set:+"):
           definition_parts = unit_definition.split(",")
           output_parts = [linked_unit_definition("set:" +\
@@ -280,7 +322,8 @@ def my_context_processor():
         return "<br/>".join(output)
 
     return {'linked_group_definition': linked_group_definition,
-            'linked_unit_definition': linked_unit_definition}
+            'linked_unit_definition': linked_unit_definition,
+            'linked_tag_value': linked_tag_value}
 
 # The following web routes are defined for each type of record:
 #
