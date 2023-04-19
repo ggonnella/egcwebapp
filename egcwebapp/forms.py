@@ -398,7 +398,6 @@ class SourceForm(Form):
 
     @staticmethod
     def sources_validator(egc_data, sources_field):
-      from icecream import ic
       for source in sources_field:
         if source.data["source_id"] != '':
           if not egc_data.id_exists(source.data["source_id"]):
