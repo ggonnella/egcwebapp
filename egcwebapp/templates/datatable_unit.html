@@ -28,9 +28,9 @@
               {% if main %}
                 {{ unit.id }}
               {% else %}
-                {% set related_type, related_id, prev =
+                {% set linked_type, linked_id, prev =
                    'unit', unit.id, 'unit_list' %}
-                {% include 'related_record_link.html' %}
+                {% include 'linked_record_id.html' %}
               {% endif %}
             </td>
             <td>{{ unit.type }}</td>

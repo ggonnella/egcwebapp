@@ -26,9 +26,9 @@
           <tr>
             {% if show_unit %}
               <td>
-                {% set related_type, related_id, prev =
+                {% set linked_type, linked_id, prev =
                    'unit', model.unit_id, 'model_list' %}
-                {% include 'related_record_link.html' %}
+                {% include 'linked_record_id.html' %}
               </td>
             {% endif %}
             <td>{{ model.resource_id }}</td>
