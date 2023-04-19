@@ -1,7 +1,10 @@
 {% block content %}
+  {% set record_table="unit" %}
+  {% set record_type="U" %}
   {% set table_id="unit-table" %}
-  {% set show_refby=True %}
-  {% if not main %}
+  {% if main %}
+    {% set prev = 'unit_list' %}
+  {% else %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
@@ -14,14 +17,13 @@
             <th>Symbol</th>
             <th>Description</th>
             <th>Tags</th>
-            {% if show_refby %}
-              <th>Referenced&nbsp;by</th>
-            {% endif %}
+            <th>Referenced&nbsp;by</th>
             <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for unit in units %}
+          {% set record_id = unit.id %}
           <tr>
             <td>
               {% if main %}
@@ -40,19 +42,14 @@
               {% set record = unit %}
               {% include 'tags_lines.html' %}
             </td>
-            {% if show_refby %}
-              <td>
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
-                       'attribute', unit.id, 'U', 'A' %}
-                {% include 'ref_by_link.html' %}
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
-                       'unit', unit.id, 'U', 'U' %}
-                {% include 'ref_by_link.html' %}
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt =
-                       'model', unit.id, 'U', 'M' %}
-                {% include 'ref_by_link.html' %}
-              </td>
-            {% endif %}
+            <td>
+              {% set ref_by_table, ref_by_rt = 'attribute', 'A' %}
+              {% include 'ref_by_link.html' %}
+              {% set ref_by_table, ref_by_rt = 'unit', 'U' %}
+              {% include 'ref_by_link.html' %}
+              {% set ref_by_table, ref_by_rt = 'model', 'M' %}
+              {% include 'ref_by_link.html' %}
+            </td>
             <td>
               <a href="{{ url_for('edit_unit', record_id=unit.id) }}">
                 <i class="fas fa-edit"></i></a>
@@ -68,24 +65,18 @@
       </tbody>
     </table>
   </div>
-  {% if show_refby %}
-    <script type="module">
-     import { openNestedTable } from
-          '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(function() {
-        $('body').on('click', '.show-attributes',
-              openNestedTable('units', 'attributes', 8));
-      });
-      $(function() {
-        $('body').on('click', '.show-units',
-              openNestedTable('units', 'units', 8));
-      });
-      $(function() {
-        $('body').on('click', '.show-models',
-              openNestedTable('units', 'models', 8));
-      });
-    </script>
-  {% endif %}
+  <script type="module">
+   import { openNestedTable } from
+        '{{ url_for('static', filename='js/nested_table.js') }}';
+    $(function() {
+      $('body').on('click', '.show-units-attributes',
+            openNestedTable('units', 'attributes', 7));
+      $('body').on('click', '.show-units-units',
+            openNestedTable('units', 'units', 7));
+      $('body').on('click', '.show-units-models',
+            openNestedTable('units', 'models', 7));
+    });
+  </script>
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';

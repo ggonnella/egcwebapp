@@ -1,10 +1,10 @@
 {% block content %}
+  {% set record_table="attribute" %}
+  {% set record_type="A" %}
   {% set table_id="attribute-table" %}
-  {% set show_refby=True %}
-  {% if not hide_unit %}
-    {% set show_unit=True %}
-  {% endif %}
-  {% if not main %}
+  {% if main %}
+    {% set prev = 'attribute_list' %}
+  {% else %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
@@ -12,22 +12,19 @@
       <thead>
         <tr>
           <th>ID</th>
-          {% if show_unit %}
-            <th>Unit</th>
-          {% endif %}
+          <th>Unit</th>
           <th>Measurement Mode</th>
           <th>Reference</th>
           <th>Location Type</th>
           <th>Location Label</th>
           <th>Tags</th>
-          {% if show_refby %}
-            <th>Referenced&nbsp;by</th>
-          {% endif %}
+          <th>Referenced&nbsp;by</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for attribute in attributes %}
+          {% set record_id = attribute.id %}
           <tr>
             <td>
               {% if main %}
@@ -38,20 +35,17 @@
                 {% include 'linked_record_id.html' %}
               {% endif %}
             </td>
-            {% if show_unit %}
-              <td>
-                {% set related_type, related_id, prev =
-                   'unit', attribute.unit_id, 'attribute_list' %}
-                {% include 'related_record_link.html' %}
-              </td>
-            {% endif %}
+            <td>
+              {% set related_table, related_id = 'unit', attribute.unit_id %}
+              {% include 'refs_link.html' %}
+            </td>
             {% if attribute.mode.mode  %}
               <td>{{ attribute.mode.mode }}</td>
               <td>
                 {% if attribute.mode.reference %}
-                  {% set related_type, related_id, prev =
-                     'unit', attribute.mode.reference, 'attribute_list' %}
-                  {% include 'related_record_link.html' %}
+                  {% set related_table, related_id =
+                     'unit', attribute.mode.reference %}
+                  {% include 'refs_link.html' %}
                 {% endif %}
               </td>
               <td>{{ attribute.mode.location_type }}</td>
@@ -64,19 +58,17 @@
               {% set record = attribute %}
               {% include 'tags_lines.html' %}
             </td>
-            {% if show_refby %}
-              <td>
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
-                       'vrule', attribute.id, 'A', 'V', 'value rule' %}
-                {% include 'ref_by_link.html' %}
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
-                       'crule', attribute.id, 'A', 'C', 'comp. rule' %}
-                {% include 'ref_by_link.html' %}
-              </td>
-            {% endif %}
             <td>
-              <a href="{{ url_for('edit_attribute', record_id=attribute.id) }}"><i class="fas fa-edit"></i></a>
-              <form action="{{ url_for('delete_attribute', record_id=attribute.id) }}" method="post" style="display: inline-block;">
+              {% set ref_by_table, ref_by_rt, ref_by_lbl =
+                     'vrule', 'V', 'value rule' %}
+              {% include 'ref_by_link.html' %}
+              {% set ref_by_table, ref_by_rt, ref_by_lbl =
+                     'crule', 'C', 'comp. rule' %}
+              {% include 'ref_by_link.html' %}
+            </td>
+            <td>
+              <a href="{{ url_for('edit_attribute', record_id=record_id) }}"><i class="fas fa-edit"></i></a>
+              <form action="{{ url_for('delete_attribute', record_id=record_id) }}" method="post" style="display: inline-block;">
                <input type="hidden" name="_method" value="DELETE">
                 <button type="submit" class="btn btn-link"><i class="fas fa-trash"></i></button>
               </form>
@@ -86,20 +78,20 @@
       </tbody>
     </table>
   </div>
-  {% if show_refby %}
-    <script type="module">
-     import { openNestedTable } from
-          '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(function() {
-        $('body').on('click', '.show-vrules',
-              openNestedTable('attributes', 'vrules', 8));
-      });
-      $(function() {
-        $('body').on('click', '.show-crules',
-              openNestedTable('attributes', 'crules', 8));
-      });
-    </script>
-  {% endif %}
+  <script type="module">
+   import { openNestedTable } from
+        '{{ url_for('static', filename='js/nested_table.js') }}';
+   import { openRelatedNested } from
+        '{{ url_for('static', filename='js/nested_table.js') }}';
+    $(function() {
+      $('body').on('click', '.show-attributes-vrules',
+            openNestedTable('attributes', 'vrules', 8));
+      $('body').on('click', '.show-attributes-crules',
+            openNestedTable('attributes', 'crules', 8));
+      $('body').on('click', '.related-attributes-extracts',
+            openRelatedNested('attributes', 'extracts', 8));
+    });
+  </script>
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';

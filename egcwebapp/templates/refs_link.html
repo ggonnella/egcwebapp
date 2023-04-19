@@ -1,0 +1,20 @@
+{% if parent_id and parent_id == related_id %}
+  <i>{{ related_id }}</i>
+{% else %}
+  <a href="#"
+     data-related-id="{{related_id}}"
+     data-record-id="{{record_id}}"
+     class="related-{{record_table}}s-{{related_table}}s">{{related_id}}</a></span><span
+     class="{{related_table}}-info"
+     style="display: inline;">&nbsp;&#9432;</span><span
+     style="display: inline;">
+     <a href="{{ url_for('edit_'+related_table,
+                  record_id=related_id,
+                  previous_page=prev) }}">
+       <i class="fa fa-edit" style="color: black;"></i></a>
+     <a href="{{ url_for('show_'+related_table,
+                  record_id=related_id,
+                  previous_page=prev) }}">
+       <i class="fa fa-arrow-up" style="color: black;"></i></a></span>
+</span>
+{% endif %}

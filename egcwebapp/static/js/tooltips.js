@@ -15,7 +15,7 @@ export async function initTooltip(target, loading, content) {
 
 export async function initRelatedTooltips(infoclass, collection) {
   $(infoclass).each(async function() {
-    const recordId = $(this).prev().data('record-id');
+    const recordId = $(this).prev().data('related-id');
     try {
       const response = await fetch(`/api/${collection}/${recordId}`);
       if (!response.ok) {

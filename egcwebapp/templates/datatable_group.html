@@ -1,7 +1,10 @@
 {% block content %}
+  {% set record_table="group" %}
+  {% set record_type="G" %}
   {% set table_id="group-table" %}
-  {% set show_refby=True %}
-  {% if not main %}
+  {% if main %}
+    {% set prev = 'group_list' %}
+  {% else %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
 
@@ -14,14 +17,13 @@
             <th>Name</th>
             <th>Definition</th>
             <th>Tags</th>
-            {% if show_refby %}
-              <th>Referenced&nbsp;by</th>
-            {% endif %}
+            <th>Referenced&nbsp;by</th>
             <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for group in groups %}
+          {% set record_id = group.id %}
           <tr>
             <td>
               {% if main %}
@@ -39,19 +41,17 @@
               {% set record = group %}
               {% include 'tags_lines.html' %}
             </td>
-            {% if show_refby %}
-              <td>
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
-                       'vrule', group.id, 'G', 'V', 'value rule' %}
-                {% include 'ref_by_link.html' %}
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
-                       'crule', group.id, 'G', 'C', 'comp. rule' %}
-                {% include 'ref_by_link.html' %}
-                {% set ref_by_type, ref_id, ref_rt, ref_by_rt, lbl_by_type =
-                       'group', group.id, 'G', 'G', 'group' %}
-                {% include 'ref_by_link.html' %}
-              </td>
-            {% endif %}
+            <td>
+              {% set ref_by_table, ref_by_rt, ref_by_lbl =
+                     'vrule', 'V', 'value rule' %}
+              {% include 'ref_by_link.html' %}
+              {% set ref_by_table, ref_by_rt, ref_by_lbl =
+                     'crule', 'C', 'comp. rule' %}
+              {% include 'ref_by_link.html' %}
+              {% set ref_by_table, ref_by_rt, ref_by_lbl =
+                     'group', 'G', 'group' %}
+              {% include 'ref_by_link.html' %}
+            </td>
             <td>
               <a href="{{ url_for('edit_group', record_id=group.id) }}"><i class="fas fa-edit"></i></a>
               <form action="{{ url_for('delete_group', record_id=group.id) }}" method="post" style="display: inline-block;">
@@ -64,24 +64,18 @@
       </tbody>
     </table>
   </div>
-  {% if show_refby %}
-    <script type="module">
-     import { openNestedTable } from
-          '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(function() {
-        $('body').on('click', '.show-vrules',
-              openNestedTable('groups', 'vrules', 6));
-      });
-      $(function() {
-        $('body').on('click', '.show-crules',
-              openNestedTable('groups', 'crules', 6));
-      });
-      $(function() {
-        $('body').on('click', '.show-groups',
-              openNestedTable('groups', 'groups', 6));
-      });
-    </script>
-  {% endif %}
+  <script type="module">
+   import { openNestedTable } from
+        '{{ url_for('static', filename='js/nested_table.js') }}';
+    $(function() {
+      $('body').on('click', '.show-groups-vrules',
+            openNestedTable('groups', 'vrules', 6));
+      $('body').on('click', '.show-groups-crules',
+            openNestedTable('groups', 'crules', 6));
+      $('body').on('click', '.show-groups-groups',
+            openNestedTable('groups', 'groups', 6));
+    });
+  </script>
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';

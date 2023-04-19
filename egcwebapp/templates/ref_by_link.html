@@ -1,13 +1,18 @@
-<div class="{{ref_by_type}}s-count" data-record-id="{{ ref_id }}">
-  {% set count=egc_data.ref_by_ids(ref_rt, ref_id, ref_by_rt)|length %}
-  {% if not lbl_by_type %}
-    {% set lbl_by_type = ref_by_type %}
+<div class="count-{{record_table}}s-{{ref_by_table}}s"
+     data-record-id="{{ record_id }}">
+  {% if not count %}
+    {% set count=egc_data.ref_by_ids(record_type, record_id, ref_by_rt)|length %}
+  {% endif %}
+  {% if not ref_by_lbl %}
+    {% set ref_by_lbl = ref_by_table %}
   {% endif %}
   {% if count == 0 %}
-    no {{lbl_by_type}}s
+    no {{ref_by_lbl}}s
   {% elif count == 1 %}
-  <a href="#" class="show-{{ref_by_type}}s"> 1 {{lbl_by_type}} </a>
+    <a href="#" class="show-{{record_table}}s-{{ref_by_table}}s">
+      1 {{ref_by_lbl}} </a>
   {% else %}
-    <a href="#" class="show-{{ref_by_type}}s"> {{ count }} {{lbl_by_type}}s </a>
+    <a href="#" class="show-{{record_table}}s-{{ref_by_table}}s">
+      {{ count }} {{ref_by_lbl}}s </a>
   {% endif %}
 </div>

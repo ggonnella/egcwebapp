@@ -1,7 +1,10 @@
 {% block content %}
+  {% set record_table="document" %}
+  {% set record_type="D" %}
   {% set table_id="document-table" %}
-  {% set show_refby=True %}
-  {% if not main %}
+  {% if main %}
+    {% set prev = 'document_list' %}
+  {% else %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
@@ -11,9 +14,7 @@
             <th>PMID</th>
             <th>Link</th>
             <th>Tags</th>
-            {% if show_refby %}
-              <th>Extracts</th>
-            {% endif %}
+            <th>Extracts</th>
             <th>Actions</th>
           </tr>
       </thead>
@@ -41,15 +42,15 @@
                     {% set record = document %}
                     {% include 'tags_lines.html' %}
                   </td>
-                  {% if show_refby %}
-                    <td>
-                      <div class="extracts-count" data-record-id="{{ record_id }}">
-                        <a href="#" class="show-extracts"
-                          >{{ (egc_data.ref_by_ids('D', record_id,'S') +
-                              egc_data.ref_by_ids('D', record_id, 'T')) | length }} extracts</a>
-                      </div>
-                    </td>
-                  {% endif %}
+                  <td>
+                    {% set count =
+                         (egc_data.ref_by_ids('D', record_id, 'S') +
+                          egc_data.ref_by_ids('D', record_id, 'T')) | length %}
+                    {% set ref_by_table = 'extract' %}
+                    {% include 'ref_by_link.html' %}
+                    {% set count = None %}
+                    </div>
+                  </td>
                   <td>
                       <a href="{{ url_for('edit_document', record_id=record_id) }}"
                         ><i class="fas fa-edit"></i></a>
@@ -65,16 +66,14 @@
       </tbody>
     </table>
   </div>
-  {% if show_refby %}
-    <script type="module">
-     import { openNestedTable } from
-        '{{ url_for('static', filename='js/nested_table.js') }}';
-      $(function() {
-        $('body').on('click', '.show-extracts',
-              openNestedTable('documents', 'extracts', 4));
-      });
-    </script>
-  {% endif %}
+  <script type="module">
+   import { openNestedTable } from
+      '{{ url_for('static', filename='js/nested_table.js') }}';
+    $(function() {
+      $('body').on('click', '.show-documents-extracts',
+            openNestedTable('documents', 'extracts', 4));
+    });
+  </script>
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';

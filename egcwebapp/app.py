@@ -1123,6 +1123,62 @@ def get_crule(record_id):
   return render_template('table_crule.html',
       crule=crule, egc_data=egc_data)
 
+@app.route('/api/ref/<parent_id>/documents/<record_id>', methods=['GET'])
+@require_egc_data
+def get_ref_document(parent_id, record_id):
+  document = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_document.html', documents=[document],
+            egc_data=egc_data, parent_id=parent_id)
+
+@app.route('/api/ref/<parent_id>/extracts/<record_id>', methods=['GET'])
+@require_egc_data
+def get_ref_extract(parent_id, record_id):
+  extract = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_extract.html', extracts=[extract],
+            egc_data=egc_data, parent_id=parent_id)
+
+@app.route('/api/ref/<parent_id>/units/<record_id>', methods=['GET'])
+def get_ref_unit(parent_id, record_id):
+  unit = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_unit.html',
+      units=[unit], egc_data=egc_data, parent_id=parent_id)
+
+@app.route('/api/ref/<parent_id>/attributes/<record_id>', methods=['GET'])
+@require_egc_data
+def get_ref_attribute(parent_id, record_id):
+  attribute = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_attribute.html',
+      attributes=[attribute], egc_data=egc_data, parent_id=parent_id)
+
+@app.route('/api/ref/<parent_id>/groups/<record_id>', methods=['GET'])
+@require_egc_data
+def get_ref_group(parent_id, record_id):
+  group = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_group.html',
+      groups=[group], egc_data=egc_data, parent_id=parent_id)
+
+@app.route('/api/ref/<parent_id>/models/<record_id>', methods=['GET'])
+@require_egc_data
+def get_ref_model(parent_id, record_id):
+  model = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_model.html',
+      models=[model], egc_data=egc_data, parent_id=parent_id)
+
+@app.route('/api/ref/<parent_id>/vrules/<record_id>', methods=['GET'])
+@require_egc_data
+def get_ref_vrule(parent_id, record_id):
+  vrule = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_vrule.html',
+      vrules=[vrule], egc_data=egc_data, parent_id=parent_id)
+
+@app.route('/api/ref/<parent_id>/crules/<record_id>', methods=['GET'])
+@require_egc_data
+def get_ref_crule(parent_id, record_id):
+  crule = egc_data.get_record_by_id(record_id) or abort(404)
+  return render_template('datatable_crule.html',
+      crules=[crule], egc_data=egc_data, parent_id=parent_id)
+
+
 @app.route('/api/documents/<record_id>/extracts', methods=['GET'])
 @require_egc_data
 def get_document_extracts(record_id):

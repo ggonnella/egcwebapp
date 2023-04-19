@@ -1,12 +1,10 @@
 {% block content %}
+  {% set record_table="vrule" %}
+  {% set record_type="V" %}
   {% set table_id="vrule-table" %}
-  {% if not hide_attribute %}
-    {% set show_attribute=True %}
-  {% endif %}
-  {% if not hide_group %}
-    {% set show_group=True %}
-  {% endif %}
-  {% if not main %}
+  {% if main %}
+    {% set prev = 'vrule_list' %}
+  {% else %}
     {% set table_id=table_id+"-"+parent_id%}
   {% endif %}
   <div id="{{table_id}}-wrapper">
@@ -15,13 +13,9 @@
         <tr>
           <th>ID</th>
           <th>Sources</th>
-          {% if show_attribute %}
-            <th>Attribute</th>
-          {% endif %}
-          {% if show_group %}
-            <th>Group</th>
-            <th>Group Portion</th>
-          {% endif %}
+          <th>Attribute</th>
+          <th>Group</th>
+          <th>Group Portion</th>
           <th>Operator</th>
           <th>Reference</th>
           <th>Tags</th>
@@ -30,49 +24,42 @@
       </thead>
       <tbody>
         {% for vrule in vrules %}
+          {% set record_id = vrule.id %}
           <tr>
             <td>
               {% if main %}
                 {{ vrule.id }}
               {% else %}
-                {% set linked_type, linked_id, prev =
-                   'vrule', vrule.id, 'vrule_list' %}
+                {% set linked_type, linked_id = 'vrule', vrule.id %}
                 {% include 'linked_record_id.html' %}
               {% endif %}
             </td>
             <td>
               {% if vrule.source is string %}
-                {% set related_type, related_id, prev =
-                   'extract', vrule.source, 'vrule_list' %}
-                {% include 'related_record_link.html' %}
+                {% set related_table, related_id = 'extract', vrule.source %}
+                {% include 'refs_link.html' %}
               {% else %}
                 {% for source in vrule.source %}
-                  {% set related_type, related_id, prev =
-                     'extract', source, 'vrule_list' %}
-                  {% include 'related_record_link.html' %}
+                  {% set related_table, related_id = 'extract', source %}
+                  {% include 'refs_link.html' %}
                   <br/>
                 {% endfor %}
               {% endif %}
             </td>
-            {% if show_attribute %}
-              <td>
-                {% set related_type, related_id, prev =
-                   'attribute', vrule.attribute, 'vrule_list' %}
-                {% include 'related_record_link.html' %}
-              </td>
-            {% endif %}
-            {% if show_group %}
-              <td>
-                {% set related_type, related_id, prev =
-                   'group', vrule.group.id, 'vrule_list' %}
-                {% include 'related_record_link.html' %}
-              </td>
-              <td>
-                {% if vrule.group.portion %}
-                  {{ vrule.group.portion }}
-                {% endif %}
-              </td>
-            {% endif %}
+            <td>
+              {% set related_table, related_id =
+                     'attribute', vrule.attribute %}
+              {% include 'refs_link.html' %}
+            </td>
+            <td>
+              {% set related_table, related_id = 'group', vrule.group.id %}
+              {% include 'refs_link.html' %}
+            </td>
+            <td>
+              {% if vrule.group.portion %}
+                {{ vrule.group.portion }}
+              {% endif %}
+            </td>
             <td>{{ vrule.operator }}</td>
             <td>{{ vrule.reference }}</td>
             <td>
@@ -91,6 +78,18 @@
       </tbody>
     </table>
   </div>
+    <script type="module">
+     import { openRelatedNested } from
+          '{{ url_for('static', filename='js/nested_table.js') }}';
+      $(function() {
+        $('body').on('click', '.related-vrules-extracts',
+              openRelatedNested('vrules', 'extracts', 8));
+        $('body').on('click', '.related-vrules-attributes',
+              openRelatedNested('vrules', 'attributes', 8));
+        $('body').on('click', '.related-vrules-groups',
+              openRelatedNested('vrules', 'groups', 8));
+      });
+    </script>
   {% if not main %}
     <script type="module">
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
