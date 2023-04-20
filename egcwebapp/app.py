@@ -19,7 +19,7 @@ app.config['UPLOAD_FOLDER'] = str(Path(app.instance_path) / 'uploads')
 if os.environ.get('EGCWEBAPP') == 'development':
   app.debug = True
   this_dir = Path(__file__).parent
-  egc_data = EGCData.from_file(str(this_dir.parent / "archaea.egc"))
+  egc_data = EGCData.from_file(str(this_dir.parent / "development.egc"))
 
 def break_string(string, goal_length, min_length=None, breaking_chars=" ,"):
     """Breaks a string into pieces of a desired length.
