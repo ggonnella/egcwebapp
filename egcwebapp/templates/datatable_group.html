@@ -25,6 +25,7 @@
       </thead>
       <tbody>
         {% for group in groups %}
+          {% set record = group %}
           {% set record_id = group.id %}
           <tr>
             <td>
@@ -40,7 +41,6 @@
                                            group.definition, ancestor_ids) | safe
                 }}</td>
             <td>
-              {% set record = group %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

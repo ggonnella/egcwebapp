@@ -25,6 +25,7 @@
       </thead>
       <tbody>
         {% for unit in units %}
+          {% set record = unit %}
           {% set record_id = unit.id %}
           <tr>
             <td>
@@ -40,7 +41,6 @@
             <td>{{ linked_unit_symbol(unit.type, unit.symbol) | safe }}</td>
             <td>{{ linked_unit_description(unit.type, unit.description) | safe }}</td>
             <td>
-              {% set record = unit %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

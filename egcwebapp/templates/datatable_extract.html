@@ -23,6 +23,7 @@
       </thead>
       <tbody>
         {% for extract in extracts %}
+          {% set record = extract %}
           {% set record_id=extract.id %}
           {% set record_type=extract.record_type %}
           <tr>
@@ -46,7 +47,6 @@
             </td>
             <td>{{ extract.text if record_type == "S" else extract.table_ref }}</td>
             <td>
-              {% set record = extract %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

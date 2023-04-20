@@ -26,6 +26,7 @@
       </thead>
       <tbody>
         {% for attribute in attributes %}
+          {% set record = attribute %}
           {% set record_id = attribute.id %}
           <tr>
             <td>
@@ -55,7 +56,6 @@
               <td></td> <td></td> <td></td>
             {% endif %}
             <td>
-              {% set record = attribute %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

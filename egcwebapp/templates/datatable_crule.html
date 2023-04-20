@@ -27,6 +27,7 @@
       </thead>
       <tbody>
         {% for crule in crules %}
+          {% set record = crule %}
           {% set record_id = crule.id %}
           <tr>
             <td>
@@ -86,7 +87,6 @@
               {% endif %}
             </td>
             <td>
-              {% set record = crule %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

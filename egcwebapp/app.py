@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, \
-                  url_for, abort, send_from_directory
+                  url_for, abort, send_from_directory, flash
 import egcwebapp.forms
 from egctools.egcdata import EGCData
 from pathlib import Path
@@ -124,8 +124,12 @@ def create_app():
 
   def delete_record_route(record_kind):
     def route_function(record_id):
-      app.egc_data.delete_record_by_id(record_id)
       previous_page = request.args.get('previous_page') or record_kind + '_list'
+      if app.egc_data.is_ref_by(record_id):
+        flash(f"Cannot delete {record_id} "+\
+               "because it is referenced by other records")
+        return redirect(url_for(previous_page))
+      app.egc_data.delete_record_by_id(record_id)
       return redirect(url_for(previous_page))
 
     route_function.__name__ = f'delete_{record_kind}'

@@ -26,6 +26,7 @@
       </thead>
       <tbody>
         {% for vrule in vrules %}
+          {% set record = vrule %}
           {% set record_id = vrule.id %}
           <tr>
             <td>
@@ -64,7 +65,6 @@
             <td>{{ vrule.operator }}</td>
             <td>{{ vrule.reference }}</td>
             <td>
-              {% set record = vrule %}
               {% include 'tags_lines.html' %}
             </td>
             <td>

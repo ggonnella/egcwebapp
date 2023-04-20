@@ -19,6 +19,10 @@ class ModelForm(Form):
       if self.old_id != new_id:
         if not self.egc_data.has_unique_id(new_id):
           raise validators.ValidationError('Record already exists')
+        if self.egc_data.is_ref_by(self.old_id):
+            raise validators.ValidationError('Record data cannot be changed '+\
+                f'since the old one ({self.old_id}) '+\
+                'is referenced by other records')
       return True
 
     def validate_unit_id(self, field):
