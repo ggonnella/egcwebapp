@@ -1,0 +1,12 @@
+<span class="related_link">
+  <a href="{{url_for('edit_'+record_table, record_id=record_id)}}"
+  target="_blank"><i class="fas fa-edit"></i></a
+  >&nbsp;<a href="{{url_for('show_'+record_table, record_id=record_id)}}"
+  ><i class="fas fa-arrow-up"></i></a
+></a><form action="{{ url_for('delete_'+record_table,
+    record_id=record_id) }}" method="post" style="display:inline;"><input
+    type="hidden" name="_method" value="DELETE">&nbsp;<button
+      type="submit" class="btn btn-link" style="padding: 0; border: 0;"><i
+        class="fas fa-trash"></i></button>
+  </form>
+</span>

@@ -90,11 +90,7 @@
               {% include 'tags_lines.html' %}
             </td>
             <td>
-              <a href="{{ url_for('edit_crule', record_id=record_id) }}"><i class="fas fa-edit"></i></a>
-              <form action="{{ url_for('delete_crule', record_id=record_id) }}" method="post" style="display: inline-block;">
-               <input type="hidden" name="_method" value="DELETE">
-                <button type="submit" class="btn btn-link"><i class="fas fa-trash"></i></button>
-              </form>
+              {% include 'record_actions.html' %}
             </td>
           </tr>
         {% endfor %}

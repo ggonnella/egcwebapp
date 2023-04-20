@@ -52,14 +52,7 @@
               {% include 'ref_by_link.html' %}
             </td>
             <td>
-              <a href="{{ url_for('edit_unit', record_id=unit.id) }}">
-                <i class="fas fa-edit"></i></a>
-              <form action="{{ url_for('delete_unit', record_id=unit.id) }}"
-                method="post" style="display: inline-block;">
-              <input type="hidden" name="_method" vaue="DELETE">
-              <button type="submit" class="btn btn-link">
-                <i class="fas fa-trash"></i></button>
-              </form>
+              {% include 'record_actions.html' %}
             </td>
           </tr>
         {% endfor %}
