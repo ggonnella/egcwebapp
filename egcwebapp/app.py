@@ -342,7 +342,7 @@ def my_context_processor():
               unit_definition[4:])
         if unit_type.startswith("set:+"):
           definition_parts = unit_definition.split(",")
-          output_parts = [linked_unit_definition("set:" +\
+          output_parts = [linked_unit_definition(unit_id, "set:" +\
               unit_type[5:], part, ancestor_ids) for part in definition_parts]
           return ",".join(output_parts)
         unit_definition_pieces = break_string(unit_definition, 15)
