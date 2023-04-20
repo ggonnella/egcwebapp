@@ -4,29 +4,33 @@
 {% if ancestor_ids and (related_id in ancestor_ids) %}
   <i>{{ link_text }}</i>
 {% else %}
-  {% if ancestor_ids %}
-    {% set ancestor_ids_all = ancestor_ids + [record_id] %}
-    {% set ancestor_ids_str = ancestor_ids_all | join(',') %}
-  {% else %}
-    {% set ancestor_ids_str = record_id %}
-  {% endif %}
-  <span
-      style="display: inline;"
-    {% if not noclass %}
-      class="related_link"
+  {% if egc_data.id_exists(related_id) %}
+    {% if ancestor_ids %}
+      {% set ancestor_ids_all = ancestor_ids + [record_id] %}
+      {% set ancestor_ids_str = ancestor_ids_all | join(',') %}
+    {% else %}
+      {% set ancestor_ids_str = record_id %}
     {% endif %}
-    ><a href="#"
-       data-related-id="{{related_id}}"
-       data-ancestor-ids="{{ancestor_ids_str}}"
-       class="related-{{record_table}}s-{{related_table}}s">{{link_text}}</a><span
-       class="{{related_table}}-info">&nbsp;&#9432;
-       <a href="{{ url_for('edit_'+related_table,
-                    record_id=related_id,
-                    previous_page=prev) }}" target="_blank">
-         <i class="fa fa-edit" style="color: black;"></i></a>
-       <a href="{{ url_for('show_'+related_table,
-                    record_id=related_id,
-                    previous_page=prev) }}">
-         <i class="fa fa-arrow-up" style="color: black;"></i></a></span>
-  </span>
+    <span
+        style="display: inline;"
+      {% if not noclass %}
+        class="related_link"
+      {% endif %}
+      ><a href="#"
+         data-related-id="{{related_id}}"
+         data-ancestor-ids="{{ancestor_ids_str}}"
+         class="related-{{record_table}}s-{{related_table}}s">{{link_text}}</a><span
+         class="{{related_table}}-info">&nbsp;&#9432;
+         <a href="{{ url_for('edit_'+related_table,
+                      record_id=related_id,
+                      previous_page=prev) }}" target="_blank">
+           <i class="fa fa-edit" style="color: black;"></i></a>
+         <a href="{{ url_for('show_'+related_table,
+                      record_id=related_id,
+                      previous_page=prev) }}">
+           <i class="fa fa-arrow-up" style="color: black;"></i></a></span>
+    </span>
+  {% else %}
+    <span style="color:red;">{{ link_text }}</span>
+  {% endif %}
 {% endif %}
