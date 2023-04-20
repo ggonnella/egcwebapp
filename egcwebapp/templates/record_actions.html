@@ -3,10 +3,14 @@
   target="_blank"><i class="fas fa-edit"></i></a
   >&nbsp;<a href="{{url_for('show_'+record_table, record_id=record_id)}}"
   ><i class="fas fa-arrow-up"></i></a
-></a>{% if not egc_data.is_ref_by(record_id) %}<form action="{{ url_for('delete_'+record_table,
-    record_id=record_id) }}" method="post" style="display:inline;"><input
-    type="hidden" name="_method" value="DELETE">&nbsp;<button
-      type="submit" class="btn btn-link" style="padding: 0; border: 0;"><i
-        class="fas fa-trash"></i></button>
-  </form>{% endif %}
+></a><form action="{{ url_for('delete_'+record_table,
+    record_id=record_id) }}" method="post" style="display:inline;"
+    onsubmit="return confirm('Are you sure you want to delete record {{record_id}}?');">
+    <input type="hidden" name="_method" value="DELETE">
+    &nbsp;<button type="submit" class="btn btn-link" style="padding: 0; border: 0;"
+      {% if egc_data.is_ref_by(record_id) %}disabled{% endif %}>
+      <i class="fas fa-trash"></i>
+    </button>
+  </form>
 </span>
+
