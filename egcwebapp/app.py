@@ -292,7 +292,8 @@ def my_context_processor():
               rendered_template = render_template('refs_link.html',
                   record_table='group', record_id=group_id,
                   related_table='group', related_id=rel_group,
-                  ancestor_ids=ancestor_ids, prev='list_group')
+                  ancestor_ids=ancestor_ids, prev='list_group',
+                  egc_data=egc_data)
               group_definition = re.sub(r'\b' + re.escape(rel_group) + r'\b',
                   rendered_template, group_definition)
           group_definition = '<span class="related_link">' +\
@@ -370,7 +371,8 @@ def my_context_processor():
               rendered_template = render_template('refs_link.html',
                   record_table='unit', record_id=unit_id,
                   related_table='unit', related_id=rel_unit, prev='list_unit',
-                  noclass=True, ancestor_ids=ancestor_ids)
+                  noclass=True, ancestor_ids=ancestor_ids,
+                  egc_data=egc_data)
               unit_definition = re.sub(r'\b' + re.escape(rel_unit) + r'\b',
                   rendered_template, unit_definition)
           unit_definition = '<span class="related_link">' +\
