@@ -51,7 +51,7 @@ class ExtractForm(Form):
             raise validators.ValidationError('Record ID already exists')
 
     def validate_document_id(self, field):
-        d_id = self.egc_data.compute_docid(field.data)
+        d_id = self.egc_data.compute_docid_from_pfx_and_item("PMID", field.data)
         if not self.egc_data.id_exists(d_id):
             raise validators.ValidationError('Document ID does not exist')
 
