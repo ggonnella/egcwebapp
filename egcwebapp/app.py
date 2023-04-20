@@ -9,22 +9,10 @@ import os
 import re
 import functools
 import urllib.parse
-from flask_navigation import Navigation
+from egcwebapp.nav import configure_nav
 
 app = Flask(__name__)
-nav = Navigation(app)
-nav.Bar('top', [
-    nav.Item('Load', 'load_egc_file'),
-    nav.Item('Save', 'save_egc_file'),
-    nav.Item('Documents', 'document_list'),
-    nav.Item('Extracts', 'extract_list'),
-    nav.Item('Groups', 'group_list'),
-    nav.Item('Units', 'unit_list'),
-    nav.Item('Models', 'model_list'),
-    nav.Item('Attributes', 'attribute_list'),
-    nav.Item('Value Exp.', 'vrule_list'),
-    nav.Item('Comp. Exp.', 'crule_list'),
-])
+configure_nav(app)
 egc_data = None
 app.secret_key = 'secret_key'
 app.config['UPLOAD_FOLDER'] = str(Path(app.instance_path) / 'uploads')
