@@ -5,7 +5,8 @@ from .tag import TagForm
 
 class UnitForm(Form):
   id = StringField('Record ID', [validators.Length(min=1, max=50),
-                               validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
+                               validators.Regexp('[a-zA-Z0-9_]+'),
+                               validators.DataRequired()])
   type = StringField('Type', validators=[validators.DataRequired()])
   definition = StringField('Definition')
   symbol = StringField('Symbol')
@@ -58,10 +59,11 @@ class UnitForm(Form):
   def validate_id(self, field):
     new_id = field.data
     if self.old_id != new_id:
-      if self.egc_data.is_ref_by(self.old_id):
-          raise validators.ValidationError('Record ID cannot be changed '+\
-              f'since the old ID ({self.old_id}) '+\
-              'is referenced by other records')
+      if self.old_id:
+        if self.egc_data.is_ref_by(self.old_id):
+            raise validators.ValidationError('Record ID cannot be changed '+\
+                f'since the old ID ({self.old_id}) '+\
+                'is referenced by other records')
       if not self.egc_data.is_unique_id(new_id):
           raise validators.ValidationError('Record ID already exists')
 

@@ -1,17 +1,20 @@
-from wtforms import Form, StringField, validators, \
-                    FieldList, FormField
-
+from wtforms import Form, StringField, validators, FieldList, FormField
 from .tag import TagForm
 from .source import SourceForm
 
 class VruleForm(Form):
-    id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
+    id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'),
+      validators.DataRequired()])
     sources = FieldList(FormField(SourceForm), min_entries=1, label="Sources")
-    attribute = StringField('Attribute', [validators.Length(min=1), validators.DataRequired()])
-    group = StringField('Group', [validators.Length(min=1), validators.DataRequired()])
+    attribute = StringField('Attribute', [validators.Length(min=1),
+      validators.DataRequired()])
+    group = StringField('Group', [validators.Length(min=1),
+      validators.DataRequired()])
     group_portion = StringField('Group Portion')
-    operator = StringField('Operator', [validators.Length(min=1), validators.DataRequired()])
-    reference = StringField('Reference', [validators.Length(min=1), validators.DataRequired()])
+    operator = StringField('Operator', [validators.Length(min=1),
+      validators.DataRequired()])
+    reference = StringField('Reference', [validators.Length(min=1),
+      validators.DataRequired()])
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
     comment = StringField('Comment')
 
@@ -62,10 +65,11 @@ class VruleForm(Form):
     def validate_id(self, field):
       new_id = field.data
       if self.old_id != new_id:
-        if self.egc_data.is_ref_by(self.old_id):
-            raise validators.ValidationError('Record ID cannot be changed '+\
-                f'since the old ID ({self.old_id}) '+\
-                'is referenced by other records')
+        if self.old_id:
+          if self.egc_data.is_ref_by(self.old_id):
+              raise validators.ValidationError('Record ID cannot be changed '+\
+                  f'since the old ID ({self.old_id}) '+\
+                  'is referenced by other records')
         if not self.egc_data.is_unique_id(new_id):
             raise validators.ValidationError('Record ID already exists')
 

@@ -4,25 +4,32 @@ from wtforms import Form, StringField, validators, \
 from .tag import TagForm
 
 class ModelForm(Form):
-    unit_id = StringField('Unit ID', [validators.Length(min=1, max=50), validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
+    unit_id = StringField('Unit ID', [validators.Length(min=1, max=50),
+      validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
     resource_id = StringField('Resource ID', [validators.Length(min=1, max=50),
-                               validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
-    model_id = StringField('Model ID', [validators.Length(min=1, max=50), validators.DataRequired()])
-    model_name = StringField('Model Name', [validators.Length(min=1, max=100), validators.DataRequired()])
+                               validators.Regexp('[a-zA-Z0-9_]+'),
+                               validators.DataRequired()])
+    model_id = StringField('Model ID', [validators.Length(min=1, max=50),
+      validators.DataRequired()])
+    model_name = StringField('Model Name', [validators.Length(min=1, max=100),
+      validators.DataRequired()])
     tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
     comment = StringField('Comment')
 
     def validate(self):
       if not super().validate():
         return False
-      new_id = self.egc_data.compute_modelid_from_data(self.unit_id.data, self.resource_id.data, self.model_id.data)
+      new_id = self.egc_data.compute_modelid_from_data(self.unit_id.data,
+          self.resource_id.data, self.model_id.data)
       if self.old_id != new_id:
         if not self.egc_data.has_unique_id(new_id):
           raise validators.ValidationError('Record already exists')
-        if self.egc_data.is_ref_by(self.old_id):
-            raise validators.ValidationError('Record data cannot be changed '+\
-                f'since the old one ({self.old_id}) '+\
-                'is referenced by other records')
+        if self.old_id is not None:
+          if self.egc_data.is_ref_by(self.old_id):
+              raise validators.ValidationError(\
+                  'Record data cannot be changed '+\
+                  f'since the old one ({self.old_id}) '+\
+                  'is referenced by other records')
       return True
 
     def validate_unit_id(self, field):
