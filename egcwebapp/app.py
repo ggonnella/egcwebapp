@@ -65,6 +65,22 @@ def create_app():
           os.path.basename(app.egc_data.file_path),
           mimetype='application/egc')
 
+  @app.route('/process_egc_data', methods=['POST'])
+  def process_egc_data():
+      data = request.get_json()
+      file_path = os.path.join(app.config['UPLOAD_FOLDER'], data['filename'])
+      with open(file_path, 'w') as f:
+          f.write(data['contents'])
+      app.egc_data = EGCData.from_file(file_path)
+      return 'OK', 200
+
+  @app.route('/get_egc_data/')
+  def get_egc_data():
+      with open(app.egc_data.file_path) as f:
+          contents = f.read()
+      filename = os.path.basename(app.egc_data.file_path)
+      return jsonify({'contents': contents, 'filename': filename})
+
   from egcwebapp.record_kinds import record_kind_info
   record_kinds = list(record_kind_info.keys())
 

@@ -32,7 +32,60 @@
 
   <body>
 
+     <script>
+        let fileHandle = null;
+
+        async function loadFile() {
+          try {
+            [fileHandle] = await window.showOpenFilePicker();
+            const file = await fileHandle.getFile();
+            const contents = await file.text();
+            const response = await fetch('/process_egc_data', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({filename: file.name, contents: contents}),
+            });
+            if (response.ok) {
+                window.location.href = '/documents';
+            } else {
+                throw new Error('Failed to load the EGC file');
+            }
+          } catch (err) {
+            console.error(err);
+            alert('Error loading file: ' + err.message);
+          }
+        }
+
+        async function saveFile(event) {
+          event.preventDefault();
+          const response = await fetch('/get_egc_data/')
+          const data = await response.json();
+          const filename = data['filename'];
+          const contents = data['contents'];
+          if (!fileHandle) {
+            const options = {
+              suggestedName: filename,
+              types: [
+                {
+                  description: 'EGC Files',
+                  accept: {
+                    'application/egc': ['.egc'],
+                  },
+                },
+              ],
+            };
+            fileHandle = await window.showSaveFilePicker(options);
+          }
+          const writable = await fileHandle.createWritable();
+          await writable.write(contents);
+          await writable.close();
+          alert('File saved successfully');
+        }
+      </script>
+
       <div class="topnav">
+        <a href="#" onclick="loadFile()">Load</a>
+        <a href="#" onclick="saveFile(event)">Save</a>
         {% for item in nav.top %}
           <a href="{{ item.url }}" class="{{ 'active' if item.is_active else '' }}">{{ item.label }}</a>
         {% endfor %}
