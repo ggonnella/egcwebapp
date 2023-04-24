@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>{{list_title}}
+    {% include 'filename.html' %}
+    <span style="float: right">
+      <a href="{{ url_for('create_'+record_kind) }}"
+         class="btn btn-primary create">New Record</a>
+    </span>
+  </h1>
+  {% set main=True %}
+  {% include 'datatable_'+record_kind+'.html' %}
+
+  <script src="{{ url_for('static', filename='js/list_'+record_kind+'.mjs') }}"
+    type="module"></script>
+
+{% endblock %}
+

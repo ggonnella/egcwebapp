@@ -1,9 +1,0 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h1>Value Expectation Rule</h1>
-  {% set main=True %}
-  {% set vrules = [vrule] %}
-  {% include 'datatable_vrule.html' %}
-  <script src="{{ url_for('static', filename='js/list_vrule.mjs') }}"
-      type="module"></script>
-{% endblock %}

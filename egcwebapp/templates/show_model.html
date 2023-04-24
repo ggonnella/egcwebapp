@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
-  <h1>Unit Model</h1>
-  {% set main=True %}
-  {% set models = [model] %}
-  {% include 'datatable_model.html' %}
-  <script src="{{ url_for('static', filename='js/list_model.mjs') }}"
-      type="module"></script>
-{% endblock %}

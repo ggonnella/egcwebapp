@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
-  <h1>Attribute</h1>
-  {% set main=True %}
-  {% set attributes = [attribute] %}
-  {% include 'datatable_attribute.html' %}
-  <script src="{{ url_for('static', filename='js/list_attribute.mjs') }}"
-      type="module"></script>
-{% endblock %}

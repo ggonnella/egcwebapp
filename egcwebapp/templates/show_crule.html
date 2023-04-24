@@ -1,9 +1,0 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h1>Comparative Expectation Rule</h1>
-  {% set main=True %}
-  {% set crules = [crule] %}
-  {% include 'datatable_crule.html' %}
-  <script src="{{ url_for('static', filename='js/list_crule.mjs') }}"
-      type="module"></script>
-{% endblock %}

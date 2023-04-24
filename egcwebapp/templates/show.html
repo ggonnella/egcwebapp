@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{record_title}} <i>{{record_id}}</i>
+    {% include 'filename.html' %}
+  </h1>
+  {% set main=True %}
+  {% include 'datatable_'+record_kind+'.html' %}
+
+  <script src="{{ url_for('static', filename='js/list_'+record_kind+'.mjs') }}"
+    type="module"></script>
+
+{% endblock %}

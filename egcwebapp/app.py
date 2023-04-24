@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, \
+from flask import Flask, render_template, request, redirect, jsonify, \
                   url_for, abort, send_from_directory, flash
 import egcwebapp.forms
 from egctools.egcdata import EGCData
@@ -20,6 +20,10 @@ def create_app():
 
   from egcwebapp.context import processors
   app.context_processor(processors)
+
+  @app.template_filter()
+  def basename(path):
+    return os.path.basename(path)
 
   # The following web routes are defined for each type of record:
   #
@@ -69,8 +73,10 @@ def create_app():
       records = []
       for record_type in record_kind_info[record_kind]["record_types"]:
         records.extend(app.egc_data.get_records(record_type))
-      return render_template(f'list_{record_kind}.html',
-              **{record_kind+"s": records, 'egc_data': app.egc_data})
+      return render_template('list.html',
+              **{record_kind+"s": records, 'egc_data': app.egc_data,
+                 'record_kind': record_kind,
+                 'list_title': record_kind_info[record_kind]['title']+'s'})
 
     route_function.__name__ = f"{record_kind}_list"
     route_function = app.route(f"/{record_kind}s",
@@ -140,8 +146,10 @@ def create_app():
   def show_record_route(record_kind):
     def route_function(record_id):
         record = app.egc_data.get_record_by_id(record_id) or abort(404)
-        return render_template(f'show_{record_kind}.html',
-            **{record_kind: record, 'egc_data': app.egc_data})
+        return render_template('show.html',
+                **{record_kind+"s": [record], 'egc_data': app.egc_data,
+                   'record_kind': record_kind, 'record_id': record_id,
+                   'record_title': record_kind_info[record_kind]['title']})
 
     route_function.__name__ = f'show_{record_kind}'
     route_function = app.route(f'/{record_kind}s/<record_id>', \
