@@ -23,6 +23,10 @@ h1:after {
   height: 1px;
 }
 
+.field-error-msg {
+  color: red;
+}
+
 .container {
     width: 97%;
     max-width: unset;

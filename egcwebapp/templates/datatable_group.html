@@ -24,9 +24,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for group in groups %}
-          {% set record = group %}
-          {% set record_id = group.id %}
+        {% for record in groups %}
           {% include 'row_group.html' %}
         {% endfor %}
       </tbody>

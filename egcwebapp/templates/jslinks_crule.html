@@ -15,7 +15,7 @@
       import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
       import { initTooltips } from '{{ url_for('static', filename='js/list_crule.mjs') }}';
       $(document).ready(function() {
-        initNestedTable("{{table_id}}");
+        {% if table_id %} initNestedTable("{{table_id}}"); {% endif %}
         initTooltips();
       });
     </script>

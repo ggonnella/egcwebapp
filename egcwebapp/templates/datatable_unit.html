@@ -24,9 +24,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for unit in units %}
-          {% set record = unit %}
-          {% set record_id = unit.id %}
+        {% for record in units %}
           {% include 'row_unit.html' %}
         {% endfor %}
       </tbody>

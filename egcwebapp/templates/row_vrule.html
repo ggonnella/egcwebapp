@@ -1,32 +1,34 @@
 {% set nested_colspan = 8 %}
+{% set record_type="V" %}
+{% set record_id=record.id %}
 <tr>
   <td>
     {% include 'linked_record_id.html' %}
   </td>
   <td>
-    {% if vrule.source is string %}
-      {% set related_kind, related_id = 'extract', vrule.source %}
+    {% if record.source is string %}
+      {% set related_kind, related_id = 'extract', record.source %}
       {% include 'refs_link.html' %}
     {% else %}
-      {% for source in vrule.source %}
+      {% for source in record.source %}
         {% set related_kind, related_id = 'extract', source %}
         {% include 'refs_link.html' %} <br/>
       {% endfor %}
     {% endif %}
   </td>
   <td>
-    {% set related_kind, related_id = 'attribute', vrule.attribute %}
+    {% set related_kind, related_id = 'attribute', record.attribute %}
     {% include 'refs_link.html' %}
   </td>
   <td>
-    {% set related_kind, related_id = 'group', vrule.group.id %}
+    {% set related_kind, related_id = 'group', record.group.id %}
     {% include 'refs_link.html' %}
   </td>
   <td>
-    {% if vrule.group.portion %} {{ vrule.group.portion }} {% endif %}
+    {% if record.group.portion %} {{ record.group.portion }} {% endif %}
   </td>
-  <td>{{ vrule.operator }}</td>
-  <td>{{ vrule.reference }}</td>
+  <td>{{ record.operator }}</td>
+  <td>{{ record.reference }}</td>
   <td>
     {% include 'tags_lines.html' %}
   </td>

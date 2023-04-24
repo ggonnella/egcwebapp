@@ -1,12 +1,14 @@
 {% set nested_colspan = 6 %}
+{% set record_type="G" %}
+{% set record_id=record.id %}
 <tr>
   <td>
     {% include 'linked_record_id.html' %}
   </td>
-  <td>{{ group.type }}</td>
-  <td>{{ group.name }}</td>
-  <td>{{ linked_group_definition(record_id, group.type,
-                                 group.definition, ancestor_ids) | safe
+  <td>{{ record.type }}</td>
+  <td>{{ record.name }}</td>
+  <td>{{ linked_group_definition(record_id, record.type,
+                                 record.definition, ancestor_ids) | safe
       }}</td>
   <td>
     {% include 'tags_lines.html' %}

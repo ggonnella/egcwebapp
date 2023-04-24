@@ -1,20 +1,21 @@
 {% set nested_colspan = 6 %}
+{% set record_id=record.id %}
+{% set record_type=record.record_type %}
 <tr>
-  <td>{{ extract.record_type }}</td>
+  <td>{{ record.record_type }}</td>
   <td>
     {% include 'linked_record_id.html' %}
   </td>
   <td style="white-space: nowrap;">
-    {% set document_record_id = egc_data.
-         compute_docid_from_pfx_and_item(
-           extract.document_id.resource_prefix,
-           extract.document_id.item) %}
+    {% set document_record_id = egc_data.compute_docid_from_pfx_and_item(
+                                          record.document_id.resource_prefix,
+                                          record.document_id.item) %}
     {% set related_kind, related_id, link_text =
            'document', document_record_id,
-           'PMID:' + extract.document_id.item %}
+           'PMID:' + record.document_id.item %}
     {% include 'refs_link.html' %}
   </td>
-  <td>{{ extract.text if record_type == "S" else extract.table_ref }}</td>
+  <td>{{ record.text if record_type == "S" else record.table_ref }}</td>
   <td>
     {% include 'tags_lines.html' %}
   </td>

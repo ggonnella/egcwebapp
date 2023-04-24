@@ -21,9 +21,7 @@
           </tr>
       </thead>
       <tbody>
-          {% for document in documents %}
-             {% set record = document %}
-             {% set record_id = egc_data.compute_id(document) %}
+          {% for record in documents %}
              {% include 'row_document.html' %}
           {% endfor %}
       </tbody>

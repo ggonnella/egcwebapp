@@ -17,14 +17,9 @@ export function openNestedTable(thisRecordsName, nestedRecordsName, colspan) {
           $currentRow.next(`.${nestedClassName}`).remove();
         }
 
-        // Create a new row below the current row
-        // Create a new cell that spans all the columns in the table
         var $newRow = $(`<tr class="${nestedClassName}"></tr>`);
         var $newCell = $(`<td colspan="${colspan}"></td>`);
 
-        // Append the response to the new cell
-        // Append the new cell to the new row
-        // Insert the new row below the current row
         $newCell.append(response);
         $newRow.append($newCell);
         $currentRow.after($newRow);
@@ -34,6 +29,79 @@ export function openNestedTable(thisRecordsName, nestedRecordsName, colspan) {
       }
     });
   }
+}
+
+export function openEditForm(event) {
+  event.preventDefault();
+  const recordId = $(this).data('record-id');
+  const recordKind = $(this).data('record-kind');
+  const colspan = $(this).data('colspan');
+  const $currentRow = $(this).closest('tr');
+
+  $.ajax({
+    url: `/api/${recordKind}s/${recordId}/edit`,
+    type: 'GET',
+    success: function(response) {
+
+      const nestedClassName = `nested-edit-form`;
+      // Remove existing nested form if any
+      if ($currentRow.next(`.${nestedClassName}`).length > 0) {
+        $currentRow.next(`.${nestedClassName}`).remove();
+      }
+
+      const $newRow = $(`<tr class="${nestedClassName}"></tr>`);
+      const $newCell = $(`<td colspan="${colspan}"></td>`);
+
+      $newCell.append(response);
+      $newRow.append($newCell);
+      $currentRow.after($newRow);
+    },
+    error: function(response) {
+      console.log(`Error fetching edit form for ${recordKind} ${recordId}:`,
+        response);
+    }
+  });
+}
+
+export function submitNestedEditForm(event) {
+  event.preventDefault();
+
+  const $form = $(this);
+  const recordKind = $form.data('record-kind');
+  const recordId = $form.data('record-id');
+
+  const formData = new FormData($form[0]);
+
+  $.ajax({
+    url: `/api/${recordKind}s/${recordId}/update`,
+    type: 'POST',
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function(response) {
+      const $currentRow = $form.closest('tr');
+      // response is a JSON dictionary with the following keys:
+      // - success: boolean
+      // - html: string
+      if (response.success) {
+        console.log(`Success updating ${recordKind} ${recordId}`);
+        console.log(response.html);
+        $currentRow.prev().replaceWith(response.html);
+        $currentRow.remove();
+      } else {
+        console.log(`Failure updating ${recordKind} ${recordId}`);
+        console.log(response.html);
+        const colspan = $currentRow.children('td').attr('colspan');
+        const $newRow = $(`<tr class="nested-edit-form"></tr>`);
+        const $newCell = $(`<td colspan="${colspan}"></td>`);
+        $newCell.append(response.html);
+        $newRow.append($newCell);
+        $currentRow.replaceWith($newRow);
+      }
+    },
+    error: function(response) {
+    }
+  });
 }
 
 export function initNestedTable(table_id) {
@@ -62,14 +130,8 @@ export function openRelatedNested(thisRecordsName, nestedRecordsName, colspan) {
           $currentRow.next(`.${nestedClassName}`).remove();
         }
 
-        // Create a new row below the current row
-        // Create a new cell that spans all the columns in the table
         var $newRow = $(`<tr class="${nestedClassName}"></tr>`);
         var $newCell = $(`<td colspan="${colspan}"></td>`);
-
-        // Append the response to the new cell
-        // Append the new cell to the new row
-        // Insert the new row below the current row
         $newCell.append(response);
         $newRow.append($newCell);
         $currentRow.after($newRow);

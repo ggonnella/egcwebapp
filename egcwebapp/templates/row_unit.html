@@ -1,13 +1,15 @@
 {% set nested_colspan = 7 %}
+{% set record_type="U" %}
+{% set record_id=record.id %}
 <tr>
   <td>
     {% include 'linked_record_id.html' %}
   </td>
-  <td>{{ unit.type }}</td>
-  <td>{{ linked_unit_definition(record_id, unit.type,
-           unit.definition, ancestor_ids) | safe }}</td>
-  <td>{{ linked_unit_symbol(unit.type, unit.symbol) | safe }}</td>
-  <td>{{ linked_unit_description(unit.type, unit.description) | safe }}</td>
+  <td>{{ record.type }}</td>
+  <td>{{ linked_unit_definition(record_id, record.type,
+           record.definition, ancestor_ids) | safe }}</td>
+  <td>{{ linked_unit_symbol(record.type, record.symbol) | safe }}</td>
+  <td>{{ linked_unit_description(record.type, record.description) | safe }}</td>
   <td>
     {% include 'tags_lines.html' %}
   </td>

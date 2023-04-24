@@ -1,23 +1,24 @@
 {% set nested_colspan = 4 %}
+{% set record_type="D" %}
+{% set record_id = egc_data.compute_id(record) %}
 <tr>
     <td style="white-space: nowrap;">
       <span class="document-id" style="display: inline;"
         data-document-id="{{ record_id }}"
-        ><a href="https://pubmed.ncbi.nlm.nih.gov/{{ document.document_id.item }}"
+        ><a href="https://pubmed.ncbi.nlm.nih.gov/{{ record.document_id.item }}"
           target="_blank" class="no-underline pmid-link"
-        >{{ document.document_id.item }}</a></span><span
+        >{{ record.document_id.item }}</a></span><span
           class="document-info"
           style="display: inline;">&nbsp;&#9432;</span>
     </td>
 
     <td>
-      <a href="{{ document.link }}" target="_blank"
+      <a href="{{ record.link }}" target="_blank"
           class="no-underline document-link">
-            {{ document.link }}
+            {{ record.link }}
         </a>
     </td>
     <td>
-      {% set record = document %}
       {% include 'tags_lines.html' %}
     </td>
     <td>

@@ -26,9 +26,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for crule in crules %}
-          {% set record = crule %}
-          {% set record_id = crule.id %}
+        {% for record in crules %}
           {% include 'row_crule.html' %}
         {% endfor %}
       </tbody>

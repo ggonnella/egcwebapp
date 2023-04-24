@@ -1,48 +1,50 @@
 {% set nested_colspan = 9 %}
+{% set record_type="C" %}
+{% set record_id=record.id %}
 <tr>
   <td>
     {% include 'linked_record_id.html' %}
   </td>
   <td>
-    {% if crule.source is string %}
-      {% set related_kind, related_id = 'extract', crule.source %}
+    {% if record.source is string %}
+      {% set related_kind, related_id = 'extract', record.source %}
       {% include 'refs_link.html' %}
     {% else %}
-      {% for source in crule.source %}
+      {% for source in record.source %}
         {% set related_kind, related_id = 'extract', source %}
         {% include 'refs_link.html' %}
       {% endfor %}
     {% endif %}
   </td>
   <td>
-    {% if crule.attribute is string %}
-      {% set related_kind, related_id = 'attribute', crule.attribute %}
+    {% if record.attribute is string %}
+      {% set related_kind, related_id = 'attribute', record.attribute %}
       {% include 'refs_link.html' %}
     {% else %}
-      {% set related_kind, related_id = 'attribute', crule.attribute.id1 %}
+      {% set related_kind, related_id = 'attribute', record.attribute.id1 %}
       {% include 'refs_link.html' %}
       <br/>vs.<br/>
-      {% set related_kind, related_id = 'attribute', crule.attribute.id2 %}
+      {% set related_kind, related_id = 'attribute', record.attribute.id2 %}
       {% include 'refs_link.html' %}
     {% endif %}
   </td>
   <td>
-    {% set related_kind, related_id = 'group', crule.group1.id %}
+    {% set related_kind, related_id = 'group', record.group1.id %}
     {% include 'refs_link.html' %}
   </td>
   <td>
-    {% if crule.group1.portion %}
-      {{ crule.group1.portion }}
+    {% if record.group1.portion %}
+      {{ record.group1.portion }}
     {% endif %}
   </td>
-  <td>{{ crule.operator }}</td>
+  <td>{{ record.operator }}</td>
   <td>
-    {% set related_type, related_id = 'group', crule.group2.id %}
+    {% set related_type, related_id = 'group', record.group2.id %}
     {% include 'refs_link.html' %}
   </td>
   <td>
-    {% if crule.group2.portion %}
-      {{ crule.group2.portion }}
+    {% if record.group2.portion %}
+      {{ record.group2.portion }}
     {% endif %}
   </td>
   <td>

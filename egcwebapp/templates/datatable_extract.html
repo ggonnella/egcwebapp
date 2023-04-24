@@ -22,10 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for extract in extracts %}
-          {% set record = extract %}
-          {% set record_id=extract.id %}
-          {% set record_type=extract.record_type %}
+        {% for record in extracts %}
           {% include 'row_extract.html' %}
         {% endfor %}
       </tbody>

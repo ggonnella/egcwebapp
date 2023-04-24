@@ -22,9 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for model in models %}
-          {% set record = model %}
-          {% set record_id = egc_data.compute_modelid(model) %}
+        {% for record in models %}
           {% include 'row_model.html' %}
         {% endfor %}
       </tbody>

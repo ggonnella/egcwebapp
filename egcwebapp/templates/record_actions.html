@@ -1,9 +1,12 @@
 <span class="related_link">
-  <a href="{{url_for('edit_'+record_table, record_id=record_id)}}"
-  target="_blank"><i class="fas fa-edit"></i></a
-  >&nbsp;<a href="{{url_for('show_'+record_table, record_id=record_id)}}"
+  <a href="#" id='edit-record-{{record_id}}'
+     data-record-id='{{record_id}}'
+     data-record-kind='{{record_kind}}'
+     data-colspan='{{nested_colspan}}'
+    ><i class="fas fa-edit"></i></a
+  >&nbsp;<a href="{{url_for('show_'+record_kind, record_id=record_id)}}"
   ><i class="fas fa-arrow-up"></i></a
-></a><form action="{{ url_for('delete_'+record_table,
+></a><form action="{{ url_for('delete_'+record_kind,
     record_id=record_id) }}" method="post" style="display:inline;"
     onsubmit="return confirm('Are you sure you want to delete record {{record_id}}?');">
     <input type="hidden" name="_method" value="DELETE">
@@ -13,4 +16,7 @@
     </button>
   </form>
 </span>
-
+<script type="module">
+ import { openEditForm } from '{{ url_for('static', filename='js/nested_table.js') }}';
+ $('body').on('click', '#edit-record-{{record_id}}', openEditForm);
+</script>

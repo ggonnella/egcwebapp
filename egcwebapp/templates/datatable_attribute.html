@@ -25,9 +25,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for attribute in attributes %}
-          {% set record = attribute %}
-          {% set record_id = attribute.id %}
+        {% for record in attributes %}
           {% include 'row_attribute.html' %}
         {% endfor %}
       </tbody>

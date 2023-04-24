@@ -1,0 +1,13 @@
+<form method="POST" enctype="multipart/form-data"
+     id="nested-edit-form-{{record_id}}" data-record-id="{{record_id}}"
+     data-record-kind="{{record_kind}}">
+    {{ form.csrf_token }}
+    {% include 'form_fields_with_tags.html' %}
+    <input type="submit" value="Save">
+</form>
+<script type="module">
+  import { submitNestedEditForm } from
+  '{{ url_for('static', filename='js/nested_table.js') }}';
+  $('body').on('submit', '#nested-edit-form-{{record_id}}', submitNestedEditForm);
+</script>
+

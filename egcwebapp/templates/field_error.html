@@ -1,7 +1,7 @@
 {% if field.errors %}
   <ul>
     {% for error in field.errors %}
-       <li>{{ error }}</li>
+       <li class="field-error-msg">{{ error }}</li>
     {% endfor %}
   </ul>
 {% endif %}
