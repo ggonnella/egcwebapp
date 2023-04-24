@@ -79,8 +79,8 @@ def processors():
 
           for rel_group in rel_groups:
               rendered_template = render_template('refs_link.html',
-                  record_table='group', record_id=group_id,
-                  related_table='group', related_id=rel_group,
+                  record_kind='group', record_id=group_id,
+                  related_kind='group', related_id=rel_group,
                   ancestor_ids=ancestor_ids, prev='list_group',
                   egc_data=current_app.egc_data)
               group_definition = re.sub(r'\b' + re.escape(rel_group) + r'\b',
@@ -158,8 +158,8 @@ def processors():
 
           for rel_unit in rel_units:
               rendered_template = render_template('refs_link.html',
-                  record_table='unit', record_id=unit_id,
-                  related_table='unit', related_id=rel_unit, prev='list_unit',
+                  record_kind='unit', record_id=unit_id,
+                  related_kind='unit', related_id=rel_unit, prev='list_unit',
                   noclass=True, ancestor_ids=ancestor_ids,
                   egc_data=current_app.egc_data)
               unit_definition = re.sub(r'\b' + re.escape(rel_unit) + r'\b',

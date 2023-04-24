@@ -1,0 +1,36 @@
+{% set nested_colspan = 8 %}
+<tr>
+  <td>
+    {% include 'linked_record_id.html' %}
+  </td>
+  <td>
+    {% set related_kind, related_id = 'unit', attribute.unit_id %}
+    {% include 'refs_link.html' %}
+  </td>
+  {% if attribute.mode.mode  %}
+    <td>{{ attribute.mode.mode }}</td>
+    <td>
+      {% if attribute.mode.reference %}
+        {% set related_kind, related_id = 'unit', attribute.mode.reference %}
+        {% include 'refs_link.html' %}
+      {% endif %}
+    </td>
+    <td>{{ attribute.mode.location_type }}</td>
+    <td>{{ attribute.mode.location_label }}</td>
+  {% else %}
+    <td>{{ attribute.mode }}</td>
+    <td></td> <td></td> <td></td>
+  {% endif %}
+  <td>
+    {% include 'tags_lines.html' %}
+  </td>
+  <td>
+    {% set ref_by_kind, ref_by_rt, ref_by_lbl = 'vrule', 'V', 'value rule' %}
+    {% include 'ref_by_link.html' %}
+    {% set ref_by_kind, ref_by_rt, ref_by_lbl = 'crule', 'C', 'comp. rule' %}
+    {% include 'ref_by_link.html' %}
+  </td>
+  <td>
+    {% include 'record_actions.html' %}
+  </td>
+</tr>

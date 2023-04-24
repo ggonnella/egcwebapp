@@ -1,5 +1,5 @@
 {% block content %}
-  {% set record_table="model" %}
+  {% set record_kind="model" %}
   {% set record_type="M" %}
   {% set table_id="model-table" %}
   {% if main %}
@@ -25,42 +25,11 @@
         {% for model in models %}
           {% set record = model %}
           {% set record_id = egc_data.compute_modelid(model) %}
-          <tr>
-            <td>
-              {% set related_table, related_id = 'unit', model.unit_id %}
-              {% include 'refs_link.html' %}
-            </td>
-            <td>{{ model.resource_id }}</td>
-            <td>{{ linked_model_id(model.resource_id, model.model_id) | safe }}</td>
-            <td>{{ model.model_name }}</td>
-            <td>
-              {% include 'tags_lines.html' %}
-            </td>
-            <td>
-              {% include 'record_actions.html' %}
-            </td>
-          </tr>
+          {% include 'row_model.html' %}
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <script type="module">
-   import { openRelatedNested } from
-        '{{ url_for('static', filename='js/nested_table.js') }}';
-    $(function() {
-      $('body').on('click', '.related-models-units',
-            openRelatedNested('models', 'units', 5));
-    });
-  </script>
-  {% if not main %}
-    <script type="module">
-      import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-      import { initTooltips } from '{{ url_for('static', filename='js/list_model.mjs') }}';
-      $(document).ready(function() {
-        initNestedTable("{{table_id}}");
-        initTooltips();
-      });
-    </script>
-  {% endif %}
+  {% include 'jslinks_model.html' %}
 {% endblock %}
 

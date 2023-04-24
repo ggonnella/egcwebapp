@@ -4,21 +4,21 @@
 {% else %}
   {% set ancestor_ids_str = record_id %}
 {% endif %}
-<div class="count-{{record_table}}s-{{ref_by_table}}s"
+<div class="count-{{record_kind}}s-{{ref_by_kind}}s"
      data-ancestor-ids="{{ ancestor_ids_str }}">
   {% if not count %}
     {% set count=egc_data.ref_by_ids(record_type, record_id, ref_by_rt)|length %}
   {% endif %}
   {% if not ref_by_lbl %}
-    {% set ref_by_lbl = ref_by_table %}
+    {% set ref_by_lbl = ref_by_kind %}
   {% endif %}
   {% if count == 0 %}
     no {{ref_by_lbl}}s
   {% elif count == 1 %}
-    <a href="#" class="show-{{record_table}}s-{{ref_by_table}}s">
+    <a href="#" class="show-{{record_kind}}s-{{ref_by_kind}}s">
       1 {{ref_by_lbl}} </a>
   {% else %}
-    <a href="#" class="show-{{record_table}}s-{{ref_by_table}}s">
+    <a href="#" class="show-{{record_kind}}s-{{ref_by_kind}}s">
       {{ count }} {{ref_by_lbl}}s </a>
   {% endif %}
 </div>

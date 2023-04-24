@@ -1,0 +1,25 @@
+{% set nested_colspan = 6 %}
+<tr>
+  <td>
+    {% include 'linked_record_id.html' %}
+  </td>
+  <td>{{ group.type }}</td>
+  <td>{{ group.name }}</td>
+  <td>{{ linked_group_definition(record_id, group.type,
+                                 group.definition, ancestor_ids) | safe
+      }}</td>
+  <td>
+    {% include 'tags_lines.html' %}
+  </td>
+  <td>
+    {% set ref_by_kind, ref_by_rt, ref_by_lbl = 'vrule', 'V', 'value rule' %}
+    {% include 'ref_by_link.html' %}
+    {% set ref_by_kind, ref_by_rt, ref_by_lbl = 'crule', 'C', 'comp. rule' %}
+    {% include 'ref_by_link.html' %}
+    {% set ref_by_kind, ref_by_rt, ref_by_lbl = 'group', 'G', 'group' %}
+    {% include 'ref_by_link.html' %}
+  </td>
+  <td>
+    {% include 'record_actions.html' %}
+  </td>
+</tr>

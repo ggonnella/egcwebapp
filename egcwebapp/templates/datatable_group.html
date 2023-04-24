@@ -1,5 +1,5 @@
 {% block content %}
-  {% set record_table="group" %}
+  {% set record_kind="group" %}
   {% set record_type="G" %}
   {% set table_id="group-table" %}
   {% if main %}
@@ -27,63 +27,10 @@
         {% for group in groups %}
           {% set record = group %}
           {% set record_id = group.id %}
-          <tr>
-            <td>
-              {% if main %}
-                {{ group.id }}
-              {% else %}
-                {% include 'linked_record_id.html' %}
-              {% endif %}
-            </td>
-            <td>{{ group.type }}</td>
-            <td>{{ group.name }}</td>
-            <td>{{ linked_group_definition(record_id, group.type,
-                                           group.definition, ancestor_ids) | safe
-                }}</td>
-            <td>
-              {% include 'tags_lines.html' %}
-            </td>
-            <td>
-              {% set ref_by_table, ref_by_rt, ref_by_lbl =
-                     'vrule', 'V', 'value rule' %}
-              {% include 'ref_by_link.html' %}
-              {% set ref_by_table, ref_by_rt, ref_by_lbl =
-                     'crule', 'C', 'comp. rule' %}
-              {% include 'ref_by_link.html' %}
-              {% set ref_by_table, ref_by_rt, ref_by_lbl =
-                     'group', 'G', 'group' %}
-              {% include 'ref_by_link.html' %}
-            </td>
-            <td>
-              {% include 'record_actions.html' %}
-            </td>
-          </tr>
+          {% include 'row_group.html' %}
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <script type="module">
-   import { openNestedTable, openRelatedNested } from
-        '{{ url_for('static', filename='js/nested_table.js') }}';
-    $(function() {
-      $('body').on('click', '.show-groups-vrules',
-            openNestedTable('groups', 'vrules', 6));
-      $('body').on('click', '.show-groups-crules',
-            openNestedTable('groups', 'crules', 6));
-      $('body').on('click', '.show-groups-groups',
-            openNestedTable('groups', 'groups', 6));
-      $('body').on('click', '.related-groups-groups',
-            openRelatedNested('groups', 'groups', 6));
-    });
-  </script>
-  {% if not main %}
-    <script type="module">
-      import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-      import { initTooltips } from '{{ url_for('static', filename='js/list_group.mjs') }}';
-      $(document).ready(function() {
-        initNestedTable("{{table_id}}");
-        initTooltips();
-      });
-    </script>
-  {% endif %}
+  {% include 'jslinks_group.html' %}
 {% endblock %}

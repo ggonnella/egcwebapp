@@ -1,0 +1,26 @@
+<script type="module">
+ import { openNestedTable } from
+      '{{ url_for('static', filename='js/nested_table.js') }}';
+ import { openRelatedNested } from
+      '{{ url_for('static', filename='js/nested_table.js') }}';
+  $(function() {
+    $('body').on('click', '.show-attributes-vrules',
+          openNestedTable('attributes', 'vrules', 8));
+    $('body').on('click', '.show-attributes-crules',
+          openNestedTable('attributes', 'crules', 8));
+    $('body').on('click', '.related-attributes-extracts',
+          openRelatedNested('attributes', 'extracts', 8));
+    $('body').on('click', '.related-attributes-units',
+          openRelatedNested('attributes', 'units', 8));
+  });
+</script>
+{% if not main %}
+  <script type="module">
+    import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
+    import { initTooltips } from '{{ url_for('static', filename='js/list_attribute.mjs') }}';
+    $(document).ready(function() {
+      initNestedTable("{{table_id}}");
+      initTooltips();
+    });
+  </script>
+{% endif %}

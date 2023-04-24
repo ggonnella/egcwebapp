@@ -1,0 +1,36 @@
+{% set nested_colspan = 8 %}
+<tr>
+  <td>
+    {% include 'linked_record_id.html' %}
+  </td>
+  <td>
+    {% if vrule.source is string %}
+      {% set related_kind, related_id = 'extract', vrule.source %}
+      {% include 'refs_link.html' %}
+    {% else %}
+      {% for source in vrule.source %}
+        {% set related_kind, related_id = 'extract', source %}
+        {% include 'refs_link.html' %} <br/>
+      {% endfor %}
+    {% endif %}
+  </td>
+  <td>
+    {% set related_kind, related_id = 'attribute', vrule.attribute %}
+    {% include 'refs_link.html' %}
+  </td>
+  <td>
+    {% set related_kind, related_id = 'group', vrule.group.id %}
+    {% include 'refs_link.html' %}
+  </td>
+  <td>
+    {% if vrule.group.portion %} {{ vrule.group.portion }} {% endif %}
+  </td>
+  <td>{{ vrule.operator }}</td>
+  <td>{{ vrule.reference }}</td>
+  <td>
+    {% include 'tags_lines.html' %}
+  </td>
+  <td>
+    {% include 'record_actions.html' %}
+  </td>
+</tr>

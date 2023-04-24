@@ -1,0 +1,25 @@
+{% set nested_colspan = 7 %}
+<tr>
+  <td>
+    {% include 'linked_record_id.html' %}
+  </td>
+  <td>{{ unit.type }}</td>
+  <td>{{ linked_unit_definition(record_id, unit.type,
+           unit.definition, ancestor_ids) | safe }}</td>
+  <td>{{ linked_unit_symbol(unit.type, unit.symbol) | safe }}</td>
+  <td>{{ linked_unit_description(unit.type, unit.description) | safe }}</td>
+  <td>
+    {% include 'tags_lines.html' %}
+  </td>
+  <td>
+    {% set ref_by_kind, ref_by_rt = 'attribute', 'A' %}
+    {% include 'ref_by_link.html' %}
+    {% set ref_by_kind, ref_by_rt = 'unit', 'U' %}
+    {% include 'ref_by_link.html' %}
+    {% set ref_by_kind, ref_by_rt = 'model', 'M' %}
+    {% include 'ref_by_link.html' %}
+  </td>
+  <td>
+    {% include 'record_actions.html' %}
+  </td>
+</tr>

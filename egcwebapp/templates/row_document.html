@@ -1,0 +1,35 @@
+{% set nested_colspan = 4 %}
+<tr>
+    <td style="white-space: nowrap;">
+      <span class="document-id" style="display: inline;"
+        data-document-id="{{ record_id }}"
+        ><a href="https://pubmed.ncbi.nlm.nih.gov/{{ document.document_id.item }}"
+          target="_blank" class="no-underline pmid-link"
+        >{{ document.document_id.item }}</a></span><span
+          class="document-info"
+          style="display: inline;">&nbsp;&#9432;</span>
+    </td>
+
+    <td>
+      <a href="{{ document.link }}" target="_blank"
+          class="no-underline document-link">
+            {{ document.link }}
+        </a>
+    </td>
+    <td>
+      {% set record = document %}
+      {% include 'tags_lines.html' %}
+    </td>
+    <td>
+      {% set count =
+           (egc_data.ref_by_ids('D', record_id, 'S') +
+            egc_data.ref_by_ids('D', record_id, 'T')) | length %}
+      {% set ref_by_kind = 'extract' %}
+      {% include 'ref_by_link.html' %}
+      {% set count = None %}
+      </div>
+    </td>
+    <td>
+      {% include 'record_actions.html' %}
+    </td>
+</tr>

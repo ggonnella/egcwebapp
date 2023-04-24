@@ -1,0 +1,16 @@
+{% set nested_colspan = 5 %}
+<tr>
+  <td>
+    {% set related_kind, related_id = 'unit', model.unit_id %}
+    {% include 'refs_link.html' %}
+  </td>
+  <td>{{ model.resource_id }}</td>
+  <td>{{ linked_model_id(model.resource_id, model.model_id) | safe }}</td>
+  <td>{{ model.model_name }}</td>
+  <td>
+    {% include 'tags_lines.html' %}
+  </td>
+  <td>
+    {% include 'record_actions.html' %}
+  </td>
+</tr>
