@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ title_label }} Record</h1>
+    <h1>{{ title_label }} Record
+    {% include 'filename.html' %}
+    </h1>
     <form method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
         {% include 'form_fields_with_tags.html' %}
