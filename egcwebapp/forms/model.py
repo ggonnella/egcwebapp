@@ -48,7 +48,7 @@ class ModelForm(Form):
           "unit_id": record["unit_id"],
           "resource_id": record["resource_id"],
           "model_id": record["model_id"],
-          "mode_name": record["model_name"],
+          "model_name": record["model_name"],
       }
       TagForm.add_tags_to_form_data(record, form_data)
       kwargs["data"] = form_data
