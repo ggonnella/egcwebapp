@@ -1,0 +1,30 @@
+{% set table_id=record_kind+"-table" %}
+{% if main %}
+  {% set prev = record_kind+'_list' %}
+  {% set ancestor_ids = [] %}
+{% else %}
+  {% set ancestor_ids_str = ancestor_ids | join("-") %}
+  {% set table_id=table_id+"-"+ancestor_ids_str %}
+{% endif %}
+<div id="{{table_id}}-wrapper">
+  <table id="{{table_id}}" class="table table-striped table-hover">
+    <thead>
+      <tr>
+        {% for col, collbl in info.table_columns %}
+          <th>{{collbl|safe}}</th>
+        {% endfor %}
+        <th>Tags</th>
+        {% if info.ref_by_kinds | length > 0 %}
+          <th>Referenced&nbsp;by</th>
+        {% endif %}
+        <th>Actions</th>
+      <tr/>
+    </thead>
+    <tbody>
+      {% for record in records %}
+        {% include 'row_'+record_kind+'.html' %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'jslinks.html' %}

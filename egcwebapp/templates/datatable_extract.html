@@ -1,32 +1,4 @@
 {% block content %}
-  {% set record_kind="extract" %}
-  {% set table_id="extract-table" %}
-  {% if main %}
-    {% set prev = 'extract_list' %}
-    {% set ancestor_ids = [] %}
-  {% else %}
-    {% set ancestor_ids_str = ancestor_ids | join("-") %}
-    {% set table_id=table_id+"-"+ancestor_ids_str %}
-  {% endif %}
-  <div id="{{table_id}}-wrapper">
-    <table id="{{table_id}}" class="table table-striped table-hover">
-      <thead>
-        <tr>
-            <th>Extract Type</th>
-            <th>ID</th>
-            <th>Document</th>
-            <th>Text / Table Reference</th>
-            <th>Tags</th>
-            <th>Referenced&nbsp;by</th>
-            <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for record in extracts %}
-          {% include 'row_extract.html' %}
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% include 'jslinks.html' %}
+  {% set records=extracts %}
+  {% include 'datatable.html' %}
 {% endblock %}

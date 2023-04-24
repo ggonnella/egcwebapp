@@ -1,35 +1,5 @@
 {% block content %}
-  {% set record_kind="attribute" %}
+  {% set records=attributes %}
   {% set record_type="A" %}
-  {% set table_id="attribute-table" %}
-  {% if main %}
-    {% set prev = 'attribute_list' %}
-    {% set ancestor_ids = [] %}
-  {% else %}
-    {% set ancestor_ids_str = ancestor_ids | join("-") %}
-    {% set table_id=table_id+"-"+ancestor_ids_str %}
-  {% endif %}
-  <div id="{{table_id}}-wrapper">
-    <table id="{{table_id}}" class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Unit</th>
-          <th>Measurement Mode</th>
-          <th>Reference</th>
-          <th>Location Type</th>
-          <th>Location Label</th>
-          <th>Tags</th>
-          <th>Referenced&nbsp;by</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for record in attributes %}
-          {% include 'row_attribute.html' %}
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% include 'jslinks.html' %}
+  {% include 'datatable.html' %}
 {% endblock %}

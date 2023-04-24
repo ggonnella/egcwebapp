@@ -22,7 +22,7 @@
     {% set tooltip_script = 'js/list_'+record_kind+'.mjs'%}
     import { initTooltips } from '{{ url_for('static', filename=tooltip_script) }}';
     $(document).ready(function() {
-      {% if table_id %} initNestedTable("{{table_id}}"); {% edif %}
+      {% if table_id %} initNestedTable("{{table_id}}"); {% endif %}
       initTooltips();
     });
   </script>
