@@ -92,7 +92,7 @@ def create_app():
       return render_template('list.html',
               **{record_kind+"s": records, 'egc_data': app.egc_data,
                  'record_kind': record_kind,
-                 'list_title': record_kind_info[record_kind]['title']+'s'})
+                 'info': record_kind_info[record_kind]})
 
     route_function.__name__ = f"{record_kind}_list"
     route_function = app.route(f"/{record_kind}s",
@@ -174,8 +174,8 @@ def create_app():
             updated_row_html = render_template(f"row_{record_kind}.html",
                     record=updated_data, record_kind=record_kind,
                     egc_data=app.egc_data)
-            updated_row_html += render_template(f"jslinks_{record_kind}.html",
-                    record_kind=record_kind)
+            updated_row_html += render_template("jslinks.html",
+                    record_kind=record_kind, info=record_kind_info[record_kind])
             return jsonify({'success': True, 'html': updated_row_html})
         else:
             form_html = render_template('record_form_partial.html', form=form,
@@ -232,6 +232,8 @@ def create_app():
           record = app.egc_data.get_record_by_id(record_id) or abort(404)
           return render_template(f'datatable_{record_kind}.html',
               **{record_kind+"s": [record], 'egc_data': app.egc_data,
+                 'record_kind': record_kind,
+                 'info': record_kind_info[record_kind],
                  'ancestor_ids': ancestor_ids.split(',')})
 
       route_function.__name__ = f'get_ref_{record_kind}'
@@ -251,6 +253,7 @@ def create_app():
             app.egc_data.ref_by(ref_by_rt, ref_by_id, ref_from_rt))
       return render_template(f'datatable_{ref_from_kind}.html',
           **{ref_from_kind+"s": ref_from_records, 'egc_data': app.egc_data,
+             'record_kind': record_kind, 'info': record_kind_info[record_kind],
              'ancestor_ids': ancestor_ids.split(',')})
 
     route_function.__name__ = f'get_{ref_by_kind}_{ref_from_kind}s'

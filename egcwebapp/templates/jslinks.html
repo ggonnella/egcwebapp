@@ -1,0 +1,29 @@
+<script type="module">
+  import { openNestedTable, openRelatedNested } from
+    '{{ url_for('static', filename='js/nested_table.js') }}';
+
+  $(function() {
+    {% for nested_kind in info.ref_by_kinds %}
+      $('body').on('click', `.show-{{ record_kind }}s-{{ nested_kind }}s`,
+            openNestedTable('{{ record_kind }}s', '{{ nested_kind }}s',
+            {{ info.nested_colspan }}));
+    {% endfor %}
+    {% for related_kind in info.ref_kinds %}
+      $('body').on('click', `.related-{{ record_kind }}s-{{ related_kind }}s`,
+            openRelatedNested('{{ record_kind }}s', '{{ related_kind }}s',
+            {{ info.nested_colspan }}));
+    {% endfor %}
+  });
+</script>
+
+{% if not main %}
+  <script type="module">
+    import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
+    {% set tooltip_script = 'js/list_'+record_kind+'.mjs'%}
+    import { initTooltips } from '{{ url_for('static', filename=tooltip_script) }}';
+    $(document).ready(function() {
+      {% if table_id %} initNestedTable("{{table_id}}"); {% edif %}
+      initTooltips();
+    });
+  </script>
+{% endif %}
