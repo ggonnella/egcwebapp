@@ -14,11 +14,11 @@
           <th>{{collbl|safe}}</th>
         {% endfor %}
         <th>Tags</th>
-        {% if info.ref_by_kinds | length > 0 %}
+        {% if (info.ref_by_kinds | length) > 0 %}
           <th>Referenced&nbsp;by</th>
         {% endif %}
         <th>Actions</th>
-      <tr/>
+      </tr>
     </thead>
     <tbody>
       {% for record in records %}

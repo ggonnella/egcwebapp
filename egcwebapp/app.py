@@ -90,7 +90,7 @@ def create_app():
       for record_type in record_kind_info[record_kind]["record_types"]:
         records.extend(app.egc_data.get_records(record_type))
       return render_template('list.html',
-              **{record_kind+"s": records, 'egc_data': app.egc_data,
+              **{"records": records, 'egc_data': app.egc_data,
                  'record_kind': record_kind,
                  'info': record_kind_info[record_kind]})
 
@@ -207,8 +207,9 @@ def create_app():
     def route_function(record_id):
         record = app.egc_data.get_record_by_id(record_id) or abort(404)
         return render_template('show.html',
-                **{record_kind+"s": [record], 'egc_data': app.egc_data,
+                **{"records": [record], 'egc_data': app.egc_data,
                    'record_kind': record_kind, 'record_id': record_id,
+                   'info': record_kind_info[record_kind],
                    'record_title': record_kind_info[record_kind]['title']})
 
     route_function.__name__ = f'show_{record_kind}'
@@ -230,8 +231,8 @@ def create_app():
   def get_ref_route(record_kind):
       def route_function(ancestor_ids, record_id):
           record = app.egc_data.get_record_by_id(record_id) or abort(404)
-          return render_template(f'datatable_{record_kind}.html',
-              **{record_kind+"s": [record], 'egc_data': app.egc_data,
+          return render_template('datatable.html',
+              **{"records": [record], 'egc_data': app.egc_data,
                  'record_kind': record_kind,
                  'info': record_kind_info[record_kind],
                  'ancestor_ids': ancestor_ids.split(',')})
@@ -251,9 +252,10 @@ def create_app():
       for ref_from_rt in record_kind_info[ref_from_kind]["record_types"]:
         ref_from_records.extend(\
             app.egc_data.ref_by(ref_by_rt, ref_by_id, ref_from_rt))
-      return render_template(f'datatable_{ref_from_kind}.html',
-          **{ref_from_kind+"s": ref_from_records, 'egc_data': app.egc_data,
-             'record_kind': record_kind, 'info': record_kind_info[record_kind],
+      return render_template('datatable.html',
+          **{"records": ref_from_records, 'egc_data': app.egc_data,
+             'record_kind': ref_from_kind,
+             'info': record_kind_info[ref_from_kind],
              'ancestor_ids': ancestor_ids.split(',')})
 
     route_function.__name__ = f'get_{ref_by_kind}_{ref_from_kind}s'
