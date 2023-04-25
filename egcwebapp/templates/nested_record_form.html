@@ -2,7 +2,7 @@
      id="nested-edit-form-{{record_id}}" data-record-id="{{record_id}}"
      data-record-kind="{{record_kind}}">
     {{ form.csrf_token }}
-    {% include 'form_fields_with_tags.html' %}
+    {% include 'form_fields.html' %}
     <input type="submit" value="Save">
 </form>
 <script type="module">

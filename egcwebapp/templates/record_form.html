@@ -6,7 +6,7 @@
     </h1>
     <form method="POST" enctype="multipart/form-data">
         {{ form.csrf_token }}
-        {% include 'form_fields_with_tags.html' %}
+        {% include 'form_fields.html' %}
         <input type="submit" value="Save">
     </form>
 {% endblock %}

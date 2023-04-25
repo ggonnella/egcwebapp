@@ -165,7 +165,7 @@ def create_app():
                              f"{record_kind.capitalize()}Form")
         form = form_class.from_record(request.form, record,
                           egc_data=app.egc_data, old_id=record_id)
-        form_html = render_template('record_form_partial.html', form=form,
+        form_html = render_template('nested_record_form.html', form=form,
                     egc_data=app.egc_data, errors=form.errors,
                     info=record_kind_info[record_kind],
                     record_kind=record_kind, record_id=record_id)
@@ -194,7 +194,7 @@ def create_app():
                     record_kind=record_kind, info=record_kind_info[record_kind])
             return jsonify({'success': True, 'html': updated_row_html})
         else:
-            form_html = render_template('record_form_partial.html', form=form,
+            form_html = render_template('nested_record_form.html', form=form,
                     egc_data=app.egc_data, errors=form.errors,
                     info=record_kind_info[record_kind],
                     record_kind=record_kind, record_id=record_id)
