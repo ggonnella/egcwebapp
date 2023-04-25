@@ -29,11 +29,6 @@ class DocumentForm(Form):
     def validate_document_id(self, field):
       new_id = self.egc_data.compute_docid_from_pfx_and_item("PMID", field.data)
       if self.old_id != new_id:
-        if self.old_id is not None:
-          if self.egc_data.is_ref_by(self.old_id):
-              raise validators.ValidationError('Record ID cannot be changed '+\
-                  f'since the old data ({self.old_id}) '+\
-                  'is referenced by other records')
         if not self.egc_data.is_unique_id(new_id):
           raise validators.ValidationError('Document ID already exists')
 
