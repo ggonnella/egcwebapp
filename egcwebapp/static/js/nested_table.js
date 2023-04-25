@@ -1,3 +1,5 @@
+import { addColumnFilters } from './datatable_filters.mjs';
+
 export function openNestedTable(thisRecordsName, nestedRecordsName, colspan) {
   return function(event) {
     event.preventDefault();
@@ -104,16 +106,18 @@ export function submitNestedEditForm(event) {
   });
 }
 
-export function initNestedTable(table_id) {
-  var table = $('#' + table_id).DataTable();
+export function initNestedTable(table_id, drawCallback) {
+  var table = $('#' + table_id).DataTable({
+    "drawCallback": drawCallback
+  });
   addCloseButton(table_id);
   return table;
 }
 
-import { addColumnFilters } from './datatable_filters.mjs';
-
-export function initMainTable(table_id) {
-  var table = $('#' + table_id).DataTable();
+export function initMainTable(table_id, drawCallback) {
+  var table = $('#' + table_id).DataTable({
+    "drawCallback": drawCallback
+  });
   addColumnFilters(table);
   return table;
 }

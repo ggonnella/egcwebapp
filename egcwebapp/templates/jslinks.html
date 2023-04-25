@@ -29,13 +29,15 @@
   {% endif %}
   $(document).ready(function() {
     {% if table_id %}
-      {{initTable}}("{{table_id}}");
-    {% endif %}
-    {% for related_kind in info.ref_kinds %}
-      initRelatedTooltips(".{{ related_kind }}-info", "{{ related_kind }}s");
-    {% endfor %}
-    {% if ttscript %}
-      initRecordKindSpecificTooltips();
+      var table = {{initTable}}("{{table_id}}", function () {
+          {% for related_kind in info.ref_kinds %}
+            initRelatedTooltips(".{{ related_kind }}-info", "{{ related_kind }}s");
+          {% endfor %}
+          {% if ttscript %}
+            initRecordKindSpecificTooltips();
+          {% endif %}
+        }
+      );
     {% endif %}
   });
 </script>
