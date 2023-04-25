@@ -34,6 +34,18 @@ def create_app():
   # D /<record_type>s/<record_id>/delete  deletes a single record
   #
 
+  def column_context_processor(record_kind, column):
+    procs = processors().values()
+    names = [p.__name__ for p in procs]
+    if f"{record_kind}_{column}" in names:
+      return processors()[f"{record_kind}_{column}"]
+    elif f"record_{column}" in names:
+      return processors()[f"record_{column}"]
+    else:
+      return None
+  app.jinja_env.globals.update(\
+      column_context_processor=column_context_processor)
+
   @app.route('/')
   def index():
       return redirect(url_for('document_list'))
@@ -113,6 +125,7 @@ def create_app():
         return render_template("record_form.html", form=form,
             egc_data=app.egc_data,
             errors=form.errors, previous_page=prev,
+            info=record_kind_info[record_kind],
             title_label=f"Create {title_label}",
         )
 
@@ -137,6 +150,7 @@ def create_app():
         return render_template('record_form.html', form=form,
                     egc_data=app.egc_data,
                     errors=form.errors, previous_page=prev,
+                    info=record_kind_info[record_kind],
                     title_label=f'Edit {title_label}')
 
     route_function.__name__ = f'edit_{record_kind}'
@@ -153,6 +167,7 @@ def create_app():
                           egc_data=app.egc_data, old_id=record_id)
         form_html = render_template('record_form_partial.html', form=form,
                     egc_data=app.egc_data, errors=form.errors,
+                    info=record_kind_info[record_kind],
                     record_kind=record_kind, record_id=record_id)
         return form_html
 
@@ -171,8 +186,9 @@ def create_app():
         if form.validate():
             updated_data = form.to_record()
             app.egc_data.update_record_by_id(record_id, updated_data)
-            updated_row_html = render_template(f"row_{record_kind}.html",
+            updated_row_html = render_template("row.html",
                     record=updated_data, record_kind=record_kind,
+                    info=record_kind_info[record_kind],
                     egc_data=app.egc_data)
             updated_row_html += render_template("jslinks.html",
                     record_kind=record_kind, info=record_kind_info[record_kind])
@@ -180,6 +196,7 @@ def create_app():
         else:
             form_html = render_template('record_form_partial.html', form=form,
                     egc_data=app.egc_data, errors=form.errors,
+                    info=record_kind_info[record_kind],
                     record_kind=record_kind, record_id=record_id)
             return jsonify({'success': False, 'html': form_html})
 
@@ -220,8 +237,11 @@ def create_app():
   def get_record_route(record_kind):
     def route_function(record_id):
         record = app.egc_data.get_record_by_id(record_id) or abort(404)
-        return render_template(f'table_{record_kind}.html',
-            **{record_kind: record, 'egc_data': app.egc_data})
+        return render_template('table.html',
+            **{'record': record, 'egc_data': app.egc_data,
+               'record_kind': record_kind, 'record_id': record_id,
+               'info': record_kind_info[record_kind],
+              })
 
     route_function.__name__ = f'get_{record_kind}'
     route_function = app.route(f'/api/{record_kind}s/<record_id>', \

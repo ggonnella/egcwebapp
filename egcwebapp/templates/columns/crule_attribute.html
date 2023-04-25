@@ -1,0 +1,10 @@
+{% if record.attribute is string %}
+  {% set related_kind, related_id = 'attribute', record.attribute %}
+  {% include 'refs_link.html' %}
+{% else %}
+  {% set related_kind, related_id = 'attribute', record.attribute.id1 %}
+  {% include 'refs_link.html' %}
+  <br/>vs.<br/>
+  {% set related_kind, related_id = 'attribute', record.attribute.id2 %}
+  {% include 'refs_link.html' %}
+{% endif %}

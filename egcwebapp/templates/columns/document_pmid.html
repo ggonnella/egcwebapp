@@ -1,0 +1,7 @@
+<span class="document-id" style="display: inline;"
+  data-document-id="{{ record_id }}"
+  ><a href="https://pubmed.ncbi.nlm.nih.gov/{{ record.document_id.item }}"
+    target="_blank" class="no-underline pmid-link"
+  >{{ record.document_id.item }}</a></span>{% if not in_tooltip %}<span
+    class="document-info"
+    style="display: inline;">&nbsp;&#9432;</span>{% endif %}

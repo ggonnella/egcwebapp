@@ -1,0 +1,9 @@
+{% if record.source is string %}
+  {% set related_kind, related_id = 'extract', record.source %}
+  {% include 'refs_link.html' %}
+{% else %}
+  {% for source in record.source %}
+    {% set related_kind, related_id = 'extract', source %}
+    {% include 'refs_link.html' %}
+  {% endfor %}
+{% endif %}

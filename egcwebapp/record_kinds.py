@@ -12,7 +12,7 @@ record_kind_info = {
                 "nested_colspan": 6,
                 "record_types": ['S', 'T'],
                  "table_columns": [
-                   ("extract_type", "Extract Type"),
+                   ("record_type", "Extract Type"),
                    ('id', "ID"),
                    ("document", "Document"),
                    ("content", "Text / Table Ref."),
@@ -71,7 +71,7 @@ record_kind_info = {
               "record_types": ['V'],
               "table_columns": [
                 ('id', "ID"),
-                ('sources', "Sources"),
+                ('source', "Sources"),
                 ("attribute", "Attribute"),
                 ("group", "Group"),
                 ("group_portion", "Group Portion"),
@@ -85,7 +85,7 @@ record_kind_info = {
               "record_types": ['C'],
               "table_columns": [
                 ('id', "ID"),
-                ('sources', "Sources"),
+                ('source', "Sources"),
                 ("attribute", "Attribute"),
                 ("group1", "Group 1"),
                 ("group1_portion", "Group&nbsp;1 Portion"),

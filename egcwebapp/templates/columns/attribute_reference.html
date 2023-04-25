@@ -1,0 +1,6 @@
+{% if record.mode.mode  %}
+    {% if record.mode.reference %}
+      {% set related_kind, related_id = 'unit', record.mode.reference %}
+      {% include 'refs_link.html' %}
+    {% endif %}
+{% endif %}

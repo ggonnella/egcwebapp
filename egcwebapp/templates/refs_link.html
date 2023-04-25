@@ -5,31 +5,40 @@
   <i>{{ link_text }}</i>
 {% else %}
   {% if egc_data.id_exists(related_id) %}
-    {% if ancestor_ids %}
-      {% set ancestor_ids_all = ancestor_ids + [record_id] %}
-      {% set ancestor_ids_str = ancestor_ids_all | join(',') %}
+    {% if in_tooltip %}
+      <span style="display: inline;">{{link_text}}
+           <a href="{{ url_for('show_'+related_kind,
+                        record_id=related_id,
+                        previous_page=prev) }}">
+             <i class="fa fa-arrow-up" style="color: black;"></i></a>
+      </span>
     {% else %}
-      {% set ancestor_ids_str = record_id %}
-    {% endif %}
-    <span
-        style="display: inline;"
-      {% if not noclass %}
-        class="related_link"
+      {% if ancestor_ids %}
+        {% set ancestor_ids_all = ancestor_ids + [record_id] %}
+        {% set ancestor_ids_str = ancestor_ids_all | join(',') %}
+      {% else %}
+        {% set ancestor_ids_str = record_id %}
       {% endif %}
-      ><a href="#"
-         data-related-id="{{related_id}}"
-         data-ancestor-ids="{{ancestor_ids_str}}"
-         class="related-{{record_kind}}s-{{related_kind}}s">{{link_text}}</a><span
-         class="{{related_kind}}-info">&nbsp;&#9432;
-         <a href="{{ url_for('edit_'+related_kind,
-                      record_id=related_id,
-                      previous_page=prev) }}" target="_blank">
-           <i class="fa fa-edit" style="color: black;"></i></a>
-         <a href="{{ url_for('show_'+related_kind,
-                      record_id=related_id,
-                      previous_page=prev) }}">
-           <i class="fa fa-arrow-up" style="color: black;"></i></a></span>
-    </span>
+      <span
+          style="display: inline;"
+        {% if not noclass %}
+          class="related_link"
+        {% endif %}
+        ><a href="#"
+           data-related-id="{{related_id}}"
+           data-ancestor-ids="{{ancestor_ids_str}}"
+           class="related-{{record_kind}}s-{{related_kind}}s">{{link_text}}</a><span
+           class="{{related_kind}}-info">&nbsp;&#9432;
+           <a href="{{ url_for('edit_'+related_kind,
+                        record_id=related_id,
+                        previous_page=prev) }}" target="_blank">
+             <i class="fa fa-edit" style="color: black;"></i></a>
+           <a href="{{ url_for('show_'+related_kind,
+                        record_id=related_id,
+                        previous_page=prev) }}">
+             <i class="fa fa-arrow-up" style="color: black;"></i></a></span>
+      </span>
+    {% endif %}
   {% else %}
     <span style="color:red;">{{ link_text }}</span>
   {% endif %}

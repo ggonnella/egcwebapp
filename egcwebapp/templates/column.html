@@ -1,0 +1,13 @@
+{% if col == 'tags'%}
+  {% include 'tags_lines.html' %}
+{% else %}
+  {% set coltemplate = column_template(record_kind, col) %}
+  {% set col_cp = column_context_processor(record_kind, col) %}
+  {% if coltemplate %}
+    {% include coltemplate %}
+  {% elif col_cp %}
+    {{ col_cp(record) | safe }}
+  {% else %}
+    {{ record[col] }}
+  {% endif %}
+{% endif %}
