@@ -82,6 +82,11 @@ a.create {
   color: black;
   width: 100%;
   background-color: white;
+  padding: 1px;
+}
+
+.tooltip-table table {
+  margin-bottom: 0px;
 }
 
 .tooltip-table th,
@@ -94,6 +99,10 @@ a.create {
 .tooltip-table th {
   background-color: #d2d2d2;
   font-weight: bold;
+}
+
+.tooltip-table tr.even th {
+  background-color: #e2e2e2;
 }
 
 .table-record {

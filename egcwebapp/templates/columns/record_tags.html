@@ -1,8 +1,8 @@
-{% if record.tags %}
+{%- if record.tags -%}
   {% for tag_name, tag_type_value in record.tags.items() %}
     {{ tag_name }}:{{ tag_type_value.type }}:{{ linked_tag_value(tag_name, tag_type_value.value) | safe }}<br>
   {% endfor %}
-{% endif %}
-{% if record.comment %}
+{%- endif -%}
+{%- if record.comment -%}
   # {{ record.comment }}
-{% endif %}
+{%- endif -%}

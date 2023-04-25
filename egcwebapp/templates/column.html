@@ -2,8 +2,8 @@
 {% set col_cp = column_context_processor(record_kind, col) %}
 {% if coltemplate %}
   {% include coltemplate %}
-{% elif col_cp %}
+{%- elif col_cp -%}
   {{ col_cp(record) | safe }}
-{% else %}
+{%- else -%}
   {{ record[col] }}
-{% endif %}
+{%- endif -%}

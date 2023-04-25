@@ -1,13 +1,19 @@
 {% set in_tooltip = True %}
+{%- macro render_column(record, col) -%}
+{% include 'column.html' %}
+{%- endmacro -%}
 <table class="table table-striped table-record">
   <tbody>
     {% for col, collbl in info.table_columns + [("tags", "Tags")] %}
-      <tr class="{{ loop.cycle('odd', 'even') }}">
-        <th>{{collbl}}</th>
-        <td>
-          {% include 'column.html' %}
-        </td>
-      </tr>
+      {% set colval = render_column(record, col) | trim %}
+      {% if colval | length > 0 %}
+        {% if colval != '.' %}
+          <tr class="{{ loop.cycle('odd', 'even') }}">
+            <th>{{ collbl }}</th>
+            <td>{{ colval }}</td>
+          </tr>
+        {% endif %}
+      {% endif %}
     {% endfor %}
  </tbody>
 </table>
