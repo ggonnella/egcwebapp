@@ -165,7 +165,8 @@ def column_context_processors():
           definition_parts = definition.split(",")
           output_parts = [unit_definition({'id': unit_id,
               'type': "set:" + unit_type[5:],
-              "definition": part}, ancestor_ids) for part in definition_parts]
+              "definition": part}, in_tooltip, ancestor_ids) \
+                  for part in definition_parts]
           return ",".join(output_parts)
         definition_pieces = break_string(definition, 15)
         output = []
