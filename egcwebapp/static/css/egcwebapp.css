@@ -77,6 +77,11 @@ a.create {
   background-color: #f8d7da;
 }
 
+.filter {
+  padding: 1px;
+  height: calc(1.5em);
+}
+
 .tooltip-table {
   border-collapse: collapse;
   color: black;

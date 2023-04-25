@@ -1,5 +1,6 @@
 import { initTooltip } from "./tooltips.js";
 import { initRelatedTooltips } from "./tooltips.js";
+import { addColumnFilters } from "./datatable_filters.mjs";
 
 export async function initTooltips() {
     initRelatedTooltips(".extract-info", "extracts");
@@ -8,11 +9,11 @@ export async function initTooltips() {
 }
 
 $(document).ready(function() {
-  // Initialize DataTables
-  $("#crule-table").DataTable( {
+  var table = $("#crule-table").DataTable( {
     "drawCallback": function( settings ) {
       initTooltips();
     }
   });
+  addColumnFilters(table);
 });
 

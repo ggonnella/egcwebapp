@@ -1,4 +1,5 @@
 import { initDocumentInfoTooltip } from "./document_info.mjs";
+import { addColumnFilters } from "./datatable_filters.mjs";
 
 export function initTooltips() {
   $(".document-info").each(function() {
@@ -10,10 +11,10 @@ export function initTooltips() {
 }
 
 $(document).ready(function() {
-  // Initialize DataTables
-  $("#document-table").DataTable( {
+  var table = $("#document-table").DataTable( {
     "drawCallback": function( settings ) {
       initTooltips();
     }
   });
+  addColumnFilters(table);
 });
