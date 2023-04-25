@@ -1,43 +1,48 @@
 <script type="module">
-  import { openNestedTable, openRelatedNested } from
+  console.log(`JS for table {{table_id}}`);
+  {% if main %}
+      {% set initTable = 'initMainTable' %}
+  {% else %}
+      {% set initTable = 'initNestedTable' %}
+  {% endif %}
+  import { {{ initTable }}, openNestedTable, openRelatedNested } from
     '{{ url_for('static', filename='js/nested_table.js') }}';
   import { initRelatedTooltips } from
     '{{ url_for('static', filename='js/tooltips.js') }}';
 
   $(function() {
     {% for nested_kind in info.ref_by_kinds %}
+      $('body').off('click', `.show-{{ record_kind }}s-{{ nested_kind }}s`)
       $('body').on('click', `.show-{{ record_kind }}s-{{ nested_kind }}s`,
             openNestedTable('{{ record_kind }}s', '{{ nested_kind }}s',
             {{ info.nested_colspan }}));
     {% endfor %}
     {% for related_kind in info.ref_kinds %}
+      $('body').off('click', `.related-{{ record_kind }}s-{{ related_kind }}s`)
       $('body').on('click', `.related-{{ record_kind }}s-{{ related_kind }}s`,
             openRelatedNested('{{ record_kind }}s', '{{ related_kind }}s',
             {{ info.nested_colspan }}));
     {% endfor %}
   });
 
-  {% if main %}
-      {% set initTable = 'initMainTable' %}
-  {% else %}
-      {% set initTable = 'initNestedTable' %}
-  {% endif %}
-  import { {{ initTable }} } from '{{ url_for('static', filename='js/nested_table.js') }}';
   {% set ttscript = tooltip_js(record_kind) %}
   {% if ttscript %}
     import { initRecordKindSpecificTooltips } from '{{ url_for('static', filename=ttscript) }}';
   {% endif %}
   $(document).ready(function() {
+    function initTooltips() {
+      {% for related_kind in info.ref_kinds %}
+        initRelatedTooltips(".{{ related_kind }}-info", "{{ related_kind }}s");
+      {% endfor %}
+      {% if ttscript %}
+        initRecordKindSpecificTooltips();
+      {% endif %}
+    };
     {% if table_id %}
-      var table = {{initTable}}("{{table_id}}", function () {
-          {% for related_kind in info.ref_kinds %}
-            initRelatedTooltips(".{{ related_kind }}-info", "{{ related_kind }}s");
-          {% endfor %}
-          {% if ttscript %}
-            initRecordKindSpecificTooltips();
-          {% endif %}
-        }
-      );
+      {{initTable}}("{{table_id}}", initTooltips);
+      console.log(`Table initialized, ID: {{table_id}}`);
+    {% else %}
+      initTooltips();
     {% endif %}
   });
 </script>

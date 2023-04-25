@@ -6,12 +6,13 @@ export function openNestedTable(thisRecordsName, nestedRecordsName, colspan) {
     var $count = $(this).closest(`.count-${thisRecordsName}-${nestedRecordsName}`);
     var ancestorIds = $count.data('ancestor-ids');
     var $currentRow = $count.closest('tr');
+    const msg = `${nestedRecordsName} which refer to ${ancestorIds}`;
 
     $.ajax({
       url: `/api/${thisRecordsName}/${ancestorIds}/${nestedRecordsName}`,
       type: 'GET',
       success: function(response) {
-        console.log(`Success fetching ${nestedRecordsName}`);
+        console.log(`Success fetching ${msg}`);
 
         const nestedClassName = `nested-${nestedRecordsName}`;
         // Remove existing nested table if any
@@ -27,7 +28,7 @@ export function openNestedTable(thisRecordsName, nestedRecordsName, colspan) {
         $currentRow.after($newRow);
       },
       error: function(response) {
-        console.log(`Error fetching ${nestedRecordsName}:`, response);
+        console.log(`Error fetching ${msg}:`, response);
       }
     });
   }
@@ -87,12 +88,10 @@ export function submitNestedEditForm(event) {
       // - html: string
       if (response.success) {
         console.log(`Success updating ${recordKind} ${recordId}`);
-        console.log(response.html);
         $currentRow.prev().replaceWith(response.html);
         $currentRow.remove();
       } else {
         console.log(`Failure updating ${recordKind} ${recordId}`);
-        console.log(response.html);
         const colspan = $currentRow.children('td').attr('colspan');
         const $newRow = $(`<tr class="nested-edit-form"></tr>`);
         const $newCell = $(`<td colspan="${colspan}"></td>`);
@@ -129,12 +128,13 @@ export function openRelatedNested(thisRecordsName, nestedRecordsName, colspan) {
     var relatedId = $link.data('related-id');
     var ancestorIds = $link.data('ancestor-ids');
     var $currentRow = $link.closest('tr');
+    const msg = `${nestedRecordsName} '${relatedId}' related to: ${ancestorIds}`;
 
     $.ajax({
       url: `/api/ref/${ancestorIds}/${nestedRecordsName}/${relatedId}`,
       type: 'GET',
       success: function(response) {
-        console.log(`Success fetching ${nestedRecordsName} ${relatedId}`);
+        console.log(`Success fetching ${msg}`);
 
         const nestedClassName = `nested-${nestedRecordsName}`;
         // Remove existing nested table if any
@@ -147,10 +147,10 @@ export function openRelatedNested(thisRecordsName, nestedRecordsName, colspan) {
         $newCell.append(response);
         $newRow.append($newCell);
         $currentRow.after($newRow);
+        console.log(`Done with ${msg}`);
       },
       error: function(response) {
-        console.log(`Error fetching ${nestedRecordsName} ${relatedId}:`,
-          response);
+        console.log(`Error fetching ${msg}:`, response);
       }
     });
   }
@@ -163,12 +163,12 @@ function addCloseButton(table_id) {
   if ($button.length == 0) {
     var closeButton = $(`<button id="${buttonId}" class="btn btn-sm btn-light" style="margin-left: 10px;"><i class="fas fa-times"></i></button>`);
     closeButton.on('click', closeNestedTable);
-    $(`#${table_id}-wrapper .dataTables_filter`).append(closeButton);
+    $(`#${table_id}_wrapper .dataTables_filter`).append(closeButton);
   }
 }
 
 function closeNestedTable() {
-  var $nestedTable = $(this).closest('div.dataTables_wrapper').parent().parent().parent();
+  var $nestedTable = $(this).closest('div.dataTables_wrapper').parent().parent();
   if ($nestedTable.length > 0) {
     $nestedTable.remove();
   }

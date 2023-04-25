@@ -6,25 +6,24 @@
   {% set ancestor_ids_str = ancestor_ids | join("-") %}
   {% set table_id=table_id+"-"+ancestor_ids_str %}
 {% endif %}
-<div id="{{table_id}}-wrapper">
-  <table id="{{table_id}}" class="table table-striped table-hover">
-    <thead>
-      <tr>
-        {% for col, collbl in info.table_columns %}
-          <th>{{collbl|safe}}</th>
-        {% endfor %}
-        <th>Tags</th>
-        {% if (info.ref_by_kinds | length) > 0 %}
-          <th>Referenced&nbsp;by</th>
-        {% endif %}
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for record in records %}
-        {% include 'row.html' %}
+{% set in_tooltip = False %}
+<table id="{{table_id}}" class="table table-striped table-hover">
+  <thead>
+    <tr>
+      {% for col, collbl in info.table_columns %}
+        <th>{{collbl|safe}}</th>
       {% endfor %}
-    </tbody>
-  </table>
-</div>
+      <th>Tags</th>
+      {% if (info.ref_by_kinds | length) > 0 %}
+        <th>Referenced&nbsp;by</th>
+      {% endif %}
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for record in records %}
+      {% include 'row.html' %}
+    {% endfor %}
+  </tbody>
+</table>
 {% include 'jslinks.html' %}
