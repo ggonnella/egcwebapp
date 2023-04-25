@@ -1,6 +1,15 @@
 import { initTooltip } from "./tooltips.js";
 
-export async function initDocumentInfoTooltip(target, pmid, url) {
+export function initRecordKindSpecificTooltips() {
+  $(".document-info").each(function() {
+    const $pmidCell = $(this).prev();
+    const pmid = $pmidCell.text();
+    const url = $pmidCell.parent().next().find("a").attr("href");
+    initDocumentInfoTooltip($(this), pmid, url);
+  });
+}
+
+async function initDocumentInfoTooltip(target, pmid, url) {
   initTooltip(target, "article information",
     await getDocumentInfoTable(pmid, url));
 }

@@ -110,6 +110,14 @@ export function initNestedTable(table_id) {
   return table;
 }
 
+import { addColumnFilters } from './datatable_filters.mjs';
+
+export function initMainTable(table_id) {
+  var table = $('#' + table_id).DataTable();
+  addColumnFilters(table);
+  return table;
+}
+
 export function openRelatedNested(thisRecordsName, nestedRecordsName, colspan) {
   return function(event) {
     event.preventDefault();

@@ -1,6 +1,8 @@
 <script type="module">
   import { openNestedTable, openRelatedNested } from
     '{{ url_for('static', filename='js/nested_table.js') }}';
+  import { initRelatedTooltips } from
+    '{{ url_for('static', filename='js/tooltips.js') }}';
 
   $(function() {
     {% for nested_kind in info.ref_by_kinds %}
@@ -14,16 +16,26 @@
             {{ info.nested_colspan }}));
     {% endfor %}
   });
-</script>
 
-{% if not main %}
-  <script type="module">
-    import { initNestedTable } from '{{ url_for('static', filename='js/nested_table.js') }}';
-    {% set tooltip_script = 'js/list_'+record_kind+'.mjs'%}
-    import { initTooltips } from '{{ url_for('static', filename=tooltip_script) }}';
-    $(document).ready(function() {
-      {% if table_id %} initNestedTable("{{table_id}}"); {% endif %}
-      initTooltips();
-    });
-  </script>
-{% endif %}
+  {% if main %}
+      {% set initTable = 'initMainTable' %}
+  {% else %}
+      {% set initTable = 'initNestedTable' %}
+  {% endif %}
+  import { {{ initTable }} } from '{{ url_for('static', filename='js/nested_table.js') }}';
+  {% set ttscript = tooltip_js(record_kind) %}
+  {% if ttscript %}
+    import { initRecordKindSpecificTooltips } from '{{ url_for('static', filename=ttscript) }}';
+  {% endif %}
+  $(document).ready(function() {
+    {% if table_id %}
+      {{initTable}}("{{table_id}}");
+    {% endif %}
+    {% for related_kind in info.ref_kinds %}
+      initRelatedTooltips(".{{ related_kind }}-info", "{{ related_kind }}s");
+    {% endfor %}
+    {% if ttscript %}
+      initRecordKindSpecificTooltips();
+    {% endif %}
+  });
+</script>

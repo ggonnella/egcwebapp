@@ -187,11 +187,20 @@ def processors():
       else:
         return None
 
+    def tooltip_js(record_kind):
+      record_kind_specific = f"js/{record_kind}_tooltips.mjs"
+      staticdir = Path(current_app.root_path) / "static"
+      if (staticdir / record_kind_specific).exists():
+        return record_kind_specific
+      else:
+        return None
+
     return {'group_definition': group_definition,
             'unit_definition': unit_definition,
             'linked_tag_value': linked_tag_value,
             'model_model_id': model_model_id,
             'unit_symbol': unit_symbol,
             'unit_description': unit_description,
-            'column_template': column_template
+            'column_template': column_template,
+            'tooltip_js': tooltip_js
            }
