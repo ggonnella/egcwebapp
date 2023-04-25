@@ -1,3 +1,5 @@
+from flask import url_for
+
 DOI_URL = "https://doi.org/"
 GEONAMES_URL = "https://www.geonames.org/"
 OBO_URL = "http://purl.obolibrary.org/obo/"
@@ -108,6 +110,9 @@ def link_external_resource(resource, item, text=None):
 
 def link_uniprotkb_query(query):
   url = UNIPROTKB_QUERY_URL + query
-  return f"<small>[&rightarrow;&nbsp;<a href='{url}' "+\
+  img = url_for("static", filename="img/uniprot.png")
+  img_html = f"<img src='{img}' alt='UniProtKB' "+\
+      "style='height: 20px; vertical-align: middle;'/>"
+  return f"<small><a href='{url}' "+\
          "style='text-decoration: none' "+\
-         "target='_blank'>UniProtKB</a>]</small>"
+         f"target='_blank'>{img_html}</a></small>"
