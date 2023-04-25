@@ -10,7 +10,8 @@
            <a href="{{ url_for('show_'+related_kind,
                         record_id=related_id,
                         previous_page=prev) }}">
-             <i class="fa fa-arrow-up" style="color: black;"></i></a>
+             <i class="fa fa-chevron-up"
+                style="color: black;"></i></a>
       </span>
     {% else %}
       {% if ancestor_ids %}
@@ -19,8 +20,7 @@
       {% else %}
         {% set ancestor_ids_str = record_id %}
       {% endif %}
-      <span
-          style="display: inline;"
+      <span style="display: inline;"
         {% if not noclass %}
           class="related_link"
         {% endif %}
@@ -28,15 +28,12 @@
            data-related-id="{{related_id}}"
            data-ancestor-ids="{{ancestor_ids_str}}"
            class="related-{{record_kind}}s-{{related_kind}}s">{{link_text}}</a><span
-           class="{{related_kind}}-info">&nbsp;&#9432;
-           <a href="{{ url_for('edit_'+related_kind,
-                        record_id=related_id,
-                        previous_page=prev) }}" target="_blank">
-             <i class="fa fa-edit" style="color: black;"></i></a>
+           class="{{related_kind}}-info">&nbsp;&#9432;</span>
            <a href="{{ url_for('show_'+related_kind,
                         record_id=related_id,
                         previous_page=prev) }}">
-             <i class="fa fa-arrow-up" style="color: black;"></i></a></span>
+           <i class="fa fa-chevron-up"
+             style="color: black; font-size:90%;"></i></a>
       </span>
     {% endif %}
   {% else %}
