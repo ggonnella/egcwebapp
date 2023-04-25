@@ -6,6 +6,9 @@ from pathlib import Path
 import os
 import functools
 from egcwebapp.nav import configure_nav
+from egcwebapp.record_kinds import record_kind_info
+from egcwebapp.context import common_context_processors, \
+                              column_context_processors
 
 def create_app():
   app = Flask(__name__)
@@ -18,29 +21,20 @@ def create_app():
     this_dir = Path(__file__).parent
     app.egc_data = EGCData.from_file(str(this_dir.parent / "development.egc"))
 
-  from egcwebapp.context import processors
-  app.context_processor(processors)
-
   @app.template_filter()
   def basename(path):
     return os.path.basename(path)
 
-  # The following web routes are defined for each type of record:
-  #
-  # /<record_type>s                       table of all records of a given type
-  # C /<record_type>s/create              form to create a new record
-  # R /<record_type>s/<record_id>         page showing a single record
-  # U /<record_type>s/<record_id>/edit    page for editing a single record
-  # D /<record_type>s/<record_id>/delete  deletes a single record
-  #
+  app.context_processor(common_context_processors)
+  app.context_processor(column_context_processors)
 
   def column_context_processor(record_kind, column):
-    procs = processors().values()
-    names = [p.__name__ for p in procs]
+    procs = column_context_processors()
+    names = [p.__name__ for p in procs.values()]
     if f"{record_kind}_{column}" in names:
-      return processors()[f"{record_kind}_{column}"]
+      return procs[f"{record_kind}_{column}"]
     elif f"record_{column}" in names:
-      return processors()[f"record_{column}"]
+      return procs[f"record_{column}"]
     else:
       return None
   app.jinja_env.globals.update(\
@@ -93,8 +87,19 @@ def create_app():
       filename = os.path.basename(app.egc_data.file_path)
       return jsonify({'contents': contents, 'filename': filename})
 
-  from egcwebapp.record_kinds import record_kind_info
   record_kinds = list(record_kind_info.keys())
+
+  #
+  # The following web routes are defined for each type of record:
+  #
+  # /<record_type>s                       table of all records of a given type
+  # C /<record_type>s/create              form to create a new record
+  # R /<record_type>s/<record_id>         page showing a single record
+  # U /<record_type>s/<record_id>/edit    page for editing a single record
+  # D /<record_type>s/<record_id>/delete  deletes a single record
+  #
+  # Additionally api routes are defined for each type of record
+  #
 
   def list_route(record_kind):
     def route_function():

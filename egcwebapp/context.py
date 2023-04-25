@@ -3,11 +3,37 @@ import re
 from pathlib import Path
 from flask import render_template, current_app
 from egcwebapp.formatting import break_string
+from egcwebapp.external_links import link_external_resource, \
+                                     link_uniprotkb_query
 
-def processors():
 
-    from egcwebapp.external_links import link_external_resource, \
-                                         link_uniprotkb_query
+def common_context_processors():
+
+    def column_template(record_kind, column):
+      record_kind_specific = "columns/" + record_kind + "_" + column + ".html"
+      generic = "columns/record_" + column + ".html"
+      templatesdir = Path(current_app.root_path) / 'templates'
+      if (templatesdir / record_kind_specific).exists():
+        return record_kind_specific
+      elif (templatesdir / generic).exists():
+        return generic
+      else:
+        return None
+
+    def tooltip_js(record_kind):
+      record_kind_specific = f"js/{record_kind}_tooltips.mjs"
+      staticdir = Path(current_app.root_path) / "static"
+      if (staticdir / record_kind_specific).exists():
+        return record_kind_specific
+      else:
+        return None
+
+    return {
+            'column_template': column_template,
+            'tooltip_js': tooltip_js
+           }
+
+def column_context_processors():
 
     def linked_tag_value(tag_type, tag_value):
       if tag_type in ["XD", "XR"]:
@@ -58,7 +84,7 @@ def processors():
       else:
         return description
 
-    def group_definition(record, ancestor_ids):
+    def group_definition(record, in_tooltip, ancestor_ids):
         group_id = record['id']
         group_type = record['type']
         definition = record['definition']
@@ -84,6 +110,7 @@ def processors():
 
           for rel_group in rel_groups:
               rendered_template = render_template('refs_link.html',
+                  in_tooltip=in_tooltip,
                   record_kind='group', record_id=group_id,
                   related_kind='group', related_id=rel_group,
                   ancestor_ids=ancestor_ids, prev='list_group',
@@ -96,7 +123,7 @@ def processors():
 
         return "<br/>".join(output)
 
-    def unit_definition(record, ancestor_ids):
+    def unit_definition(record, in_tooltip, ancestor_ids):
         unit_id = record['id']
         unit_type = record['type']
         definition = record['definition']
@@ -164,6 +191,7 @@ def processors():
 
           for rel_unit in rel_units:
               rendered_template = render_template('refs_link.html',
+                  in_tooltip=in_tooltip,
                   record_kind='unit', record_id=unit_id,
                   related_kind='unit', related_id=rel_unit, prev='list_unit',
                   noclass=True, ancestor_ids=ancestor_ids,
@@ -176,31 +204,11 @@ def processors():
 
         return "<br/>".join(output)
 
-    def column_template(record_kind, column):
-      record_kind_specific = "columns/" + record_kind + "_" + column + ".html"
-      generic = "columns/record_" + column + ".html"
-      templatesdir = Path(current_app.root_path) / 'templates'
-      if (templatesdir / record_kind_specific).exists():
-        return record_kind_specific
-      elif (templatesdir / generic).exists():
-        return generic
-      else:
-        return None
-
-    def tooltip_js(record_kind):
-      record_kind_specific = f"js/{record_kind}_tooltips.mjs"
-      staticdir = Path(current_app.root_path) / "static"
-      if (staticdir / record_kind_specific).exists():
-        return record_kind_specific
-      else:
-        return None
-
-    return {'group_definition': group_definition,
-            'unit_definition': unit_definition,
+    return {
             'linked_tag_value': linked_tag_value,
+            'group_definition': group_definition,
+            'unit_definition': unit_definition,
             'model_model_id': model_model_id,
             'unit_symbol': unit_symbol,
             'unit_description': unit_description,
-            'column_template': column_template,
-            'tooltip_js': tooltip_js
            }
