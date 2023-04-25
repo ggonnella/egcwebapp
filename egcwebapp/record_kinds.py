@@ -43,7 +43,7 @@ record_kind_info = {
                     ("location_label", "Location Label"),
                   ],
                   "ref_by_kinds": ['vrule', 'crule'],
-                  "ref_kinds": ['extract', 'unit']},
+                  "ref_kinds": ['unit']},
     'group': {"title": "Group",
               "nested_colspan": 6,
               "record_types": ['G'],
