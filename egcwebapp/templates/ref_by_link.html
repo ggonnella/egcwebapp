@@ -12,13 +12,8 @@
   {% if not ref_by_lbl %}
     {% set ref_by_lbl = ref_by_kind %}
   {% endif %}
-  {% if count == 0 %}
-    no {{ref_by_lbl}}s
-  {% elif count == 1 %}
+  {% if count > 0 %}
     <a href="#" class="show-{{record_kind}}s-{{ref_by_kind}}s">
-      1 {{ref_by_lbl}} </a>
-  {% else %}
-    <a href="#" class="show-{{record_kind}}s-{{ref_by_kind}}s">
-      {{ count }} {{ref_by_lbl}}s </a>
+      {{ count }} {{ref_by_lbl}}{%- if count > 1 -%}s{%- endif -%} </a>
   {% endif %}
 </div>
