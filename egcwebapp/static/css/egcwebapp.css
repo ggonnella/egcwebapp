@@ -122,3 +122,46 @@ a.create {
 .related_link {
   white-space: nowrap;
 }
+
+.nested-edit-form {
+  background-color: #f2f8ff !important;
+}
+
+input[type="submit"],
+button[type="button"],
+button[type="cancel"] {
+  background-color: #d7e8ff;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button[type="button"] {
+  padding: 0px 3px;
+}
+
+input[type="submit"],
+button[type="cancel"] {
+  font-size: 110%;
+  padding: 5px 8px;
+}
+
+input[type="submit"]:hover,
+button[type="button"]:hover,
+button[type="cancel"]:hover {
+  background-color: #b5ccef;
+  color: #444;
+}
+
+button[type="button"].btn-danger {
+  background-color: #ffeaea;
+  border-color: #e5b7b7;
+}
+
+button[type="button"].btn-danger:hover {
+  background-color: #ffc7c7;
+  border-color: #d9534f;
+}
+

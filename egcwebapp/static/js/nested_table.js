@@ -66,6 +66,13 @@ export function openEditForm(event) {
   });
 }
 
+export function cancelNestedEditForm(event) {
+    event.preventDefault();
+    const $nestedForm = $(this).closest('form');
+    const $currentRow = $nestedForm.closest('tr');
+    $currentRow.remove();
+}
+
 export function submitNestedEditForm(event) {
   event.preventDefault();
 

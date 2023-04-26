@@ -4,10 +4,12 @@
     {{ form.csrf_token }}
     {% include 'form_fields.html' %}
     <input type="submit" value="Save">
+    <button type="cancel" id="cancel-button-{{record_id}}">Cancel</button>
 </form>
 <script type="module">
-  import { submitNestedEditForm } from
-  '{{ url_for('static', filename='js/nested_table.js') }}';
+  import { submitNestedEditForm, cancelNestedEditForm } from
+                      '{{ url_for('static', filename='js/nested_table.js') }}';
   $('body').on('submit', '#nested-edit-form-{{record_id}}', submitNestedEditForm);
+  $('body').on('click', '#cancel-button-{{record_id}}', cancelNestedEditForm);
 </script>
 
