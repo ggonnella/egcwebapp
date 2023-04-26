@@ -1,11 +1,12 @@
 from wtforms import Form, StringField, validators, \
-                    FieldList, FormField
+                    FieldList, FormField, BooleanField
 
 from .tag import TagForm
 from .source import SourceForm
 
 class CruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
+    auto_id = BooleanField('Auto-generate ID', default=False)
     sources = FieldList(FormField(SourceForm), min_entries=1, label="Sources")
     attribute = StringField('Attribute', [validators.Length(min=1), validators.DataRequired()])
     vs_attribute = StringField('vs. Attribute')
@@ -74,12 +75,28 @@ class CruleForm(Form):
         self.egc_data = kwargs.pop('egc_data')
         self.old_id = kwargs.pop('old_id', None)
         self.script = TagForm.Script + SourceForm.Script
+        if self.auto_id.data:
+          self.id.render_kw = {'readonly': True}
+          self.id.data = 'auto_generated'
 
     def validate_id(self, field):
+      if self.auto_id.data:
+        return True
       new_id = field.data
       if self.old_id != new_id:
         if not self.egc_data.is_unique_id(new_id):
             raise validators.ValidationError('Record ID already exists')
+
+    def auto_generate_id(self):
+      if self.auto_id.data:
+        existing_ids = self.egc_data.get_record_ids("C")
+        i = 1
+        while True:
+          new_id = "C" + str(i)
+          if new_id == self.old_id or new_id not in existing_ids:
+            self.id.data = new_id
+            break
+          i += 1
 
     def validate_attribute(self, field):
         if not self.egc_data.id_exists(field.data):

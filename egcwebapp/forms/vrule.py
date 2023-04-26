@@ -69,6 +69,17 @@ class VruleForm(Form):
         if not self.egc_data.is_unique_id(new_id):
             raise validators.ValidationError('Record ID already exists')
 
+    def auto_generate_id(self):
+      if self.auto_id.data:
+        existing_ids = self.egc_data.get_record_ids("V")
+        i = 1
+        while True:
+          new_id = "V" + str(i)
+          if new_id == self.old_id or new_id not in existing_ids:
+            self.id.data = new_id
+            break
+          i += 1
+
     def validate_attribute(self, field):
         if not self.egc_data.id_exists(field.data):
             raise validators.ValidationError('Attribute does not exist')

@@ -1,5 +1,5 @@
 from wtforms import Form, StringField, SelectField, TextAreaField, validators, \
-                    FieldList, FormField
+                    FieldList, FormField, BooleanField
 
 from .document import DocumentForm
 from .tag import TagForm
@@ -8,6 +8,7 @@ class ExtractForm(Form):
     id = StringField('Record ID',
         [validators.Length(min=1, max=50),
          validators.Regexp('[a-zA-Z0-9_]+'), validators.DataRequired()])
+    auto_id = BooleanField('Auto-generate ID', default=False)
     record_type = SelectField('Record Type',
         choices=[('S', 'Snippet'), ('T', 'Table')],
         validators=[validators.DataRequired()])
@@ -23,6 +24,9 @@ class ExtractForm(Form):
         self.egc_data = kwargs.pop('egc_data')
         self.old_id = kwargs.pop('old_id', None)
         self.script = TagForm.Script
+        if self.auto_id.data:
+          self.id.render_kw = {'readonly': True}
+          self.id.data = 'auto_generated'
 
     @classmethod
     def from_record(cls, form, record, **kwargs):
@@ -41,10 +45,24 @@ class ExtractForm(Form):
       return cls(form, **kwargs)
 
     def validate_id(self, field):
+      if self.auto_id.data:
+        return True
       new_id = field.data
       if self.old_id != new_id:
         if not self.egc_data.is_unique_id(new_id):
             raise validators.ValidationError('Record ID already exists')
+
+    def auto_generate_id(self):
+      if self.auto_id.data:
+        record_type = self.record_type.data
+        existing_ids = self.egc_data.get_record_ids(record_type)
+        i = 1
+        while True:
+          new_id = record_type + str(i)
+          if new_id == self.old_id or new_id not in existing_ids:
+            self.id.data = new_id
+            break
+          i += 1
 
     def validate_document_id(self, field):
         d_id = self.egc_data.compute_docid_from_pfx_and_item("PMID", field.data)

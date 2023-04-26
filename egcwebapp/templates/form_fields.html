@@ -1,5 +1,19 @@
 {% for field in form %}
-  {% if field.name == "sources" %}
+  {% if field.name == "id" %}
+    <div id=id-wrapper">
+      {{ field.label }}
+      <span class="form-group" style="display: inline;">
+        <span class="form-check" style="display: inline;">
+          <input class="form-check-input auto_id-checkbox" type="checkbox" \
+                 name="auto_id">
+          <label class="form-check-label" for="auto_id">auto</label>
+          {{ field(class_="id_field form-control" + (' has-error' if field.errors else '') ) }}
+          {% include 'field_error.html' %}
+          <br/>
+        </span>
+      </span>
+    </div>
+  {% elif field.name == "sources" %}
     <div id="sources-container">
       <br/>
         {% for f in form.sources %}
@@ -7,13 +21,16 @@
               {{ f.form.source_id.label }} {{ f.form.source_id(class_="form-control-inline") }}
               {% set field=f.form.source_id %}
               {% include 'field_error.html' %}
-              <button type="button" class="btn btn-danger btn-delete-source" style="display: inline;">-</button>
+              <button type="button"
+                      class="btn btn-danger btn-delete-source"
+                      style="display: inline;">-</button>
             </div>
         {% endfor %}
         {% set field=form.sources %}
         {% include 'field_error.html' %}
     </div>
-    <button type="button" id="add_source_button" class="btn btn-primary">add more sources...</button>
+    <button type="button" id="add_source_button"
+            class="btn btn-primary">add more sources...</button>
     <br/>
     <br/>
   {% elif field.name == "tags" %}
@@ -28,28 +45,35 @@
               {{ f.form.tagvalue.label }} {{ f.form.tagvalue(class_="form-control-inline") }}
               {% set field=f.form.tagvalue %}
               {% include 'field_error.html' %}
-              <button type="button" class="btn btn-danger btn-delete-tag" style="display: inline;">-</button>
+              <button type="button"
+                      class="btn btn-danger btn-delete-tag"
+                      style="display: inline;">-</button>
             </div>
         {% endfor %}
         {% set field=form.tags %}
         {% include 'field_error.html' %}
     </div>
-    <button type="button" id="add_tag_button" class="btn btn-secondary">add more tags...</button>
+    <button type="button"
+            id="add_tag_button"
+            class="btn btn-secondary">add more tags...</button>
     <br/>
     <br/>
-  {% else %}
+  {% elif field.name != "auto_id" %}
     <div id="{{field.id}}-wrapper">
       {{ field.label }} {{ field(class_="form-control" + (' has-error' if field.errors else '') ) }}
       {% include 'field_error.html' %}
+      <br/>
     </div>
   {% endif %}
 {% endfor %}
 <br/>
-
-{% if form.script %}
-{% block scripts %}
-  <script>
+<script type="module">
+  import { activateAutoIdCheckboxes } from
+    '{{ url_for('static', filename='js/record_form.mjs') }}';
+  $(document).ready(function() {
+    activateAutoIdCheckboxes();
+  });
+  {% if form.script %}
     {{ form.script }}
-  </script>
-{% endblock %}
-{% endif %}
+  {% endif %}
+</script>

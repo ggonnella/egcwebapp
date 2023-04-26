@@ -122,6 +122,8 @@ def create_app():
         form_class = getattr(egcwebapp.forms,
                              f"{record_kind.capitalize()}Form")
         form = form_class(request.form, egc_data=app.egc_data)
+        if hasattr(form, 'auto_generate_id'):
+          form.auto_generate_id()
         if request.method == "POST" and form.validate():
             new_record = form.to_record()
             app.egc_data.create_record(new_record)
@@ -188,6 +190,8 @@ def create_app():
                              f"{record_kind.capitalize()}Form")
         form = form_class.from_record(request.form, record,
                           egc_data=app.egc_data, old_id=record_id)
+        if hasattr(form, 'auto_generate_id'):
+          form.auto_generate_id()
         if form.validate():
             updated_data = form.to_record()
             app.egc_data.update_record_by_id(record_id, updated_data)
