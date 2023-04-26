@@ -98,6 +98,7 @@ class AttributeForm(Form):
 
       modeTypeField.addEventListener('change', toggleFieldVisibility);
       document.addEventListener('DOMContentLoaded', toggleFieldVisibility);
+      toggleFieldVisibility();
     ''')
 
   def __init__(self, *args, **kwargs):
