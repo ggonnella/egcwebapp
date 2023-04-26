@@ -51,11 +51,12 @@ class SourceForm(Form):
 
     @staticmethod
     def sources_validator(egc_data, sources_field):
-      for source in sources_field:
-        if source.data["source_id"] != '':
-          if not egc_data.id_exists(source.data["source_id"]):
-            raise validators.ValidationError(\
-                'Document Extract ID "{}" does not exist'.\
-                  format(source.data["source_id"]))
+      sources = [s["source_id"] for s in sources_field.data if s['source_id']]
+      if not sources:
+        raise validators.ValidationError('At least one source is required')
+      for source in sources:
+        if not egc_data.id_exists(source):
+          raise validators.ValidationError(\
+              f"Document Extract '{source}' does not exist")
       return True
 

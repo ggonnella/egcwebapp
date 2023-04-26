@@ -26,7 +26,8 @@ class CruleForm(Form):
           "group2": {"id": form.group2.data},
       }
       if len(form.sources.data) > 1:
-        record_data["source"] = [s["source_id"] for s in form.sources.data]
+        record_data["source"] = [s["source_id"] \
+            for s in form.sources.data if s["source_id"]]
       else:
         record_data["source"] = form.sources.data[0]["source_id"]
       if form.vs_attribute.data:
