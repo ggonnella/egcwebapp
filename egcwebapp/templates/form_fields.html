@@ -2,41 +2,39 @@
   {% if field.name == "sources" %}
     <div id="sources-container">
       <br/>
-        {{ form.sources.label }}
         {% for f in form.sources %}
             <div class="source-entry">
               {{ f.form.source_id.label }} {{ f.form.source_id(class_="form-control-inline") }}
               {% set field=f.form.source_id %}
               {% include 'field_error.html' %}
-              <button type="button" class="btn btn-danger btn-delete-source" style="display: inline;">(X)</button>
+              <button type="button" class="btn btn-danger btn-delete-source" style="display: inline;">-</button>
             </div>
         {% endfor %}
         {% set field=form.sources %}
         {% include 'field_error.html' %}
     </div>
-    <button type="button" id="add_source_button" class="btn btn-primary">more sources...</button>
+    <button type="button" id="add_source_button" class="btn btn-primary">add more sources...</button>
     <br/>
     <br/>
   {% elif field.name == "tags" %}
     <div id="tags-container">
       <br/>
-        {{ form.tags.label }}
         {% for f in form.tags %}
             <div class="tag-entry">
-              {{ f.form.tagname.label }} {{ f.form.tagname(class_="form-control-inline") }}
+              Tag {{ f.form.tagname.label }} {{ f.form.tagname(class_="form-control-inline") }}
               {% set field=f.form.tagname %}
               {% include 'field_error.html' %}
               {{ f.form.tagtype.label }} {{ f.form.tagtype(class_="form-control-inline") }}
               {{ f.form.tagvalue.label }} {{ f.form.tagvalue(class_="form-control-inline") }}
               {% set field=f.form.tagvalue %}
               {% include 'field_error.html' %}
-              <button type="button" class="btn btn-danger btn-delete-tag" style="display: inline;">(X)</button>
+              <button type="button" class="btn btn-danger btn-delete-tag" style="display: inline;">-</button>
             </div>
         {% endfor %}
         {% set field=form.tags %}
         {% include 'field_error.html' %}
     </div>
-    <button type="button" id="add_tag_button" class="btn btn-secondary">more tags...</button>
+    <button type="button" id="add_tag_button" class="btn btn-secondary">add more tags...</button>
     <br/>
     <br/>
   {% else %}
