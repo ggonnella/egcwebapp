@@ -112,6 +112,41 @@ export function submitNestedEditForm(event) {
   });
 }
 
+export function submitCopyNestedEditForm(event) {
+  event.preventDefault();
+
+  const $form = $(this).parent();
+  const recordKind = $form.data('record-kind');
+  const recordId = $form.data('record-id');
+  const formData = new FormData($form[0]);
+
+  $.ajax({
+    url: `/api/${recordKind}s/${recordId}/copy`,
+    type: 'POST',
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function(response) {
+      const $currentRow = $form.closest('tr');
+      if (response.success) {
+        console.log(`Success creating copy of ${recordKind} ${recordId}`);
+        $currentRow.prev().after(response.html);
+        $currentRow.remove();
+      } else {
+        console.log(`Failure creating copy of ${recordKind} ${recordId}`);
+        const colspan = $currentRow.children('td').attr('colspan');
+        const $newRow = $(`<tr class="nested-edit-form"></tr>`);
+        const $newCell = $(`<td colspan="${colspan}"></td>`);
+        $newCell.append(response.html);
+        $newRow.append($newCell);
+        $currentRow.replaceWith($newRow);
+      }
+    },
+    error: function(response) {
+    }
+  });
+}
+
 export function initNestedTable(table_id, drawCallback) {
   var table = $('#' + table_id).DataTable({
     "drawCallback": drawCallback

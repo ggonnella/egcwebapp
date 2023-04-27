@@ -129,7 +129,8 @@ a.create {
 
 input[type="submit"],
 button[type="button"],
-button[type="cancel"] {
+button[type="cancel"],
+button[type="copy"] {
   background-color: #d7e8ff;
   border: 1px solid #bbb;
   border-radius: 3px;
@@ -143,6 +144,7 @@ button[type="button"] {
 }
 
 input[type="submit"],
+button[type="copy"],
 button[type="cancel"] {
   font-size: 110%;
   padding: 5px 8px;
@@ -150,6 +152,7 @@ button[type="cancel"] {
 
 input[type="submit"]:hover,
 button[type="button"]:hover,
+button[type="copy"]:hover,
 button[type="cancel"]:hover {
   background-color: #b5ccef;
   color: #444;

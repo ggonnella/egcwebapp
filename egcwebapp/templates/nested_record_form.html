@@ -3,13 +3,19 @@
      data-record-kind="{{record_kind}}">
     {{ form.csrf_token }}
     {% include 'form_fields.html' %}
-    <input type="submit" value="Save">
+    <input type="submit" value="Update">
+    <button type="copy" id="copy-button-{{record_id}}">Save copy</button>
     <button type="cancel" id="cancel-button-{{record_id}}">Cancel</button>
 </form>
 <script type="module">
-  import { submitNestedEditForm, cancelNestedEditForm } from
+  import { submitNestedEditForm, cancelNestedEditForm,
+           submitCopyNestedEditForm } from
                       '{{ url_for('static', filename='js/nested_table.js') }}';
+  $('body').off('submit', '#nested-edit-form-{{record_id}}');
+  $('body').off('click', '#copy-button-{{record_id}}');
+  $('body').off('click', '#cancel-button-{{record_id}}');
   $('body').on('submit', '#nested-edit-form-{{record_id}}', submitNestedEditForm);
+  $('body').on('click', '#copy-button-{{record_id}}', submitCopyNestedEditForm);
   $('body').on('click', '#cancel-button-{{record_id}}', cancelNestedEditForm);
 </script>
 

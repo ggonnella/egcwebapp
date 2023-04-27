@@ -217,6 +217,40 @@ def create_app():
         methods=['POST'])(require_egc_data(route_function))
     return route_function
 
+  def copy_record_api_route(record_kind):
+    def route_function(record_id):
+        form_class = getattr(egcwebapp.forms,
+                             f"{record_kind.capitalize()}Form")
+        form = form_class(request.form, egc_data=app.egc_data)
+        if hasattr(form, 'auto_generate_id'):
+          form.auto_generate_id()
+        if form.validate():
+            new_record = form.to_record()
+            app.egc_data.create(new_record)
+            app.egc_data.save()
+            new_row_html = render_template("row.html",
+                    record=new_record, record_kind=record_kind,
+                    info=record_kind_info[record_kind],
+                    egc_data=app.egc_data)
+            new_row_html += render_template("jslinks.html",
+                    record_kind=record_kind, info=record_kind_info[record_kind])
+            return jsonify({'success': True, 'html': new_row_html})
+        else:
+            record = app.egc_data.find(record_id) or abort(404)
+            form = form_class.from_record(request.form, record,
+                              egc_data=app.egc_data, old_id=record_id)
+            form.validate()
+            form_html = render_template('nested_record_form.html', form=form,
+                    egc_data=app.egc_data, errors=form.errors,
+                    info=record_kind_info[record_kind],
+                    record_kind=record_kind, record_id=record_id)
+            return jsonify({'success': False, 'html': form_html})
+
+    route_function.__name__ = f'copy_{record_kind}_api'
+    route_function = app.route(f'/api/{record_kind}s/<record_id>/copy',
+        methods=['POST'])(require_egc_data(route_function))
+    return route_function
+
   def delete_record_route(record_kind):
     def route_function(record_id):
       previous_page = request.args.get('previous_page') or record_kind + '_list'
@@ -303,6 +337,7 @@ def create_app():
       edit_record_route(record_kind)
       edit_record_api_route(record_kind)
       update_record_api_route(record_kind)
+      copy_record_api_route(record_kind)
       delete_record_route(record_kind)
       show_record_route(record_kind)
       get_record_route(record_kind)
