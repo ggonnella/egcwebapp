@@ -7,7 +7,7 @@
 <div class="count-{{record_kind}}s-{{ref_by_kind}}s"
      data-ancestor-ids="{{ ancestor_ids_str }}">
   {% if not count %}
-    {% set count=egc_data.ref_by_ids(record_type, record_id, ref_by_rt)|length %}
+    {% set count=egc_data.ref_by_count(record_type, record_id, ref_by_rt) %}
   {% endif %}
   {% if not ref_by_lbl %}
     {% set ref_by_lbl = ref_by_kind %}

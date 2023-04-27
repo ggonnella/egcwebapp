@@ -1,4 +1,4 @@
-{% set document_record_id = egc_data.compute_docid_from_pfx_and_item(
+{% set document_record_id = egc_data.compose_id(
                                       record.document_id.resource_prefix,
                                       record.document_id.item) %}
 {% set related_kind, related_id, link_text =

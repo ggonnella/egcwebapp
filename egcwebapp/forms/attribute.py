@@ -144,7 +144,7 @@ class AttributeForm(Form):
       return True
     new_id = field.data
     if self.old_id != new_id:
-      if not self.egc_data.is_unique_id(new_id):
+      if self.egc_data.id_exists(new_id):
           raise validators.ValidationError('Record ID already exists')
 
   ModePfx = {

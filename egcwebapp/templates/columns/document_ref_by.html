@@ -1,6 +1,6 @@
 {% set count =
-     (egc_data.ref_by_ids('D', record_id, 'S') +
-      egc_data.ref_by_ids('D', record_id, 'T')) | length %}
+     egc_data.ref_by_count('D', record_id, 'S') +
+     egc_data.ref_by_count('D', record_id, 'T') %}
 {% set ref_by_kind = 'extract' %}
 {% include 'ref_by_link.html' %}
 {% set count = None %}

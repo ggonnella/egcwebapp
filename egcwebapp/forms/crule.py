@@ -84,12 +84,12 @@ class CruleForm(Form):
         return True
       new_id = field.data
       if self.old_id != new_id:
-        if not self.egc_data.is_unique_id(new_id):
+        if self.egc_data.id_exists(new_id):
             raise validators.ValidationError('Record ID already exists')
 
     def auto_generate_id(self):
       if self.auto_id.data:
-        existing_ids = self.egc_data.get_record_ids("C")
+        existing_ids = self.egc_data.find_all_ids("C")
         i = 1
         while True:
           new_id = "C" + str(i)

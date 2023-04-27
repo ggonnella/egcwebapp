@@ -19,10 +19,10 @@ class ModelForm(Form):
     def validate(self):
       if not super().validate():
         return False
-      new_id = self.egc_data.compute_modelid_from_data(self.unit_id.data,
+      new_id = self.egc_data.compose_id("M", self.unit_id.data,
           self.resource_id.data, self.model_id.data)
       if self.old_id != new_id:
-        if not self.egc_data.has_unique_id(new_id):
+        if self.egc_data.id_exists(new_id):
           raise validators.ValidationError('Record already exists')
       return True
 

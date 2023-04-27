@@ -49,13 +49,13 @@ class ExtractForm(Form):
         return True
       new_id = field.data
       if self.old_id != new_id:
-        if not self.egc_data.is_unique_id(new_id):
+        if self.egc_data.id_exists(new_id):
             raise validators.ValidationError('Record ID already exists')
 
     def auto_generate_id(self):
       if self.auto_id.data:
         record_type = self.record_type.data
-        existing_ids = self.egc_data.get_record_ids(record_type)
+        existing_ids = self.egc_data.find_all_ids(record_type)
         i = 1
         while True:
           new_id = record_type + str(i)
@@ -65,7 +65,7 @@ class ExtractForm(Form):
           i += 1
 
     def validate_document_id(self, field):
-        d_id = self.egc_data.compute_docid_from_pfx_and_item("PMID", field.data)
+        d_id = self.egc_data.compose_id("D", "PMID", field.data)
         if not self.egc_data.id_exists(d_id):
             raise validators.ValidationError('Document ID does not exist')
 

@@ -27,9 +27,9 @@ class DocumentForm(Form):
       return cls(form, **kwargs)
 
     def validate_document_id(self, field):
-      new_id = self.egc_data.compute_docid_from_pfx_and_item("PMID", field.data)
+      new_id = self.egc_data.compose_id("D", "PMID", field.data)
       if self.old_id != new_id:
-        if not self.egc_data.is_unique_id(new_id):
+        if self.egc_data.id_exists(new_id):
           raise validators.ValidationError('Document ID already exists')
 
     def validate_tags(self, field):

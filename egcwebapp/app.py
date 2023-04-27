@@ -105,7 +105,7 @@ def create_app():
     def route_function():
       records = []
       for record_type in record_kind_info[record_kind]["record_types"]:
-        records.extend(app.egc_data.get_records(record_type))
+        records.extend(app.egc_data.find_all(record_type))
       return render_template('list.html',
               **{"records": records, 'egc_data': app.egc_data,
                  'record_kind': record_kind,
@@ -126,7 +126,8 @@ def create_app():
           form.auto_generate_id()
         if request.method == "POST" and form.validate():
             new_record = form.to_record()
-            app.egc_data.create_record(new_record)
+            app.egc_data.create(new_record)
+            app.egc_data.save()
             return redirect(url_for(prev))
         title_label = record_kind_info[record_kind]["title"]
         return render_template("record_form.html", form=form,
@@ -143,7 +144,7 @@ def create_app():
 
   def edit_record_route(record_kind):
     def route_function(record_id):
-        record = app.egc_data.get_record_by_id(record_id) or abort(404)
+        record = app.egc_data.find(record_id) or abort(404)
         prev = request.args.get('previous_page') or f'{record_kind}_list'
         form_class = getattr(egcwebapp.forms,
                              f"{record_kind.capitalize()}Form")
@@ -151,7 +152,8 @@ def create_app():
                           egc_data=app.egc_data, old_id=record_id)
         if request.method == 'POST' and form.validate():
             updated_data = form.to_record()
-            app.egc_data.update_record_by_id(record_id, updated_data)
+            app.egc_data.update(record_id, updated_data)
+            app.egc_data.save()
             return redirect(url_for(prev))
         title_label = record_kind_info[record_kind]["title"]
         return render_template('record_form.html', form=form,
@@ -167,7 +169,7 @@ def create_app():
 
   def edit_record_api_route(record_kind):
     def route_function(record_id):
-        record = app.egc_data.get_record_by_id(record_id) or abort(404)
+        record = app.egc_data.find(record_id) or abort(404)
         form_class = getattr(egcwebapp.forms,
                              f"{record_kind.capitalize()}Form")
         form = form_class.from_record(request.form, record,
@@ -185,7 +187,7 @@ def create_app():
 
   def update_record_api_route(record_kind):
     def route_function(record_id):
-        record = app.egc_data.get_record_by_id(record_id) or abort(404)
+        record = app.egc_data.find(record_id) or abort(404)
         form_class = getattr(egcwebapp.forms,
                              f"{record_kind.capitalize()}Form")
         form = form_class.from_record(request.form, record,
@@ -194,7 +196,8 @@ def create_app():
           form.auto_generate_id()
         if form.validate():
             updated_data = form.to_record()
-            app.egc_data.update_record_by_id(record_id, updated_data)
+            app.egc_data.update(record_id, updated_data)
+            app.egc_data.save()
             updated_row_html = render_template("row.html",
                     record=updated_data, record_kind=record_kind,
                     info=record_kind_info[record_kind],
@@ -221,7 +224,8 @@ def create_app():
         flash(f"Cannot delete {record_id} "+\
                "because it is referenced by other records")
         return redirect(url_for(previous_page))
-      app.egc_data.delete_record_by_id(record_id)
+      app.egc_data.delete(record_id)
+      app.egc_data.save()
       return redirect(url_for(previous_page))
 
     route_function.__name__ = f'delete_{record_kind}'
@@ -231,7 +235,7 @@ def create_app():
 
   def show_record_route(record_kind):
     def route_function(record_id):
-        record = app.egc_data.get_record_by_id(record_id) or abort(404)
+        record = app.egc_data.find(record_id) or abort(404)
         return render_template('show.html',
                 **{"records": [record], 'egc_data': app.egc_data,
                    'record_kind': record_kind, 'record_id': record_id,
@@ -245,7 +249,7 @@ def create_app():
 
   def get_record_route(record_kind):
     def route_function(record_id):
-        record = app.egc_data.get_record_by_id(record_id) or abort(404)
+        record = app.egc_data.find(record_id) or abort(404)
         return render_template('table.html',
             **{'record': record, 'egc_data': app.egc_data,
                'record_kind': record_kind, 'record_id': record_id,
@@ -259,7 +263,7 @@ def create_app():
 
   def get_ref_route(record_kind):
       def route_function(ancestor_ids, record_id):
-          record = app.egc_data.get_record_by_id(record_id) or abort(404)
+          record = app.egc_data.find(record_id) or abort(404)
           return render_template('datatable.html',
               **{"records": [record], 'egc_data': app.egc_data,
                  'record_kind': record_kind,
@@ -275,7 +279,7 @@ def create_app():
   def get_refby_route(ref_by_kind, ref_from_kind):
     def route_function(ancestor_ids):
       ref_by_id = ancestor_ids.split(',')[-1]
-      ref_by_record = app.egc_data.get_record_by_id(ref_by_id) or abort(404)
+      ref_by_record = app.egc_data.find(ref_by_id) or abort(404)
       ref_by_rt = ref_by_record['record_type']
       ref_from_records = []
       for ref_from_rt in record_kind_info[ref_from_kind]["record_types"]:
