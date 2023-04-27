@@ -1,8 +1,8 @@
 from wtforms import Form, StringField, SelectField, validators, \
                     FieldList, FormField, BooleanField
 from jinja2 import Markup
-
 from .tag import TagForm
+from egctools import id_generator
 
 class AttributeForm(Form):
   id = StringField('Attribute ID', [validators.Length(min=1, max=50),
@@ -147,40 +147,10 @@ class AttributeForm(Form):
       if self.egc_data.id_exists(new_id):
           raise validators.ValidationError('Record ID already exists')
 
-  ModePfx = {
-        "complete": "all",
-        "conservation": "v",
-        "count": "c",
-        "members_presence": "mp",
-        "presence": "p",
-        "relative": "r",
-        "relative_length": "rl",
-        None: "x",
-      }
-
   def auto_generate_id(self):
     if self.auto_id.data:
-      unit_id = self.unit_id.data
-      mode = self.mode.data
-
-      u = unit_id
-      if u.startswith('U'):
-        u = u[1:]
-
-      m = AttributeForm.ModePfx.get(mode,
-            AttributeForm.ModePfx[None]+mode[0])
-
-      self.id.data = f'A{m}_{u}'
-      if self.id.data == self.old_id:
-        return
-      if self.egc_data.id_exists(self.id.data):
-        sfx = 2
-        while True:
-          sfx_id = f'{self.id.data}_{sfx}'
-          if sfx_id == self.old_id or not self.egc_data.id_exists(sfx_id):
-            self.id.data = sfx_id
-            break
-          sfx += 1
+      self.id.data = id_generator.generate_A_id(self.egc_data,
+          self.unit_id.data, self.mode.data, self.old_id)
 
   def validate_unit_id(self, field):
       if not self.egc_data.id_exists(field.data):

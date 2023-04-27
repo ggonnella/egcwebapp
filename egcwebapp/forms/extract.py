@@ -1,8 +1,8 @@
 from wtforms import Form, StringField, SelectField, TextAreaField, validators, \
                     FieldList, FormField, BooleanField
-
 from .document import DocumentForm
 from .tag import TagForm
+from egctools import id_generator
 
 class ExtractForm(Form):
     id = StringField('Record ID',
@@ -54,15 +54,8 @@ class ExtractForm(Form):
 
     def auto_generate_id(self):
       if self.auto_id.data:
-        record_type = self.record_type.data
-        existing_ids = self.egc_data.find_all_ids(record_type)
-        i = 1
-        while True:
-          new_id = record_type + str(i)
-          if new_id == self.old_id or new_id not in existing_ids:
-            self.id.data = new_id
-            break
-          i += 1
+        self.id.data = id_generator.generate_numbased_id(self.egc_data,
+            self.record_type.data, self.old_id)
 
     def validate_document_id(self, field):
         d_id = self.egc_data.compose_id("D", "PMID", field.data)

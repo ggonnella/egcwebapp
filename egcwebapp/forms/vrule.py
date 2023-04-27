@@ -1,6 +1,7 @@
 from wtforms import Form, StringField, validators, FieldList, FormField
 from .tag import TagForm
 from .source import SourceForm
+from egctools import id_generator
 
 class VruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'),
@@ -71,14 +72,8 @@ class VruleForm(Form):
 
     def auto_generate_id(self):
       if self.auto_id.data:
-        existing_ids = self.egc_data.find_all_ids("V")
-        i = 1
-        while True:
-          new_id = "V" + str(i)
-          if new_id == self.old_id or new_id not in existing_ids:
-            self.id.data = new_id
-            break
-          i += 1
+        self.id.data = id_generator.generate_numbased_id(self.egc_data, "V",
+            self.old_id)
 
     def validate_attribute(self, field):
         if not self.egc_data.id_exists(field.data):
