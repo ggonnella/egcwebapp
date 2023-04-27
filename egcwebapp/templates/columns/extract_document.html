@@ -1,4 +1,4 @@
-{% set document_record_id = egc_data.compose_id(
+{% set document_record_id = egc_data.compose_id("D",
                                       record.document_id.resource_prefix,
                                       record.document_id.item) %}
 {% set related_kind, related_id, link_text =
