@@ -13,6 +13,12 @@ export async function initTooltip(target, loading, content) {
   });
 }
 
+export async function initEgcTooltips() {
+  $(".egc-tooltip").each(async function () {
+    await initTooltip($(this), "EGC data", $(this).data("content"));
+  });
+}
+
 export async function initRelatedTooltips(infoclass, collection) {
   $(infoclass).each(async function() {
     const recordId = $(this).prev().data('related-id');

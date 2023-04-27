@@ -2,11 +2,11 @@
 {% set record_type=record.record_type %}
 {% set nested_colspan = info.nested_colspan %}
 <tr>
+  <td> {% include 'actions_column.html' %} </td>
   {% for col, collbl in info.table_columns + [("tags", "Tags")] %}
     <td> {% include 'column.html' %} </td>
   {% endfor %}
   {% if (info.ref_by_kinds | length) > 0 %}
     <td> {% include 'columns/'+record_kind+'_ref_by.html' %} </td>
   {% endif %}
-  <td> {% include 'actions_column.html' %} </td>
 </tr>

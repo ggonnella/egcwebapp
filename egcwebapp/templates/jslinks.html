@@ -7,7 +7,7 @@
   {% endif %}
   import { {{ initTable }}, openNestedTable, openRelatedNested } from
     '{{ url_for('static', filename='js/nested_table.js') }}';
-  import { initRelatedTooltips } from
+  import { initRelatedTooltips, initEgcTooltips } from
     '{{ url_for('static', filename='js/tooltips.js') }}';
 
   $(function() {
@@ -31,6 +31,7 @@
   {% endif %}
   $(document).ready(function() {
     function initTooltips() {
+      initEgcTooltips();
       {% for related_kind in info.ref_kinds %}
         initRelatedTooltips(".{{ related_kind }}-info", "{{ related_kind }}s");
       {% endfor %}

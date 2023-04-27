@@ -7,7 +7,7 @@ export function addColumnFilters(table) {
     var header = $(column.header());
     var uniqueValues = column.data().unique().sort();
 
-    if (header.text().indexOf("Referenced") != -1 || header.text() === "Actions") {
+    if (header.text().indexOf("Referenced") != -1 || header.text() === "") {
       return;
     }
 

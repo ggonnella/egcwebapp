@@ -14,8 +14,12 @@
       {% if egc_data.is_ref_by(record_id) %}disabled{% endif %}>
       <i class="fas fa-trash"></i>
     </button>
-  </form>
-</span>
+  </form>{% if not in_tooltip %}<span
+    class="egc-tooltip"
+    data-content='<div class="egcline">{{
+       egc_data.line(record_id).replace("\t",
+         "<span class='tab'>&#8594;</span>")}}</div>'
+    style="display: inline;">&nbsp;&#8599;</span>{% endif %}
 <script type="module">
  import { openEditForm } from '{{ url_for('static', filename='js/nested_table.js') }}';
  $('body').on('click', '#edit-record-{{record_id}}', openEditForm);
