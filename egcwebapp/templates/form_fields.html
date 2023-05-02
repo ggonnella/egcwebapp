@@ -60,7 +60,7 @@
     <br/>
   {% elif field.name != "auto_id" %}
     <div id="{{field.id}}-wrapper">
-      {{ field.label }} {{ field(class_="form-control" + (' has-error' if field.errors else '') ) }}
+      {{ field.label }} {{ field(class_="form-control " + field.id + '-field ' + (' has-error' if field.errors else '') ) }}
       {% include 'field_error.html' %}
       <br/>
     </div>

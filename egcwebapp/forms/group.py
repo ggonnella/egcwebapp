@@ -1,5 +1,6 @@
 from wtforms import Form, StringField, validators, \
-                    FieldList, FormField, BooleanField
+                    FieldList, FormField, BooleanField, SelectField
+from jinja2 import Markup
 from .tag import TagForm
 from egctools import id_generator
 
@@ -9,21 +10,44 @@ class GroupForm(Form):
   auto_id = BooleanField('Auto-generate ID', default=False)
   name = StringField('Group Name', [validators.Length(min=1, max=50),
     validators.DataRequired()])
-  type = StringField('Group Type', [validators.Length(min=1, max=50),
-    validators.DataRequired()])
+  type = SelectField('Group Type', [validators.DataRequired()],
+      choices=[], coerce=str)
+  custom_type = StringField('Custom Group Type',
+      [validators.Length(min=1, max=50)])
   definition = StringField('Group Definition', [validators.Length(min=1),
     validators.DataRequired()])
   tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
   comment = StringField('Comment')
 
+  Script = Markup('''
+    $(document).ready(function () {
+      const $typeSelect = $(".type-field");
+      const $customTypeInput = $(".custom_type-field");
+      function updateCustomTypeState() {
+        if ($typeSelect.val() === "custom") {
+          $customTypeInput.prop("disabled", false);
+          $customTypeInput.prop("required", true);
+        } else {
+          $customTypeInput.prop("disabled", true);
+          $customTypeInput.prop("required", false);
+        }
+      }
+      $typeSelect.on("change", updateCustomTypeState);
+      updateCustomTypeState();
+    });
+  ''')
+
   def __init__(self, *args, **kwargs):
       super().__init__(*args, **kwargs)
       self.egc_data = kwargs.pop('egc_data')
       self.old_id = kwargs.pop('old_id', None)
-      self.script = TagForm.Script
+      self.script = GroupForm.Script
+      self.script += TagForm.Script
       if self.auto_id.data:
         self.id.render_kw = {'readonly': True}
         self.id.data = 'auto_generated'
+      self.type.choices = self.egc_data.pgto_choices() +\
+                          [("custom", "Custom Group Type")]
 
   @classmethod
   def from_record(cls, form, record, **kwargs):
@@ -33,6 +57,9 @@ class GroupForm(Form):
         "type": record["type"],
         "definition": record["definition"],
     }
+    if form_data["type"] not in kwargs['egc_data'].pgto_types():
+        form_data["custom_type"] = form_data["type"]
+        form_data["type"] = "custom"
     TagForm.add_tags_to_form_data(record, form_data)
     kwargs["data"] = form_data
     return cls(form, **kwargs)
@@ -53,6 +80,10 @@ class GroupForm(Form):
   def validate_tags(self, field):
     TagForm.tags_validator(field)
 
+  def validate_type(self, field):
+      if field.data == "custom" and not self.custom_type.data:
+          raise validators.ValidationError("Please enter a custom group type")
+
   def to_record(form):
     record_data = {
         "record_type": "G",
@@ -61,5 +92,7 @@ class GroupForm(Form):
         "type": form.type.data,
         "definition": form.definition.data,
     }
+    if form.type.data == "custom":
+        record_data["type"] = form.custom_type.data
     TagForm.add_tags_from_form(form, record_data)
     return record_data
