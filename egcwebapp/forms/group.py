@@ -12,8 +12,7 @@ class GroupForm(Form):
     validators.DataRequired()])
   type = SelectField('Group Type', [validators.DataRequired()],
       choices=[], coerce=str)
-  custom_type = StringField('Custom Group Type',
-      [validators.Length(min=1, max=50)])
+  custom_type = StringField('Custom Group Type')
   definition = StringField('Group Definition', [validators.Length(min=1),
     validators.DataRequired()])
   tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
@@ -63,6 +62,19 @@ class GroupForm(Form):
     TagForm.add_tags_to_form_data(record, form_data)
     kwargs["data"] = form_data
     return cls(form, **kwargs)
+
+  def validate_definition(self, field):
+    if self.type.data == "combined" or \
+        self.type.data == "inverted":
+      try:
+        group_names = self.egc_data.get_lexpr_ids(field.data)
+        for name in group_names:
+          if not self.egc_data.id_exists(name):
+            raise validators.ValidationError(
+                "Group '{}' does not exist".format(name))
+      except Exception as e:
+        raise validators.ValidationError(str(e))
+    return True
 
   def validate_id(self, field):
     if self.auto_id.data:
