@@ -61,6 +61,13 @@ class UnitForm(Form):
         self.id.render_kw = {'readonly': True}
         self.id.data = 'auto_generated'
 
+  def validate_definition(self, field):
+    if self.type.data == "set!:arrangement":
+      if not self.egc_data.validate_fardes(field.data):
+        raise validators.ValidationError(\
+            'Invalid arrangement definition format')
+    return True
+
   def validate_id(self, field):
     if self.auto_id.data:
       return True
