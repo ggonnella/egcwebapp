@@ -1,17 +1,41 @@
-from wtforms import Form, StringField, validators, \
+from wtforms import Form, StringField, validators, SelectField, \
                     FieldList, FormField, BooleanField
 from .tag import TagForm
 from egctools import id_generator
+
+
+class InlineSelectField(SelectField):
+    def __init__(self, label=None, validators=None, **kwargs):
+        super(InlineSelectField, self).__init__(label, validators, **kwargs)
+        self.inline = True
+
+class InlineStringField(StringField):
+    def __init__(self, label=None, validators=None, **kwargs):
+        super(InlineStringField, self).__init__(label, validators, **kwargs)
+        self.inline = True
 
 class UnitForm(Form):
   id = StringField('Record ID', [validators.Length(min=1, max=50),
                                validators.Regexp('[a-zA-Z0-9_]+'),
                                validators.DataRequired()])
   auto_id = BooleanField('Auto-generate ID', default=False)
-  type = StringField('Type', validators=[validators.DataRequired()])
-  definition = StringField('Definition', validators = [validators.DataRequired()])
+  type = InlineStringField('Type', validators=[
+        validators.DataRequired(), validators.Regexp('[a-zA-Z0-9_]+')],
+      render_kw={"style": "display: inline-block; "+\
+                          "width: 32%; margin-right: 5px;"})
+  kind = InlineSelectField('Type Kind', choices=[('category', 'Category'),
+    ('single', 'Single'), ('multiple', 'Multiple'), ('named_set', 'Named Set'),
+    ('defined_set', 'Defined Set')],
+      render_kw={"style": "display: inline-block; "+\
+                          "width: 12%; margin-right: 5px;"})
+  resource = InlineStringField('Type Resource ID',
+      render_kw={"style": "display: inline-block; width: 31%; "+\
+                          "margin-bottom:20px;"})
+  definition = StringField('Definition',
+      validators = [validators.DataRequired()])
   symbol = StringField('Symbol', validators=[validators.DataRequired()])
-  description = StringField('Description', validators=[validators.DataRequired()])
+  description = StringField('Description',
+      validators=[validators.DataRequired()])
   tags = FieldList(FormField(TagForm), min_entries=1, label="Tags")
   comment = StringField('Comment')
 
@@ -24,6 +48,16 @@ class UnitForm(Form):
         "symbol": form.symbol.data,
         "description": form.description.data
     }
+    if form.kind.data == "named_set":
+      record_data["type"] = f"set:{form.type.data}"
+    elif form.kind.data == "category":
+      record_data["type"] = f"*{form.type.data}"
+    elif form.kind.data == "multiple":
+      record_data["type"] = f"set:+{form.type.data}"
+    elif form.kind.data == "defined_set":
+      record_data["type"] = f"set!:{form.type.data}"
+    if form.resource.data:
+      record_data["type"] = f"{record_data['type']}:{form.resource.data}"
     TagForm.add_tags_from_form(form, record_data)
     return record_data
 
@@ -36,6 +70,22 @@ class UnitForm(Form):
         "symbol": record["symbol"],
         "description": record["description"]
     }
+    if form_data["type"].startswith("set:+"):
+      form_data["kind"] = "multiple"
+      form_data["type"] = form_data["type"][5:]
+    elif form_data["type"].startswith("set!:"):
+      form_data["kind"] = "defined_set"
+      form_data["type"] = form_data["type"][5:]
+    elif form_data["type"].startswith("set:"):
+      form_data["kind"] = "named_set"
+      form_data["type"] = form_data["type"][4:]
+    elif form_data["type"].startswith("*"):
+      form_data["kind"] = "category"
+      form_data["type"] = form_data["type"][1:]
+    else:
+      form_data["kind"] = "single"
+    if ":" in form_data["type"]:
+      form_data["type"], form_data["resource"] = form_data["type"].split(":", 1)
     TagForm.add_tags_to_form_data(record, form_data)
     kwargs["data"] = form_data
     return cls(form, **kwargs)

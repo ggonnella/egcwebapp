@@ -59,11 +59,10 @@
     <br/>
     <br/>
   {% elif field.name != "auto_id" %}
-    <div id="{{field.id}}-wrapper">
+    {% if field.inline %}<span{% else %}<div{% endif %} id="{{field.id}}-wrapper">
       {{ field.label }} {{ field(class_="form-control " + field.id + '-field ' + (' has-error' if field.errors else '') ) }}
       {% include 'field_error.html' %}
-      <br/>
-    </div>
+    {% if field.inline %}</span>{% else %}<br/></div>{% endif %}
   {% endif %}
 {% endfor %}
 <br/>
