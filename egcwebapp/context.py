@@ -62,7 +62,7 @@ def column_context_processors():
 
     def unit_symbol(record):
       if record['type'] in ["specific_gene", "specific_protein",
-                         "function", "set:protein_complex"]:
+                            "ctg:function", "set:protein_complex"]:
         if record['symbol'] == ".":
           return record['symbol']
         symq = urllib.parse.quote(record['symbol'], safe='')
@@ -75,7 +75,7 @@ def column_context_processors():
       unit_type = record['type']
       description = record['description']
       if unit_type in ["specific_gene", "specific_protein",
-                       "function", "set:protein_complex"]:
+                       "ctg:function", "set:protein_complex"]:
         if description == ".":
           return description
         desq = description.replace("[", "(").replace("]", ")")
@@ -129,29 +129,30 @@ def column_context_processors():
         definition = record['definition']
         if definition == ".":
           return definition
-        if unit_type == 'family_or_domain:InterPro':
+        if unit_type == 'ctg:family_or_domain:InterPro':
           return link_external_resource('InterPro', definition)
-        elif unit_type == 'family_or_domain:TC':
+        elif unit_type == 'ctg:family_or_domain:TC':
           return link_external_resource('TC', definition)
-        elif unit_type == 'family_or_domain:Pfam':
+        elif unit_type == 'ctg:family_or_domain:Pfam':
           return link_external_resource('Pfam', definition)
-        elif unit_type == 'family_or_domain:Pfam_clan':
+        elif unit_type == 'ctg:family_or_domain:Pfam_clan':
           return link_external_resource('Pfam_clan', definition)
-        elif unit_type == 'family_or_domain:CDD':
+        elif unit_type == 'ctg:family_or_domain:CDD':
           return link_external_resource('CDD', definition)
-        elif unit_type == 'function:EC':
+        elif unit_type == 'ctg:function:EC':
           return link_external_resource('EC', definition)
-        elif unit_type == 'function:BRENDA_EC':
+        elif unit_type == 'ctg:function:BRENDA_EC':
           return link_external_resource('BRENDA_EC', definition)
-        elif unit_type == 'function:GO':
+        elif unit_type == 'ctg:function:GO':
           return link_external_resource('GO', definition)
-        elif unit_type == 'ortholog_groups_category:COG_category':
+        elif unit_type == 'ctg:ortholog_groups_category:COG_category':
           return link_external_resource('COG_category', definition)
-        elif unit_type == 'ortholog_group:COG':
+        elif unit_type == 'ctg:ortholog_group:COG':
           return link_external_resource('COG', definition)
-        elif unit_type == 'ortholog_group:arCOG':
+        elif unit_type == 'ctg:ortholog_group:arCOG':
           return link_external_resource('arCOG', definition)
-        elif (unit_type == 'feature_type' or unit_type == 'amino_acid') and \
+        elif (unit_type == 'ctg:feature_type' or \
+              unit_type == 'amino_acid') and \
             definition.startswith('SO:'):
           return link_external_resource('SO', definition[3:], definition)
         elif unit_type == 'set:metabolic_pathway' \
@@ -161,10 +162,12 @@ def column_context_processors():
         if m:
           return "ref:" + link_external_resource(m.group(1), m.group(2),
               definition[4:])
-        if unit_type.startswith("set:+"):
+        if unit_type.startswith("set:+") or \
+           unit_type.startswith("cat:+"):
           definition_parts = definition.split(",")
+          pfx = unit_type[:4]
           output_parts = [unit_definition({'id': unit_id,
-              'type': "set:" + unit_type[5:],
+              'type': pfx + unit_type[5:],
               "definition": part}, in_tooltip, ancestor_ids) \
                   for part in definition_parts]
           return ",".join(output_parts)
@@ -183,7 +186,7 @@ def column_context_processors():
                   m = re.match(r'^([a-zA-Z0-9_]+)$', part)
                   if m:
                       rel_units.append(m.group(1))
-          elif unit_type.startswith('*') or unit_type.startswith('set!:'):
+          elif unit_type.startswith('cat!:') or unit_type.startswith('set!:'):
               rel_units = re.findall(r"[a-zA-Z0-9_]+", definition)
           elif definition.startswith('derived:'):
               m = re.match(r'^derived:([a-zA-Z0-9_]+):.*', definition)

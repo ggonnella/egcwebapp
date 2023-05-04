@@ -23,12 +23,21 @@ class UnitForm(Form):
         validators.DataRequired(), validators.Regexp('[a-zA-Z0-9_]+')],
       render_kw={"style": "display: inline-block; "+\
                           "width: 32%; margin-right: 5px;"})
-  kind = InlineSelectField('Type Kind', choices=[('category', 'Category'),
-    ('single', 'Single'), ('multiple', 'Multiple'), ('named_set', 'Named Set'),
-    ('defined_set', 'Defined Set')],
+  kind = InlineSelectField('Kind', choices=[
+    ('single', 'Single'),
+    ('cat', 'Category (ctg:)'),
+    ('cat_enum', 'Category with members enumeration (ctg!:)'),
+    ('mcat', 'Generic category of multiple units (ctg:+)'),
+    ('mcat_enum',
+      'Generic category of multiple units with members enumeration (ctg!:+)'),
+    ('set', 'Set (set:)'),
+    ('set_enum', 'Set with members enumeration (set!:)'),
+    ('mset', 'Generic set of multiple units (set:+)'),
+    ('mset_enum',
+      'Generic set of multiple units with members enumeration (set!:+)')],
       render_kw={"style": "display: inline-block; "+\
-                          "width: 12%; margin-right: 5px;"})
-  resource = InlineStringField('Type Resource ID',
+                          "width: 18%; margin-right: 5px;"})
+  resource = InlineStringField('Resource ID',
       render_kw={"style": "display: inline-block; width: 31%; "+\
                           "margin-bottom:20px;"})
   definition = StringField('Definition',
@@ -48,14 +57,22 @@ class UnitForm(Form):
         "symbol": form.symbol.data,
         "description": form.description.data
     }
-    if form.kind.data == "named_set":
+    if form.kind.data == "set":
       record_data["type"] = f"set:{form.type.data}"
-    elif form.kind.data == "category":
-      record_data["type"] = f"*{form.type.data}"
-    elif form.kind.data == "multiple":
+    elif form.kind.data == "cat":
+      record_data["type"] = f"ctg:{form.type.data}"
+    elif form.kind.data == "mset":
       record_data["type"] = f"set:+{form.type.data}"
-    elif form.kind.data == "defined_set":
+    elif form.kind.data == "mcat":
+      record_data["type"] = f"ctg:+{form.type.data}"
+    elif form.kind.data == "set_enum":
       record_data["type"] = f"set!:{form.type.data}"
+    elif form.kind.data == "cat_enum":
+      record_data["type"] = f"ctg!:{form.type.data}"
+    elif form.kind.data == "mset_enum":
+      record_data["type"] = f"set!:+{form.type.data}"
+    elif form.kind.data == "mcat_enum":
+      record_data["type"] = f"ctg!:+{form.type.data}"
     if form.resource.data:
       record_data["type"] = f"{record_data['type']}:{form.resource.data}"
     TagForm.add_tags_from_form(form, record_data)
@@ -71,17 +88,29 @@ class UnitForm(Form):
         "description": record["description"]
     }
     if form_data["type"].startswith("set:+"):
-      form_data["kind"] = "multiple"
+      form_data["kind"] = "mset"
       form_data["type"] = form_data["type"][5:]
     elif form_data["type"].startswith("set!:"):
-      form_data["kind"] = "defined_set"
+      form_data["kind"] = "set_enum"
+      form_data["type"] = form_data["type"][5:]
+    elif form_data["type"].startswith("set!:+"):
+      form_data["kind"] = "mset_enum"
       form_data["type"] = form_data["type"][5:]
     elif form_data["type"].startswith("set:"):
-      form_data["kind"] = "named_set"
+      form_data["kind"] = "set"
       form_data["type"] = form_data["type"][4:]
-    elif form_data["type"].startswith("*"):
-      form_data["kind"] = "category"
-      form_data["type"] = form_data["type"][1:]
+    elif form_data["type"].startswith("ctg:+"):
+      form_data["kind"] = "mcat"
+      form_data["type"] = form_data["type"][5:]
+    elif form_data["type"].startswith("ctg!:"):
+      form_data["kind"] = "cat_enum"
+      form_data["type"] = form_data["type"][5:]
+    elif form_data["type"].startswith("ctg!:+"):
+      form_data["kind"] = "mcat_enum"
+      form_data["type"] = form_data["type"][5:]
+    elif form_data["type"].startswith("ctg:"):
+      form_data["kind"] = "cat"
+      form_data["type"] = form_data["type"][4:]
     else:
       form_data["kind"] = "single"
     if ":" in form_data["type"]:
