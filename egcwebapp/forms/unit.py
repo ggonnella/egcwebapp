@@ -128,10 +128,16 @@ class UnitForm(Form):
       self.multi.data = kwargs["data"]["multi"]
 
   def validate_definition(self, field):
-    if self.base_type.data == "arrangement" and self.enumerating.data:
-      if not self.egc_data.validate_fardes(field.data):
-        raise validators.ValidationError(\
-            'Invalid arrangement definition format')
+    if self.enumerating.raw_data:
+      if self.base_type.data == "arrangement":
+        if not self.egc_data.validate_fardes(field.data):
+          raise validators.ValidationError(\
+              'Invalid arrangement definition format')
+      else:
+        for unit_id in field.data.split(","):
+          if not self.egc_data.id_exists(unit_id):
+            raise validators.ValidationError(\
+                'Unit ID {} does not exist'.format(unit_id))
     return True
 
   def validate_id(self, field):
