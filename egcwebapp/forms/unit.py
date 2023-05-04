@@ -14,31 +14,36 @@ class InlineStringField(StringField):
         super(InlineStringField, self).__init__(label, validators, **kwargs)
         self.inline = True
 
+class InlineBooleanField(BooleanField):
+    def __init__(self, label=None, validators=None, **kwargs):
+        super(InlineBooleanField, self).__init__(label, validators, **kwargs)
+        self.type = "BooleanField"
+        self.inline = True
+
 class UnitForm(Form):
   id = StringField('Record ID', [validators.Length(min=1, max=50),
                                validators.Regexp('[a-zA-Z0-9_]+'),
                                validators.DataRequired()])
   auto_id = BooleanField('Auto-generate ID', default=False)
-  type = InlineStringField('Type', validators=[
+  kind = InlineSelectField('Type Kind', choices=[
+    ('simple', 'Simple'),
+    ('category', 'Category'),
+    ('set', 'Set')],
+      render_kw={"style": "display: inline-block; "+\
+                          "width: 10%; margin-right: 5px;"},
+    default='simple')
+  base_type = InlineStringField('Type', validators=[
         validators.DataRequired(), validators.Regexp('[a-zA-Z0-9_]+')],
       render_kw={"style": "display: inline-block; "+\
-                          "width: 32%; margin-right: 5px;"})
-  kind = InlineSelectField('Kind', choices=[
-    ('single', 'Single'),
-    ('cat', 'Category (ctg:)'),
-    ('cat_enum', 'Category with members enumeration (ctg!:)'),
-    ('mcat', 'Generic category of multiple units (ctg:+)'),
-    ('mcat_enum',
-      'Generic category of multiple units with members enumeration (ctg!:+)'),
-    ('set', 'Set (set:)'),
-    ('set_enum', 'Set with members enumeration (set!:)'),
-    ('mset', 'Generic set of multiple units (set:+)'),
-    ('mset_enum',
-      'Generic set of multiple units with members enumeration (set!:+)')],
-      render_kw={"style": "display: inline-block; "+\
-                          "width: 18%; margin-right: 5px;"})
+                          "width: 20%; margin-right: 4px;"})
+  enumerating = InlineBooleanField('Enumerating',
+      render_kw={"style": "display: inline-block; vertical-align: middle; "+\
+                          "width: 2%; margin-right: 4px;"})
+  multi = InlineBooleanField('Composed',
+      render_kw={"style": "display: inline-block; vertical-align: middle; "+\
+                          "width: 2%; margin-right: 4px;"})
   resource = InlineStringField('Resource ID',
-      render_kw={"style": "display: inline-block; width: 31%; "+\
+      render_kw={"style": "display: inline-block; width: 20%; "+\
                           "margin-bottom:20px;"})
   definition = StringField('Definition',
       validators = [validators.DataRequired()])
@@ -49,32 +54,24 @@ class UnitForm(Form):
   comment = StringField('Comment')
 
   def to_record(form):
+    form.enumerating.data = True if form.enumerating.raw_data else False
+    form.multi.data = True if form.multi.raw_data else False
     record_data = {
         "record_type": "U",
         "id": form.id.data,
-        "type": form.type.data,
+        "type":
+          {
+            "kind": form.kind.data,
+            "base_type": form.base_type.data,
+            "enumerating": form.enumerating.data,
+            "multi": form.multi.data,
+          },
         "definition": form.definition.data,
         "symbol": form.symbol.data,
         "description": form.description.data
     }
-    if form.kind.data == "set":
-      record_data["type"] = f"set:{form.type.data}"
-    elif form.kind.data == "cat":
-      record_data["type"] = f"ctg:{form.type.data}"
-    elif form.kind.data == "mset":
-      record_data["type"] = f"set:+{form.type.data}"
-    elif form.kind.data == "mcat":
-      record_data["type"] = f"ctg:+{form.type.data}"
-    elif form.kind.data == "set_enum":
-      record_data["type"] = f"set!:{form.type.data}"
-    elif form.kind.data == "cat_enum":
-      record_data["type"] = f"ctg!:{form.type.data}"
-    elif form.kind.data == "mset_enum":
-      record_data["type"] = f"set!:+{form.type.data}"
-    elif form.kind.data == "mcat_enum":
-      record_data["type"] = f"ctg!:+{form.type.data}"
     if form.resource.data:
-      record_data["type"] = f"{record_data['type']}:{form.resource.data}"
+      record_data["type"]["resource"] = form.resource.data
     TagForm.add_tags_from_form(form, record_data)
     return record_data
 
@@ -82,42 +79,30 @@ class UnitForm(Form):
   def from_record(cls, form, record, **kwargs):
     form_data = {
         "id": record["id"],
-        "type": record["type"],
+        "base_type": record["type"]["base_type"],
+        "kind": record["type"]["kind"],
+        "enumerating": record["type"]["enumerating"],
+        "multi": record["type"]["multi"],
+        "resource": record["type"].get("resource", ""),
         "definition": record["definition"],
         "symbol": record["symbol"],
         "description": record["description"]
     }
-    if form_data["type"].startswith("set:+"):
-      form_data["kind"] = "mset"
-      form_data["type"] = form_data["type"][5:]
-    elif form_data["type"].startswith("set!:"):
-      form_data["kind"] = "set_enum"
-      form_data["type"] = form_data["type"][5:]
-    elif form_data["type"].startswith("set!:+"):
-      form_data["kind"] = "mset_enum"
-      form_data["type"] = form_data["type"][5:]
-    elif form_data["type"].startswith("set:"):
-      form_data["kind"] = "set"
-      form_data["type"] = form_data["type"][4:]
-    elif form_data["type"].startswith("ctg:+"):
-      form_data["kind"] = "mcat"
-      form_data["type"] = form_data["type"][5:]
-    elif form_data["type"].startswith("ctg!:"):
-      form_data["kind"] = "cat_enum"
-      form_data["type"] = form_data["type"][5:]
-    elif form_data["type"].startswith("ctg!:+"):
-      form_data["kind"] = "mcat_enum"
-      form_data["type"] = form_data["type"][5:]
-    elif form_data["type"].startswith("ctg:"):
-      form_data["kind"] = "cat"
-      form_data["type"] = form_data["type"][4:]
-    else:
-      form_data["kind"] = "single"
-    if ":" in form_data["type"]:
-      form_data["type"], form_data["resource"] = form_data["type"].split(":", 1)
     TagForm.add_tags_to_form_data(record, form_data)
     kwargs["data"] = form_data
     return cls(form, **kwargs)
+
+  def validate_enumerating(self, field):
+    if self.enumerating.raw_data:
+      if self.kind.data == "simple":
+        raise validators.ValidationError(\
+            'Enumerating is not allowed for simple units')
+
+  def validate_multi(self, field):
+    if self.multi.raw_data:
+      if self.kind.data == "simple":
+        raise validators.ValidationError(\
+            'The multi flag is not allowed for simple units')
 
   def validate(self):
     if not super().validate():
@@ -139,9 +124,11 @@ class UnitForm(Form):
       if self.auto_id.data:
         self.id.render_kw = {'readonly': True}
         self.id.data = 'auto_generated'
+      self.enumerating.data = kwargs["data"]["enumerating"]
+      self.multi.data = kwargs["data"]["multi"]
 
   def validate_definition(self, field):
-    if self.type.data == "set!:arrangement":
+    if self.base_type.data == "arrangement" and self.enumerating.data:
       if not self.egc_data.validate_fardes(field.data):
         raise validators.ValidationError(\
             'Invalid arrangement definition format')
@@ -158,7 +145,7 @@ class UnitForm(Form):
   def auto_generate_id(self):
     if self.auto_id.data:
       self.id.data = id_generator.generate_U_id(\
-          self.egc_data, self.type.data, self.symbol.data,
+          self.egc_data, self.base_type.data, self.symbol.data,
           self.definition.data, self.description.data, self.old_id)
 
   def validate_tags(self, field):

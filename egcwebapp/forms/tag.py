@@ -123,7 +123,7 @@ class TagForm(Form):
     def add_tags_from_form(form, record_data):
       record_data["tags"] = {}
       for tag in form.tags.data:
-        if tag != '' and tag["tagname"] != '':
+        if tag and tag["tagname"]:
           record_data["tags"][tag["tagname"]] = \
               {"value": tag["tagvalue"], "type": tag["tagtype"]}
       if len(record_data["tags"]) == 0:
@@ -133,14 +133,16 @@ class TagForm(Form):
 
     @staticmethod
     def add_tags_to_form_data(record, form_data):
+      form_data["tags"] = []
       if "tags" in record:
-        form_data["tags"] = []
         for tag_name, tag_type_value in record["tags"].items():
-          form_data["tags"].append({
-            "tagname": tag_name,
-            "tagtype": tag_type_value["type"],
-            "tagvalue": tag_type_value["value"]
-          })
+            form_data["tags"].append({
+              "tagname": tag_name,
+              "tagtype": tag_type_value["type"],
+              "tagvalue": tag_type_value["value"]
+            })
       if "comment" in record and record["comment"]:
         form_data["comment"] = record["comment"]
+      else:
+        form_data["comment"] = ""
 

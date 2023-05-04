@@ -24,7 +24,10 @@ record_kind_info = {
              "record_types": ['U'],
              "table_columns": [
                ('id', "ID"),
-               ("type", "Type"),
+               ("kind", "Type Kind"),
+               ("base_type", "Base Type"),
+               ("enumerating", "Enum."),
+               ("multi", "Multi"),
                ("definition", "Definition"),
                ("symbol", "Symbol"),
                ("description", "Description"),

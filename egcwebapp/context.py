@@ -61,8 +61,8 @@ def column_context_processors():
         return record['model_id']
 
     def unit_symbol(record):
-      if record['type'] in ["specific_gene", "specific_protein",
-                            "ctg:function", "set:protein_complex"]:
+      if record['type']["base_type"] in ["specific_gene", "specific_protein",
+                                         "function", "protein_complex"]:
         if record['symbol'] == ".":
           return record['symbol']
         symq = urllib.parse.quote(record['symbol'], safe='')
@@ -72,10 +72,10 @@ def column_context_processors():
         return record['symbol']
 
     def unit_description(record):
-      unit_type = record['type']
+      unit_type = record['type']['base_type']
       description = record['description']
       if unit_type in ["specific_gene", "specific_protein",
-                       "ctg:function", "set:protein_complex"]:
+                       "function", "protein_complex"]:
         if description == ".":
           return description
         desq = description.replace("[", "(").replace("]", ")")
@@ -125,49 +125,37 @@ def column_context_processors():
 
     def unit_definition(record, in_tooltip, ancestor_ids):
         unit_id = record['id']
-        unit_type = record['type']
+        base_type = record['type']['base_type']
+        kind = record['type']['kind']
+        resource = record['type'].get('resource', None)
+        enumerating = record['type']['enumerating']
+        multi = record['type']['multi']
         definition = record['definition']
         if definition == ".":
           return definition
-        if unit_type == 'ctg:family_or_domain:InterPro':
-          return link_external_resource('InterPro', definition)
-        elif unit_type == 'ctg:family_or_domain:TC':
-          return link_external_resource('TC', definition)
-        elif unit_type == 'ctg:family_or_domain:Pfam':
-          return link_external_resource('Pfam', definition)
-        elif unit_type == 'ctg:family_or_domain:Pfam_clan':
-          return link_external_resource('Pfam_clan', definition)
-        elif unit_type == 'ctg:family_or_domain:CDD':
-          return link_external_resource('CDD', definition)
-        elif unit_type == 'ctg:function:EC':
-          return link_external_resource('EC', definition)
-        elif unit_type == 'ctg:function:BRENDA_EC':
-          return link_external_resource('BRENDA_EC', definition)
-        elif unit_type == 'ctg:function:GO':
-          return link_external_resource('GO', definition)
-        elif unit_type == 'ctg:ortholog_groups_category:COG_category':
-          return link_external_resource('COG_category', definition)
-        elif unit_type == 'ctg:ortholog_group:COG':
-          return link_external_resource('COG', definition)
-        elif unit_type == 'ctg:ortholog_group:arCOG':
-          return link_external_resource('arCOG', definition)
-        elif (unit_type == 'ctg:feature_type' or \
-              unit_type == 'amino_acid') and \
-            definition.startswith('SO:'):
-          return link_external_resource('SO', definition[3:], definition)
-        elif unit_type == 'set:metabolic_pathway' \
-            and definition.startswith('KEGG:'):
-          return link_external_resource('KEGG', definition[5:], definition)
+        if kind == "category":
+          if base_type in ['family_or_domain', 'function', 'ortholog_group',
+                           'ortholog_group_category']:
+            if resource in ['InterPro', 'Pfam', 'TC', 'Pfam_clan', 'CDD',
+                            'EC', 'BRENDA_EC', 'GO', 'COG', 'COG_category',
+                            'arCOG']:
+              return link_external_resource(resource, definition)
+        elif not enumerating:
+          if base_type in ['feature_type', 'amino_acid'] \
+              and definition.startswith('SO:'):
+            return link_external_resource('SO', definition[3:], definition)
+          elif base_type == 'metabolic_pathway' \
+              and definition.startswith('KEGG:'):
+            return link_external_resource('KEGG', definition[5:], definition)
         m = re.match(r"^ref:(.+):(.*)$", definition)
         if m:
           return "ref:" + link_external_resource(m.group(1), m.group(2),
               definition[4:])
-        if unit_type.startswith("set:+") or \
-           unit_type.startswith("cat:+"):
+        if not enumerating and multi:
           definition_parts = definition.split(",")
-          pfx = unit_type[:4]
           output_parts = [unit_definition({'id': unit_id,
-              'type': pfx + unit_type[5:],
+              'type': {"base_type": base_type, "multi": False,
+                       "kind": "simple", "enumerating": False},
               "definition": part}, in_tooltip, ancestor_ids) \
                   for part in definition_parts]
           return ",".join(output_parts)
@@ -175,19 +163,19 @@ def column_context_processors():
         output = []
         for definition in definition_pieces:
           rel_units = []
-          if unit_type.startswith('homolog_'):
+          if base_type.startswith('homolog_'):
               m = re.match(r'^homolog:([a-zA-Z0-9_]+)', definition)
               if m:
                   rel_units = [m.group(1)]
-          elif unit_type == 'set!:arrangement':
+          elif base_type == 'arrangement' and enumerating:
               parts = definition.split(',')
               rel_units = []
               for part in parts:
                   m = re.match(r'^([a-zA-Z0-9_]+)$', part)
                   if m:
                       rel_units.append(m.group(1))
-          elif unit_type.startswith('cat!:') or unit_type.startswith('set!:'):
-              rel_units = re.findall(r"[a-zA-Z0-9_]+", definition)
+          elif enumerating:
+            rel_units = re.findall(r"[a-zA-Z0-9_]+", definition)
           elif definition.startswith('derived:'):
               m = re.match(r'^derived:([a-zA-Z0-9_]+):.*', definition)
               if m:
