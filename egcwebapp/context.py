@@ -163,7 +163,7 @@ def column_context_processors():
         output = []
         for definition in definition_pieces:
           rel_units = []
-          if base_type.startswith('homolog_'):
+          if base_type.endswith('_homologs'):
               m = re.match(r'^homolog:([a-zA-Z0-9_]+)', definition)
               if m:
                   rel_units = [m.group(1)]
