@@ -85,7 +85,7 @@
 
       <div class="topnav">
         <a href="#" onclick="loadFile()">Load</a>
-        <a href="#" onclick="saveFile(event)">Save</a>
+        {% if mode == 'rw' %} <a href="#" onclick="saveFile(event)">Save</a> {% endif %}
         {% for item in nav.top %}
           <a href="{{ item.url }}" class="{{ 'active' if item.is_active else '' }}">{{ item.label }}</a>
         {% endfor %}

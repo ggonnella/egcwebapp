@@ -3,10 +3,10 @@
 {% block content %}
   <h1>{{info.title}}s
     {% include 'filename.html' %}
-    <span style="float: right">
+    {% if mode == 'rw' %}<span style="float: right">
       <a href="{{ url_for('create_'+record_kind) }}"
          class="btn btn-primary create">New Record</a>
-    </span>
+    </span>{% endif %}
   </h1>
   {% set main=True %}
   {% include 'datatable.html' %}

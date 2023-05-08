@@ -20,6 +20,11 @@ def create_app():
     app.debug = True
     this_dir = Path(__file__).parent
     app.egc_data = EGCData.from_file(str(this_dir.parent / "development.egc"))
+  app.config['MODE'] = os.environ.get('EGCWEBAPP_MODE') or 'rw'
+
+  @app.context_processor
+  def inject_mode():
+      return dict(mode=app.config["MODE"])
 
   @app.template_filter()
   def basename(path):
@@ -63,13 +68,14 @@ def create_app():
               return func(*args, **kwargs)
       return wrapper
 
-  @app.route('/save_egc_file')
-  @require_egc_data
-  def save_egc_file():
-      return send_from_directory(
-          app.config['UPLOAD_FOLDER'],
-          os.path.basename(app.egc_data.file_path),
-          mimetype='application/egc')
+  if app.config["MODE"] == "rw":
+    @app.route('/save_egc_file')
+    @require_egc_data
+    def save_egc_file():
+        return send_from_directory(
+            app.config['UPLOAD_FOLDER'],
+            os.path.basename(app.egc_data.file_path),
+            mimetype='application/egc')
 
   @app.route('/process_egc_data', methods=['POST'])
   def process_egc_data():
@@ -333,15 +339,16 @@ def create_app():
 
   for record_kind in record_kinds:
       list_route(record_kind)
-      create_route(record_kind)
-      edit_record_route(record_kind)
-      edit_record_api_route(record_kind)
-      update_record_api_route(record_kind)
-      copy_record_api_route(record_kind)
-      delete_record_route(record_kind)
       show_record_route(record_kind)
       get_record_route(record_kind)
       get_ref_route(record_kind)
+      if app.config["MODE"] == "rw":
+        create_route(record_kind)
+        edit_record_route(record_kind)
+        edit_record_api_route(record_kind)
+        update_record_api_route(record_kind)
+        copy_record_api_route(record_kind)
+        delete_record_route(record_kind)
       for ref_from_kind in record_kind_info[record_kind]["ref_by_kinds"]:
           get_refby_route(record_kind, ref_from_kind)
 

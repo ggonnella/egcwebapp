@@ -1,5 +1,5 @@
 <span class="related_link">
-  <a href="#" id='edit-record-{{record_id}}'
+  {% if mode == 'rw' %} <a href="#" id='edit-record-{{record_id}}'
      data-record-id='{{record_id}}'
      data-record-kind='{{record_kind}}'
      data-colspan='{{nested_colspan+1}}'
@@ -13,7 +13,7 @@
     &nbsp;<button type="submit" class="btn btn-link" style="padding: 0; border: 0;"
       {% if egc_data.is_ref_by(record_id) %}disabled{% endif %}>
       <i class="fas fa-trash"></i>
-    </button>
+    </button> {% endif %}
   </form>{% if not in_tooltip %}<span
     class="egc-tooltip"
     data-content='<div class="egcline">{{
