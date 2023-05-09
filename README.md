@@ -3,13 +3,23 @@ the information contained in EGC files.
 
 # Starting the application
 
-To start the application, clone the repository and run:
+To start the application, clone the repository, change to
+the main directory of it,
+and run:
 ```
-python3 egcwebapp/app.py
+pip install -r requirements.txt  # install necessary dependencies
+python3 egcwebapp/app.py         # start the application server
 ```
 
-from the main repository.
-Set ``EGCWEBAPP_MODE`` to any value different from ``rw`` to disable editing.
+Leave the console open with the server running,
+and enter the address mentioned in the console
+in a web browser (e.g. http://127.0.0.1:5000).
+
+By default the application is opened in read-write mode.
+To disable editing, enter this before the python3 command:
+```
+export EGCWEBAPP_MODE="r"
+```
 
 # Using the application
 
@@ -51,3 +61,9 @@ TextFormats specification
 (https://github.com/ggonnella/egctools) is a Python library for
 handling the format and EGCWebapp is based on it.
 
+## Acknowledgements
+
+This project has been created in context of the DFG project GO 3192/1-1
+“Automated characterization of microbial genomes and metagenomes by collection
+and verification of association rules”. The funders had no role in study
+design, data collection and analysis.
