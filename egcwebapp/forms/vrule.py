@@ -1,4 +1,5 @@
-from wtforms import Form, StringField, validators, FieldList, FormField
+from wtforms import Form, StringField, validators, FieldList, FormField, \
+                    BooleanField
 from .tag import TagForm
 from .source import SourceForm
 from egctools import id_generator
@@ -6,6 +7,7 @@ from egctools import id_generator
 class VruleForm(Form):
     id = StringField('Expectation ID', [validators.Regexp('[a-zA-Z0-9_]+'),
       validators.DataRequired()])
+    auto_id = BooleanField('Auto-generate ID', default=False)
     sources = FieldList(FormField(SourceForm), min_entries=1, label="Sources")
     attribute = StringField('Attribute', [validators.Length(min=1),
       validators.DataRequired()])
