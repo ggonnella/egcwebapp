@@ -71,6 +71,8 @@ class UnitForm(Form):
         "description": form.description.data
     }
     if form.resource.data:
+      from icecream import ic
+      ic(form.resource.data)
       record_data["type"]["resource"] = form.resource.data
     TagForm.add_tags_from_form(form, record_data)
     return record_data

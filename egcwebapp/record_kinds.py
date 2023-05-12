@@ -26,6 +26,7 @@ record_kind_info = {
                ('id', "ID"),
                ("kind", "Type Kind"),
                ("base_type", "Base Type"),
+               ("resource", "Resource"),
                ("enumerating", "Enum."),
                ("multi", "Multi"),
                ("definition", "Definition"),
