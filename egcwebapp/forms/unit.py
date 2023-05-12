@@ -124,8 +124,9 @@ class UnitForm(Form):
       if self.auto_id.data:
         self.id.render_kw = {'readonly': True}
         self.id.data = 'auto_generated'
-      self.enumerating.data = kwargs["data"]["enumerating"]
-      self.multi.data = kwargs["data"]["multi"]
+      if "data" in kwargs:
+        self.enumerating.data = kwargs["data"]["enumerating"]
+        self.multi.data = kwargs["data"]["multi"]
 
   def validate_definition(self, field):
     if self.enumerating.raw_data:
